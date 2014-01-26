@@ -4,6 +4,8 @@ Created on Jan 17, 2014
 @author: Cristian
 '''
 
+#TODO: class LayerConnection, class FullConnection(LayerConnections), Layer.getConnections, flag propagate for fowardInput, backwardErrorDerivative, etc.
+
 cdef class Neuron: 
     cdef:
         public bint is_input
@@ -31,7 +33,7 @@ cdef class Neuron:
         self.incoming_connections = []
         
         self.incoming_connection_count = 0
-        self.outgoing_connection_count = 0;
+        self.outgoing_connection_count = 0
         
         
         
@@ -79,14 +81,17 @@ cdef class Neuron:
         if self.outgoing_connection_count > self.backward_counter:
             raise ValueError('Cycle Detected')
         if self.outgoing_connection_count == self.backward_counter:
-            self.backwardErrorPropagation()
+            self.propagateErrorBackwards()
         return 0
         
         
     cdef float activationFunctionDerivative(self, float weighted_sum ):
+        """
+        dy/dz where => y = f(z)
+        """
         return 1.0
     
-    cpdef int backwardErrorPropagation(self):
+    cpdef int propagateErrorBackwards(self):
         self.local_gradient = self.error_diff * self.activationFunctionDerivative(self.weighted_sum)
         
         cdef Connection connection
@@ -94,7 +99,7 @@ cdef class Neuron:
             connection.backwardErrorSignal( self.local_gradient )
         return 0
             
-    cpdef float errorFunction(self, float target):
+    cpdef float outputError(self, float target):
         return 0.5*( target - self.activation_state )**2
     
     cpdef int calculateErrorDerivative(self, float target):
@@ -218,7 +223,7 @@ cdef class Layer:
             Neuron neuron
             
         for neuron in self.neurons:
-            neuron.backwardErrorPropagation()
+            neuron.propagateErrorBackwards()
             
     cpdef calculateErrorDerivative(self, list target):
         cdef:
@@ -246,7 +251,7 @@ cdef class Layer:
             neuron = self.neurons[i]
             target = targets[i]
             neuron.calculateErrorDerivative(target)
-            neuron.backwardErrorPropagation()
+            neuron.propagateErrorBackwards()
         
         
     def __repr__(self):
