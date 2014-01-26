@@ -5,8 +5,8 @@ t1 = ti.time()
 from cybrain import LinearNeuron as N
 from cybrain import LinearConnection
 from cybrain import Layer
-a,b = N(is_input=True), N(is_output=True)
 
+a, b = N(is_input=True), N(is_output=True)
 
 c = LinearConnection(a, b)
 
