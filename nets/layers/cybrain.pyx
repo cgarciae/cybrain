@@ -75,53 +75,56 @@ cdef class Neuron(object):
         for connection in self.outgoing_connections:
             connection.forwardSignal( self.activation_state )
             
-    cdef public receiveErrorSignal(self, float some_local_gradient, float learning_rate  ):
+    cpdef int backwardErrorSignal(self, float some_local_gradient ):
         self.error_diff += some_local_gradient
         self.backward_counter += 1
         if self.outgoing_connection_count > self.backward_counter:
             raise ValueError('Cycle Detected')
         if self.outgoing_connection_count == self.backward_counter:
-            self.propagateErrorBackwards( learning_rate )
-
-
+            self.propagateErrorBackwards()
+        return 0
+        
+        
     cdef float activationFunctionDerivative(self, float weighted_sum ):
         """
-        dy/dz where : y = f(z)
+        dy/dz where => y = f(z)
         """
         return 1.0
-
-    cpdef propagateErrorBackwards(self, float learning_rate ):
+    
+    cpdef int propagateErrorBackwards(self):
         self.local_gradient = self.error_diff * self.activationFunctionDerivative(self.weighted_sum)
-
+        
         cdef Connection connection
         for connection in self.incoming_connections:
-            connection.backwardErrorSignal( self.local_gradient, learning_rate )
-
+            connection.backwardErrorSignal( self.local_gradient )
+        return 0
+            
     cpdef float outputError(self, float target):
         return 0.5*( target - self.activation_state )**2
-
-    cpdef errorDerivative(self, float target):
+    
+    cpdef int calculateErrorDerivative(self, float target):
         self.error_diff = self.activation_state - target
-
-
-    def clearAcumulators(self):
+        return 0
+        
+    
+    def clear(self):
         self.error_diff = 0.0
         self.weighted_sum = 0.0
-
+        
     def clearCounters(self):
         self.forward_counter = 0
         self.backward_counter = 0
-
+        
     def __repr__(self):
-        return "{}".format(self.activation_state)
-
-
+        return "{}".format(self.activation_state)   
+    
+        
 cdef class LinearNeuron(Neuron):
-
+    
     def __init__(self, is_input = False, is_output = False):
         Neuron.__init__(self, is_input, is_output)
-
-
+        
+        
 import random as rn
 
 cdef class Connection(object):
@@ -133,42 +136,45 @@ cdef class Connection(object):
         public Neuron destination
         public float weight
         public float weight_diff
-
-
+        
+        public int forwardSignal(self, float signal) 
+    
+    
     def __init__(self, Neuron source, Neuron destination, float weight = 0.0):
         self.source = source
         source.addOutgoingConnection( self )
-
+        
         self.destination = destination
         destination.addIncomingConnection( self )
-
-        self.weight = weight if weight else rn.uniform(-1,1)
+        
+        self.weight = weight if weight else rn.uniform(-1,1);
         self.weight_diff = 0.0
-
-    cdef public forwardSignal(self, float signal):
+        
+    cdef public int forwardSignal(self, float signal):
         self.fowardPropagation( self.weight * signal )
-
+        return 0
+        
     def fowardPropagation(self, float signal):
         self.destination.receiveSignal( signal )
-
-    def backwardErrorSignal( self, float local_gradient, float learning_rate ):
+        
+    def backwardErrorSignal( self, float local_gradient ):
         self.weight_diff += local_gradient * self.source.activation_state
-        self.backwardErrorPropagation( local_gradient, learning_rate )
-
-    def backwardErrorPropagation(self, float local_gradient, float learning_rate):
-        self.source.receiveErrorSignal( local_gradient, learning_rate )
-
+        self.backwardErrorPropagation( local_gradient )
+    
+    def backwardErrorPropagation(self, float local_gradient):
+        self.source.backwardErrorSignal( local_gradient )
+        
     def clear(self):
         self.weight_diff = 0.0
-
+        
     def __repr__(self):
         return "source: {}, destination: {}, weight: {}".format(self.source, self.destination, self.weight)
-
+        
 class LinearConnection(Connection):
-
+    
     def __init__(self, Neuron source, Neuron destination, float weight = 0.0):
         Connection.__init__(self, source, destination, weight)
-
+        
 
 
 
@@ -176,7 +182,7 @@ cdef class Layer(object):
     cdef:
         public list neurons
 
-    def __init__(self, list neurons = list() ):
+    def __init__(self, list neurons = [] ):
         self.neurons = []
         if neurons:
             self.addNeurons( neurons )
@@ -186,66 +192,66 @@ cdef class Layer(object):
         for neuron in neurons:
             self.neurons.append(neuron)
             neuron.layer = self
-
+        
     cpdef addNeuron( self, Neuron neuron ):
         self.neurons.append( neuron )
         neuron.layer = self
-
+        
     cpdef fowardPropagation(self):
         cdef:
             Neuron neuron
-
+            
         for neuron in self.neurons:
             neuron.propagateForward()
-
-    cpdef forwpropagateInput(self, list input_list):
+            
+    cpdef propagateInput(self, list input_list):
         cdef:
             Neuron neuron
             int i, N
-
+            
         N = len(input_list)
         if len(self.neurons) != N:
             raise ValueError("target list and neuron list don't have the same lenght")
-
+        
         for i in range(N):
             neuron = self.neurons[i]
             neuron.weighted_sum = input_list[i]
             neuron.propagateForward()
-
-    cpdef backwardErrorPropagation(self, float learing_rate ):
+            
+    cpdef backwardErrorPropagation(self):
         cdef:
             Neuron neuron
-
+            
         for neuron in self.neurons:
-            neuron.propagateErrorBackwards( learing_rate )
-
+            neuron.propagateErrorBackwards()
+            
     cpdef calculateErrorDerivative(self, list target):
         cdef:
             Neuron neuron
             int i, N
-
+            
         N = len(target)
         if len(self.neurons) != N:
             raise ValueError("target list and neuron list don't have the same lenght")
-
+        
         for i in range(N):
-            self.neurons[i].errorDerivative(target[i])
-
-    cpdef backpropagateError(self, list targets, bint learning_rate):
+            self.neurons[i].calculateErrorDerivative(target[i])
+            
+    cpdef propagateErrorDerivative(self, list targets):
         cdef:
             Neuron neuron
             int i, N
             float target
-
+            
         N = len(targets)
         if len(self.neurons) != N:
             raise ValueError("target list and neuron list don't have the same lenght")
-
+        
         for i in range(N):
             neuron = self.neurons[i]
             target = targets[i]
-            neuron.errorDerivative(target)
-            neuron.propagateErrorBackwards( learning_rate )
+            neuron.calculateErrorDerivative(target)
+            neuron.propagateErrorBackwards()
         
         
     def __repr__(self):

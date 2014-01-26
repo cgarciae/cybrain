@@ -20,8 +20,8 @@ Lout = Layer([b])
 
 for i in range(10):
     
-    Lin.forwpropagateInput([1.0])
-    Lout.backpropagateError([1.5], learning_rate )
+    Lin.propagateInput([1.0])
+    Lout.propagateErrorDerivative([1.5])
     
     print( "a's activation state: {}, c's weight: {}, b's activation state: {}".format(a.activation_state, c.weight, b.activation_state) )
     
@@ -29,8 +29,10 @@ for i in range(10):
     
     c.clear()
     for x in [a,b]:
-        x.clearAcumulators()
+        x.clear()
         x.clearCounters()
+
+        LinearConnection
 
         
 print("Time: {:.3e}".format(ti.time() - t1) )
