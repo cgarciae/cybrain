@@ -5,8 +5,8 @@ t1 = ti.time()
 from cybrain import LinearNeuron as N
 from cybrain import LinearConnection
 from cybrain import Layer
+a,b = N(is_input=True), N(is_output=True)
 
-a, b = N(is_input=True), N(is_output=True)
 
 c = LinearConnection(a, b)
 
@@ -31,6 +31,8 @@ for i in range(10):
     for x in [a,b]:
         x.clear()
         x.clearCounters()
+
+        LinearConnection
 
         
 print("Time: {:.3e}".format(ti.time() - t1) )

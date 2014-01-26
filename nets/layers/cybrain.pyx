@@ -6,8 +6,6 @@ Created on Jan 17, 2014
 
 #TODO: class LayerConnection, class FullConnection(LayerConnections), Layer.getConnections, flag propagate for fowardInput, backwardErrorDerivative, etc.
 
-cimport numpy as np
-
 cdef class Neuron(object):
     cdef:
         public bint is_input
@@ -75,15 +73,15 @@ cdef class Neuron(object):
         
         cdef Connection connection
         for connection in self.outgoing_connections:
-            connection.receiveSignal( self.activation_state )
+            connection.forwardSignal( self.activation_state )
             
-    cpdef int receiveErrorSignal(self, float some_local_gradient ):
+    cpdef int backwardErrorSignal(self, float some_local_gradient ):
         self.error_diff += some_local_gradient
         self.backward_counter += 1
         if self.outgoing_connection_count > self.backward_counter:
             raise ValueError('Cycle Detected')
         if self.outgoing_connection_count == self.backward_counter:
-            self.propagateError()
+            self.propagateErrorBackwards()
         return 0
         
         
@@ -93,18 +91,18 @@ cdef class Neuron(object):
         """
         return 1.0
     
-    cpdef int propagateError(self):
+    cpdef int propagateErrorBackwards(self):
         self.local_gradient = self.error_diff * self.activationFunctionDerivative(self.weighted_sum)
         
         cdef Connection connection
         for connection in self.incoming_connections:
-            connection.receiveErrorSignal( self.local_gradient )
+            connection.backwardErrorSignal( self.local_gradient )
         return 0
             
     cpdef float outputError(self, float target):
         return 0.5*( target - self.activation_state )**2
     
-    cpdef int errorDerivative(self, float target):
+    cpdef int calculateErrorDerivative(self, float target):
         self.error_diff = self.activation_state - target
         return 0
         
@@ -139,7 +137,7 @@ cdef class Connection(object):
         public float weight
         public float weight_diff
         
-        public int receiveSignal(self, float signal) 
+        public int forwardSignal(self, float signal) 
     
     
     def __init__(self, Neuron source, Neuron destination, float weight = 0.0):
@@ -152,19 +150,19 @@ cdef class Connection(object):
         self.weight = weight if weight else rn.uniform(-1,1);
         self.weight_diff = 0.0
         
-    cdef public int receiveSignal(self, float signal):
-        self.propagateForward( self.weight * signal )
+    cdef public int forwardSignal(self, float signal):
+        self.fowardPropagation( self.weight * signal )
         return 0
         
-    def propagateForward(self, float signal):
+    def fowardPropagation(self, float signal):
         self.destination.receiveSignal( signal )
         
-    def receiveErrorSignal( self, float local_gradient ):
+    def backwardErrorSignal( self, float local_gradient ):
         self.weight_diff += local_gradient * self.source.activation_state
-        self.propagateError( local_gradient )
+        self.backwardErrorPropagation( local_gradient )
     
-    def propagateError(self, float local_gradient):
-        self.source.receiveErrorSignal( local_gradient )
+    def backwardErrorPropagation(self, float local_gradient):
+        self.source.backwardErrorSignal( local_gradient )
         
     def clear(self):
         self.weight_diff = 0.0
@@ -225,7 +223,7 @@ cdef class Layer(object):
             Neuron neuron
             
         for neuron in self.neurons:
-            neuron.propagateError()
+            neuron.propagateErrorBackwards()
             
     cpdef calculateErrorDerivative(self, list target):
         cdef:
@@ -237,7 +235,7 @@ cdef class Layer(object):
             raise ValueError("target list and neuron list don't have the same lenght")
         
         for i in range(N):
-            self.neurons[i].errorDerivative(target[i])
+            self.neurons[i].calculateErrorDerivative(target[i])
             
     cpdef propagateErrorDerivative(self, list targets):
         cdef:
@@ -252,8 +250,8 @@ cdef class Layer(object):
         for i in range(N):
             neuron = self.neurons[i]
             target = targets[i]
-            neuron.errorDerivative(target)
-            neuron.propagateError()
+            neuron.calculateErrorDerivative(target)
+            neuron.propagateErrorBackwards()
         
         
     def __repr__(self):
@@ -266,47 +264,8 @@ cdef class Layer(object):
             s += neuron.__repr__() + ", "
             
         return s
-
-
-cdef class ConnectionContainer(object):
-    cdef:
-        public list connections
-
-    def __init__(self, list connections = list()):
-        self.connections = connections
-
-    cpdef addConnectionList(self, list connections ):
-        self.connections += connections
-
-    cpdef addConnection(self, Connection connection ):
-        self.connections.append(connection)
-
-    cpdef removeConnection(self, Connection connection ):
-        self.connections.remove(connection)
-
-    cpdef np.ndarray getWeights(self):
-        cdef:
-            Connection connection
-            list weight_list = []
-
-        for connection in self.connections:
-            weight_list.append(connection.weight)
-
-        return np.array(weight_list)
-
-    cpdef np.ndarray getGradient(self):
-        cdef:
-            Connection connection
-            list gradient = []
-
-        for connection in self.connections:
-            gradient.append(connection.weight_diff)
-
-        return np.array(gradient)
-
-
-
-
-
-
+    
+    
+    
+    
     
