@@ -6,7 +6,7 @@ Created on Jan 17, 2014
 
 #TODO: class LayerConnection, class FullConnection(LayerConnections), Layer.getConnections, flag propagate for fowardInput, backwardErrorDerivative, etc.
 
-cdef class Neuron: 
+cdef class Neuron(object):
     cdef:
         public bint is_input
         public bint is_output
@@ -54,26 +54,26 @@ cdef class Neuron:
         self.outgoing_connection_count += 1
         
         
-    cdef public int forwardSignal(self, float signal):
+    cdef public receiveSignal(self, float signal):
         self.weighted_sum += signal
         self.forward_counter += 1
+
         if self.incoming_connection_count > self.forward_counter:
             raise ValueError('Cycle Detected')
+
         if self.incoming_connection_count == self.forward_counter:
-            self.fowardPropagation()
-            
-        return 0
+            self.propagateForward()
+
         
     cdef float activationFunction(self, float weighted_sum ):
         return weighted_sum
             
-    cpdef int fowardPropagation(self):
+    cpdef propagateForward(self):
         self.activation_state = self.activationFunction(self.weighted_sum)
         
         cdef Connection connection
         for connection in self.outgoing_connections:
             connection.forwardSignal( self.activation_state )
-        return 0
             
     cpdef int backwardErrorSignal(self, float some_local_gradient ):
         self.error_diff += some_local_gradient
@@ -127,7 +127,7 @@ cdef class LinearNeuron(Neuron):
         
 import random as rn
 
-cdef class Connection:
+cdef class Connection(object):
     """
     Connection base class
     """
@@ -155,7 +155,7 @@ cdef class Connection:
         return 0
         
     def fowardPropagation(self, float signal):
-        self.destination.forwardSignal( signal )
+        self.destination.receiveSignal( signal )
         
     def backwardErrorSignal( self, float local_gradient ):
         self.weight_diff += local_gradient * self.source.activation_state
@@ -178,7 +178,7 @@ class LinearConnection(Connection):
 
 
 
-cdef class Layer:
+cdef class Layer(object):
     cdef:
         public list neurons
 
@@ -202,7 +202,7 @@ cdef class Layer:
             Neuron neuron
             
         for neuron in self.neurons:
-            neuron.fowardPropagation()
+            neuron.propagateForward()
             
     cpdef propagateInput(self, list input_list):
         cdef:
@@ -216,7 +216,7 @@ cdef class Layer:
         for i in range(N):
             neuron = self.neurons[i]
             neuron.weighted_sum = input_list[i]
-            neuron.fowardPropagation()
+            neuron.propagateForward()
             
     cpdef backwardErrorPropagation(self):
         cdef:
