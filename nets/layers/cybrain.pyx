@@ -264,6 +264,42 @@ cdef class Layer(object):
             s += neuron.__repr__() + ", "
             
         return s
+
+cdef class ConnectionContainer:
+    cdef:
+        public list connections
+
+    def __init__(self, list connections = list()):
+        self.connections = connections
+
+    cpdef addConnectionList(self, list connections ):
+        self.connections += connections
+
+    cpdef addConnection(self, Connection connection ):
+        self.connections.append(connection)
+
+    cpdef removeConnection(self, Connection connection ):
+        self.connections.remove(connection)
+
+    cpdef np.ndarray getWeights(self):
+        cdef:
+            Connection connection
+            list weight_list = []
+
+        for connection in self.connections:
+            weight_list.append(connection.weight)
+
+        return np.array(weight_list)
+
+    cpdef np.ndarray getGradient(self):
+        cdef:
+            Connection connection
+            list gradient = []
+
+        for connection in self.connections:
+            gradient.append(connection.weight_diff)
+
+        return np.array(gradient)
     
     
     
