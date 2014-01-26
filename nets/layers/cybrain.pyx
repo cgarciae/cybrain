@@ -265,7 +265,7 @@ cdef class Layer(object):
             
         return s
 
-cdef class ConnectionContainer:
+cdef class ConnectionContainer(object):
     cdef:
         public list connections
 
@@ -281,7 +281,7 @@ cdef class ConnectionContainer:
     cpdef removeConnection(self, Connection connection ):
         self.connections.remove(connection)
 
-    cpdef np.ndarray getWeights(self):
+    cpdef list getWeights(self):
         cdef:
             Connection connection
             list weight_list = []
@@ -289,9 +289,10 @@ cdef class ConnectionContainer:
         for connection in self.connections:
             weight_list.append(connection.weight)
 
-        return np.array(weight_list)
+        return weight_list
+        #return np.array(weight_list)
 
-    cpdef np.ndarray getGradient(self):
+    cpdef list getGradient(self):
         cdef:
             Connection connection
             list gradient = []
@@ -299,7 +300,8 @@ cdef class ConnectionContainer:
         for connection in self.connections:
             gradient.append(connection.weight_diff)
 
-        return np.array(gradient)
+        return gradient
+        #return np.array(gradient)
     
     
     
