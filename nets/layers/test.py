@@ -32,7 +32,5 @@ for i in range(10):
         x.clear()
         x.clearCounters()
 
-        LinearConnection
-
         
 print("Time: {:.3e}".format(ti.time() - t1) )
