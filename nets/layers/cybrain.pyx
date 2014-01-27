@@ -13,8 +13,6 @@ from numpy cimport ndarray
 
 cdef class Neuron(object):
     cdef:
-        public bint is_input
-        public bint is_output
         public list incoming_connections
         public list outgoing_connections
         public int incoming_connection_count
@@ -27,12 +25,7 @@ cdef class Neuron(object):
         public float local_gradient
         public Layer layer       
     
-    def __init__(self, bint is_input = False, bint is_output = False):
-        if is_input and is_output:
-            raise ValueError("Neuron can't be input and output")
-        
-        self.is_input = is_input
-        self.is_output = is_output
+    def __init__(self):
         
         self.outgoing_connections = []
         self.incoming_connections = []
@@ -63,8 +56,8 @@ cdef class Neuron(object):
         self.weighted_sum += signal
         self.forward_counter += 1
 
-        if self.incoming_connection_count > self.forward_counter:
-            raise ValueError('Cycle Detected')
+        if self.incoming_connection_count < self.forward_counter:
+            raise TypeError('Cycle Detected: forward_counter = {}, incoming_connection_count = {}'.format(self.forward_counter,self.incoming_connection_count))
 
         if self.incoming_connection_count == self.forward_counter:
             self.propagateForward()
@@ -78,12 +71,12 @@ cdef class Neuron(object):
         
         cdef Connection connection
         for connection in self.outgoing_connections:
-            connection.forwardSignal( self.activation_state )
+            connection.receiveSignal( self.activation_state )
             
     cpdef int backwardErrorSignal(self, float some_local_gradient ):
         self.error_diff += some_local_gradient
         self.backward_counter += 1
-        if self.outgoing_connection_count > self.backward_counter:
+        if self.outgoing_connection_count < self.backward_counter:
             raise ValueError('Cycle Detected')
         if self.outgoing_connection_count == self.backward_counter:
             self.propagateErrorBackwards()
@@ -112,7 +105,7 @@ cdef class Neuron(object):
         return 0
         
     
-    def clear(self):
+    def clearAcumulators(self):
         self.error_diff = 0.0
         self.weighted_sum = 0.0
         
@@ -126,8 +119,8 @@ cdef class Neuron(object):
         
 cdef class LinearNeuron(Neuron):
     
-    def __init__(self, is_input = False, is_output = False):
-        Neuron.__init__(self, is_input, is_output)
+    def __init__(self):
+        Neuron.__init__(self)
         
         
 import random as rn
@@ -141,8 +134,6 @@ cdef class Connection(object):
         public Neuron destination
         float * _weight
         float * _weight_diff
-        
-        public int forwardSignal(self, float signal) 
     
     
     def __init__(self, Neuron source, Neuron destination, float weight = 0.0):
@@ -155,8 +146,8 @@ cdef class Connection(object):
         self.destination = destination
         destination.addIncomingConnection( self )
         
-        self.weight = weight if weight else rn.uniform(-1,1);
-        self.weight_diff = 0.0
+        self._weight[0] = weight if weight else rn.uniform(-1,1);
+        self._weight_diff[0] = 0.0
 
     property weight:
         def __get__(self):
@@ -172,25 +163,25 @@ cdef class Connection(object):
         def __set__(self, float value):
             self._weight_diff[0] = value
         
-    cdef public int forwardSignal(self, float signal):
-        self.fowardPropagation( self.weight * signal )
+    cdef public int receiveSignal(self, float signal):
+        self.fowardPropagation( self._weight[0] * signal )
         return 0
         
     def fowardPropagation(self, float signal):
         self.destination.receiveSignal( signal )
         
     def backwardErrorSignal( self, float local_gradient ):
-        self.weight_diff += local_gradient * self.source.activation_state
+        self._weight_diff[0] += local_gradient * self.source.activation_state
         self.backwardErrorPropagation( local_gradient )
     
     def backwardErrorPropagation(self, float local_gradient):
         self.source.backwardErrorSignal( local_gradient )
         
-    def clear(self):
-        self.weight_diff = 0.0
+    def clearAcumulators(self):
+        self._weight_diff[0] = 0.0
         
     def __repr__(self):
-        return "source: {}, destination: {}, weight: {}".format(self.source, self.destination, self.weight)
+        return "source: {}, destination: {}, weight: {}".format(self.source, self.destination, self._weight[0])
         
 class LinearConnection(Connection):
     
@@ -204,10 +195,25 @@ cdef class Layer(object):
     cdef:
         public list neurons
 
-    def __init__(self, list neurons = [] ):
-        self.neurons = []
-        if neurons:
-            self.addNeurons( neurons )
+    def __init__(self, int number_of_neurons = 0, neuron_type = LinearNeuron ):
+        self.neurons = list()
+
+        cdef int i
+        for i in range(number_of_neurons):
+            self.neurons.append(neuron_type())
+
+    cpdef clearCounters(self):
+        cdef Neuron neuron
+
+        for neuron in self.neurons:
+            neuron.clearCounters()
+
+    cpdef clearAcumulators(self):
+        cdef Neuron neuron
+
+        for neuron in self.neurons:
+            neuron.clearAcumulators()
+
 
     cpdef addNeurons( self, list neurons ):
         cdef Neuron neuron
@@ -287,43 +293,22 @@ cdef class Layer(object):
             
         return s
 
-cdef class ConnectionContainer(object):
+cpdef list fullConnection(Layer a, Layer b):
+
     cdef:
-        public list connections
+        list connection_list = list()
+        list neuron_connexions
+        Neuron na, nb
 
-    def __init__(self, list connections = list()):
-        self.connections = connections
+    for na in a.neurons:
+        neuron_connexions = list()
+        for nb in b.neurons:
+            neuron_connexions.append(Connection(na,nb))
 
-    cpdef addConnectionList(self, list connections ):
-        self.connections += connections
+        connection_list.append(neuron_connexions)
 
-    cpdef addConnection(self, Connection connection ):
-        self.connections.append(connection)
+    return connection_list
 
-    cpdef removeConnection(self, Connection connection ):
-        self.connections.remove(connection)
-
-    cpdef list getWeights(self):
-        cdef:
-            Connection connection
-            list weight_list = []
-
-        for connection in self.connections:
-            weight_list.append(connection.weight)
-
-        return weight_list
-        #return np.array(weight_list)
-
-    cpdef list getGradient(self):
-        cdef:
-            Connection connection
-            list gradient = []
-
-        for connection in self.connections:
-            gradient.append(connection.weight_diff)
-
-        return gradient
-        #return np.array(gradient)
     
     
     
