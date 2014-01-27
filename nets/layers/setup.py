@@ -1,6 +1,7 @@
 from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
+import numpy as np
 
 # connections = Extension( "connections",
 #                  sources= ["connections.pyx"],
@@ -19,6 +20,7 @@ from Cython.Distutils import build_ext
 
 cybrain = Extension( "cybrain",
                  sources= ["cybrain.pyx"],
+                 include_dirs= [np.get_include()],
                  language='c++'
                  )
 

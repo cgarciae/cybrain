@@ -3,8 +3,13 @@ Created on Jan 17, 2014
 
 @author: Cristian
 '''
+from libc.stdlib cimport malloc, free
+
 
 #TODO: class LayerConnection, class FullConnection(LayerConnections), Layer.getConnections, flag propagate for fowardInput, backwardErrorDerivative, etc.
+
+from numpy import ndarray
+from numpy cimport ndarray
 
 cdef class Neuron(object):
     cdef:
@@ -134,13 +139,16 @@ cdef class Connection(object):
     cdef:
         public Neuron source
         public Neuron destination
-        public float weight
-        public float weight_diff
+        float * _weight
+        float * _weight_diff
         
         public int forwardSignal(self, float signal) 
     
     
     def __init__(self, Neuron source, Neuron destination, float weight = 0.0):
+        self._weight = <float *> malloc( sizeof(float *) )
+        self._weight_diff = <float *> malloc( sizeof(float *) )
+
         self.source = source
         source.addOutgoingConnection( self )
         
@@ -149,6 +157,20 @@ cdef class Connection(object):
         
         self.weight = weight if weight else rn.uniform(-1,1);
         self.weight_diff = 0.0
+
+    property weight:
+        def __get__(self):
+            return self._weight[0]
+
+        def __set__(self, value):
+            self._weight[0] = value
+
+    property weight_diff:
+        def __get__(self):
+            return self._weight_diff[0]
+
+        def __set__(self, float value):
+            self._weight_diff[0] = value
         
     cdef public int forwardSignal(self, float signal):
         self.fowardPropagation( self.weight * signal )
