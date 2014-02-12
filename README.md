@@ -1,75 +1,101 @@
 CyBrain
 =======
 
-Neural Networks in Cython, inspired by PyBrain.
+Neural Networks in Cython, inspired by PyBrain, but 70x faster.
 
-Check XOR_example.py for a first approach. Documentation not available yet!
+Check Comparison.py for a first approach. In this example we train a CyBrain network to solve the XOR problem. At the end we use PyBrain to solve the same problem. A speed comparison indicates that CyBrain is 70x faster.
 
 XOR Example
 ===========
 
+    from cybrain import Neuron, LogisticNeuron, Connection, Layer, Network, BiasUnit, Trainer, SoftMaxLayer
     import numpy as np
-    from cybrain import Layer, LogisticNeuron, BiasUnit, fullConnection, Network, Trainer
-    
-    #TRUTH TABLE (DATA)
-    xin =     [[0.0, 0.0]];    yout = [[0.0]]
-    xin.append([1.0,0.0]); yout.append([1.0])
-    xin.append([0.0,1.0]); yout.append([1.0])
-    xin.append([1.0,1.0]); yout.append([0.0])
-    
-    #CONVERT DATA TO NUMPY ARRAY
-    xin, yout = np.array(xin), np.array(yout)
-    
-    #CREATE NEURAL NETWORK
+    from time import time
     nnet = Network()
     
-    #CREATE LAYERS
-    Lin = Layer(2)
-    Lhidden = Layer( 4, LogisticNeuron )
-    Lout = Layer( 1, LogisticNeuron)
-    Lbias = Layer( 1, BiasUnit )
+    #TRUTH TABLE (DATA)
+    X =     [[0.0,0.0]];     Y = [[0.0, 1.0]]
+    X.append([1.0,0.0]); Y.append([1.0, 0.0])
+    X.append([0.0,1.0]); Y.append([1.0, 0.0])
+    X.append([1.0,1.0]); Y.append([0.0, 1.0])
     
-    #CREATE CONNECTIONS
-    in_hidden = fullConnection(Lin,Lhidden)
-    hidden_out = fullConnection(Lhidden,Lout)
-    bias_hidden = fullConnection(Lbias,Lhidden)
-    bias_out = fullConnection(Lbias,Lout)
+    
+    #CONVERT DATA TO NUMPY ARRAY
+    X, Y = np.array(X), np.array(Y)
+    
+    Lin = Layer( 2, names =['1','2'])
+    Lout = Layer( 2, LogisticNeuron, names= ['3', '4'] )
+    Lhidden = Layer( 2, LogisticNeuron, names= ['5','6'] )
+    bias = Layer( 1, BiasUnit, names=['b'] )
     
     #ADD LAYERS TO NETWORK
     nnet.addInputLayer(Lin)
-    nnet.addOutputLayer(Lout)
-    nnet.addLayer(Lhidden)
-    nnet.addAutoInputLayer(Lbias)
+    nnet.addOutputLayer(Lhidden)
+    nnet.addLayer(Lout)
+    nnet.addAutoInputLayer(bias)
     
-    #ADD CONNECTIONS TO NETWORK
-    nnet.addConnections(in_hidden)
-    nnet.addConnections(hidden_out)
-    nnet.addConnections(bias_hidden)
-    nnet.addConnections(bias_out)
+    #CONNECT LAYERS
+    Lin.connectTo(Lout)
+    Lout.connectTo(Lhidden)
+    bias.connectTo(Lhidden)
+    bias.connectTo(Lout)
     
-    #CREATE FULLBATCH TRAINER
-    learning_rate = 0.1
-    batch = Trainer(nnet,xin,yout,learning_rate)
+    #CREATE BATCH TRAINER
+    rate = 0.1
+    batch = Trainer( nnet, X, Y, rate )
     
-    #SHOW INPUT OUTPUT MAP, MAKE 1 IF GREATER THAN 0.5 ELSE 0
-    print("Before Training")
-    for i in xin:
-        print "{} => {}".format(i,float(nnet.activate(i)[0] > 0.5))
-        nnet.clearNetwork()
+    #TRAIN FOR 1000 EPOCHS
+    t1 = time()
+    batch.epochs(2000)
+    print "Time CyBrain {}".format(time()-t1)
     
-    #TRAINING
-    batch.epochs(4000)
-    
-    #SHOW INPUT OUTPUT MAP, MAKE 1 IF GREATER THAN 0.5 ELSE 0
-    print("\nAfter Training")
-    for i in xin:
-        print "{} => {}".format( i, float(nnet.activate(i)[0] > .5))
-        nnet.clearNetwork()
-    
-    #PRINT
-    print("\nCONNECTIONS:")
-    print "BIAS TO HIDDEN {}".format(bias_hidden)
-    print "INPUT TO HIDDEN {}".format(in_hidden)
-    print "BIAS TO OUTPUT {}".format(bias_out)
-    print "HIDDEN TO OUTPUT {}".format(hidden_out)
+    #PRINT RESULTS
+    for x in X:
+        print "{} ==> {}".format( x, nnet.activateWith(x, return_value= True) )
 
+
+
+Same Example in PyBrain
+========================
+
+    from pybrain.tools.shortcuts import buildNetwork
+    from pybrain import LinearLayer, SigmoidLayer, FeedForwardNetwork, FullConnection, BiasUnit, SoftmaxLayer
+    from pybrain.supervised.trainers.backprop import BackpropTrainer
+    from pybrain.structure.modules.tanhlayer import TanhLayer
+    from pybrain.datasets import SupervisedDataSet
+    
+    
+    ds = SupervisedDataSet(2,1 )
+    
+    ds.addSample((0, 0), (0,))
+    ds.addSample((0, 1), (1,))
+    ds.addSample((1, 0), (1,))
+    ds.addSample((1, 1), (0,))
+    
+    
+    net = buildNetwork(2, 2, 1, bias=True, outputbias= True, hiddenclass=SigmoidLayer)
+    trainer = BackpropTrainer(net, ds, learningrate= 0.1)
+    
+    t1 = time()
+    trainer.trainEpochs(2000)
+    print "Time PyBrain {}".format(time()-t1)
+    
+    #PRINT RESULTS
+    for x in X:
+        print "{} ==> {}".format( x, net.activate(x) )
+
+
+Outputs
+=======
+
+    Time CyBrain 0.111654996872
+    [ 0.  0.] ==> [['0.0365560102866', '0.963422516281']]
+    [ 1.  0.] ==> [['0.951081842587', '0.0489475005295']]
+    [ 0.  1.] ==> [['0.951928021684', '0.0481004789023']]
+    [ 1.  1.] ==> [['0.0332036251855', '0.966776168457']]
+    
+    Time PyBrain 7.03572702408
+    [ 0.  0.] ==> [  1.67662906e-08]
+    [ 1.  0.] ==> [ 0.99999998]
+    [ 0.  1.] ==> [ 0.99999998]
+    [ 1.  1.] ==> [  7.30255101e-09]
