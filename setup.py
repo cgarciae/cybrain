@@ -23,10 +23,15 @@ cybrain = Extension( "cybrain",
                  include_dirs= [np.get_include()],
                  language='c++'
                  )
+tbrain = Extension( "tbrain",
+                 sources= ["tbrain.pyx"],
+                 include_dirs= [np.get_include()],
+                 language='c++'
+                 )
 
 
 setup(
     cmdclass = {'build_ext': build_ext},
 #     ext_modules = [ neurons, connections, layers ]
-    ext_modules = [ cybrain ]
+    ext_modules = [ cybrain, tbrain ]
 )

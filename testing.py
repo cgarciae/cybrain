@@ -27,7 +27,7 @@ class MyTestCase(unittest.TestCase):
         self.in_Logout =  LinearConnection(self.Nin,self.Logout, 0.5)
 
     def test_linear_activation(self):
-        self.Nin.propagateForward()
+        self.Nin.activate()
         a = self.Nout.state
         b = self.Nin.state * self.in_out.weight
         self.assertTrue( similar(a,b), "Failed " + self.test_linear_activation.__name__ )
@@ -43,7 +43,7 @@ class MyTestCase(unittest.TestCase):
         self.in_Logout.clearAcumulators()
 
     def test_sigmoid_activation(self):
-        self.Nin.propagateForward()
+        self.Nin.activate()
         a = self.Logout.state
         b = sigmoid( self.Nin.state * self.in_Logout.weight )
         self.assertTrue( similar(a,b), "Failed: a = {}, b = {}".format(a,b) )
@@ -51,9 +51,9 @@ class MyTestCase(unittest.TestCase):
 
     def test_linear_backprop(self):
         target = 1.5
-        self.Nin.propagateForward()
+        self.Nin.activate()
         self.Nout.errorDerivative(target)
-        self.Nout.propagateErrorBackwards()
+        self.Nout.backErrorActivate()
 
         a = self.in_out.weight_diff
         b = self.Nin.state * ( self.Nout.state - target )
@@ -63,9 +63,9 @@ class MyTestCase(unittest.TestCase):
 
     def test_linear_backprop(self):
         target = 1.5
-        self.Nin.propagateForward()
+        self.Nin.activate()
         self.Nout.errorDerivative(target)
-        self.Nout.propagateErrorBackwards()
+        self.Nout.backErrorActivate()
 
         a = self.in_out.weight_diff
         b = self.Nin.state * ( self.Nout.state - target )
@@ -75,9 +75,9 @@ class MyTestCase(unittest.TestCase):
 
     def test_logistic_backprop(self):
         target = 0.0
-        self.Nin.propagateForward()
+        self.Nin.activate()
         self.Logout.errorDerivative(target)
-        self.Logout.propagateErrorBackwards()
+        self.Logout.backErrorActivate()
 
         a = self.in_Logout.weight_diff
         b = self.Nin.state * ( self.Logout.state - target )
