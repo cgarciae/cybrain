@@ -23,10 +23,11 @@ XOR Example
     #CONVERT DATA TO NUMPY ARRAY
     X, Y = np.array(X), np.array(Y)
     
-    Lin = Layer( 2, names =['1','2'])
-    Lout = Layer( 2, LogisticNeuron, names= ['3', '4'] )
-    Lhidden = Layer( 2, LogisticNeuron, names= ['5','6'] )
-    bias = Layer( 1, BiasUnit, names=['b'] )
+    #CREATE LAYERS
+    Lin = Layer( 2 )
+    Lout = Layer( 2, LogisticNeuron )
+    Lhidden = Layer( 2, LogisticNeuron )
+    bias = Layer( 1, BiasUnit )
     
     #ADD LAYERS TO NETWORK
     nnet.addInputLayer(Lin)
@@ -44,7 +45,7 @@ XOR Example
     rate = 0.1
     batch = Trainer( nnet, X, Y, rate )
     
-    #TRAIN FOR 1000 EPOCHS
+    #TRAIN
     t1 = time()
     batch.epochs(2000)
     print "Time CyBrain {}".format(time()-t1)
