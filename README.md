@@ -14,10 +14,10 @@ XOR Example
     nnet = Network()
     
     #TRUTH TABLE (DATA)
-    X =     [[0.0,0.0]];     Y = [[0.0, 1.0]]
-    X.append([1.0,0.0]); Y.append([1.0, 0.0])
-    X.append([0.0,1.0]); Y.append([1.0, 0.0])
-    X.append([1.0,1.0]); Y.append([0.0, 1.0])
+    X =     [[0.0,0.0]];     Y = [[0.0]]
+    X.append([1.0,0.0]); Y.append([1.0])
+    X.append([0.0,1.0]); Y.append([1.0])
+    X.append([1.0,1.0]); Y.append([0.0])
     
     
     #CONVERT DATA TO NUMPY ARRAY
@@ -25,8 +25,8 @@ XOR Example
     
     #CREATE LAYERS
     Lin = Layer( 2 )
-    Lout = Layer( 2, LogisticNeuron )
     Lhidden = Layer( 2, LogisticNeuron )
+    Lout = Layer( 1, LogisticNeuron )
     bias = Layer( 1, BiasUnit )
     
     #ADD LAYERS TO NETWORK
@@ -90,10 +90,10 @@ Outputs
 =======
 
     Time CyBrain 0.111654996872
-    [ 0.  0.] ==> [['0.0365560102866', '0.963422516281']]
-    [ 1.  0.] ==> [['0.951081842587', '0.0489475005295']]
-    [ 0.  1.] ==> [['0.951928021684', '0.0481004789023']]
-    [ 1.  1.] ==> [['0.0332036251855', '0.966776168457']]
+    [ 0.  0.] ==> [ '0.0365560102866' ]
+    [ 1.  0.] ==> [ '0.951081842587'  ]
+    [ 0.  1.] ==> [ '0.951928021684'  ]
+    [ 1.  1.] ==> [ '0.0332036251855' ]
     
     Time PyBrain 7.03572702408
     [ 0.  0.] ==> [  1.67662906e-08]
