@@ -509,12 +509,7 @@ cdef class Network(object):
             layer.activate()
 
         if return_value:
-            values = []
-            for layer in self.output_layers:
-                for neuron in layer.neurons:
-                    values.append(neuron.y)
-            output = values
-            return output
+            return self.output_layers
 
     cpdef backpropagateWith(self, double[:] target_data ):
         cdef:

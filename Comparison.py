@@ -32,18 +32,17 @@ bias.connectTo(Lhidden)
 bias.connectTo(Lout)
 
 #CREATE BATCH TRAINER
-rate = 0.11
+rate = 0.1
 batch = Trainer( nnet, X, Y, rate )
 
 #TRAIN FOR 1000 EPOCHS
 t1 = time()
-batch.epochs(1000)
+batch.epochs(2000)
 print "Time CyBrain {}".format(time()-t1)
 
 #PRINT RESULTS
 for x in X:
-    nnet.activateWith(x)
-    print "{} ==> {}".format( x, nnet.output_layers )
+    print "{} ==> {}".format( x, nnet.activateWith(x, return_value= True) )
 
 
 
@@ -64,11 +63,11 @@ ds.addSample((1, 0), (1,))
 ds.addSample((1, 1), (0,))
 
 
-net = buildNetwork(2, 2, 1, bias=True, outputbias= True, hiddenclass=TanhLayer)
-trainer = BackpropTrainer(net, ds)
+net = buildNetwork(2, 2, 1, bias=True, outputbias= True, hiddenclass=SigmoidLayer)
+trainer = BackpropTrainer(net, ds, learningrate= 0.1)
 
 t1 = time()
-trainer.trainEpochs(1000)
+trainer.trainEpochs(2000)
 print "Time PyBrain {}".format(time()-t1)
 
 #PRINT RESULTS
