@@ -48,6 +48,9 @@ cdef class Neuron(object):
         self.is_error_derivative_active = False
         self.is_local_gradient_active = False
 
+    cpdef Connection connectTo(self, Neuron neuron, str name = '', weight = 0.0, connection_type = Connection ):
+        cdef Connection new = connection_type( self, neuron, name= name, weight= weight )
+        return new
 
     cdef addForwardConnection( self, Connection connection ):
         self.forward_connections.append( connection )
