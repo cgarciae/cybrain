@@ -24,20 +24,20 @@ XOR Example
     X, Y = np.array(X), np.array(Y)
     
     #CREATE LAYERS
-    Lin = Layer( 2 )
-    Lhidden = Layer( 2, LogisticNeuron )
-    Lout = Layer( 1, LogisticNeuron )
-    bias = Layer( 1, BiasUnit )
+    Lin = Layer( 2, names= ['a','b'] )
+    Lhidden = Layer( 2, LogisticNeuron , names= ['c','d'] )
+    Lout = Layer( 1, LogisticNeuron , names= ['e'] )
+    bias = Layer( 1, BiasUnit, names= ['bias'] )
     
     #ADD LAYERS TO NETWORK
     nnet.addInputLayer(Lin)
-    nnet.addOutputLayer(Lhidden)
-    nnet.addLayer(Lout)
+    nnet.addLayer(Lhidden)
+    nnet.addOutputLayer(Lout)
     nnet.addAutoInputLayer(bias)
     
     #CONNECT LAYERS
-    Lin.connectTo(Lout)
-    Lout.connectTo(Lhidden)
+    Lin.connectTo(Lhidden)
+    Lhidden.connectTo(Lout)
     bias.connectTo(Lhidden)
     bias.connectTo(Lout)
     
