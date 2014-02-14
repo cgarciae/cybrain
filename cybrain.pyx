@@ -393,6 +393,7 @@ cdef class Layer(object):
         cdef:
             Neuron neuron
             int i = 0
+
         if len(self.neurons) != len(target):
             raise IndexError("target and layer dimensions are not equal")
         for neuron in self.neurons:
@@ -522,11 +523,11 @@ cdef class Network(object):
 
         for layer in self.output_layers:
             layer_length = len(layer.neurons)
-            layer.setTarget(target_data[neuron_count:neuron_count+layer_length])
+            layer.setTarget( target_data[neuron_count:neuron_count+layer_length] )
             neuron_count += layer_length
 
         if len(target_data) != neuron_count:
-            raise IndexError("Input dimension dont match the number of output neurons")
+            raise IndexError("Target dimension dont match the number of output neurons")
 
         for layer in self.input_layers + self.auto_inputs:
             layer.errorActivate()

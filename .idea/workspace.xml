@@ -2,10 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d8edb8c6-9aef-472f-81b9-d1baaf365961" name="Default" comment="">
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Comparison.py" afterPath="$PROJECT_DIR$/testComparison.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/test2.py" afterPath="$PROJECT_DIR$/testTBrain.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/temp.macosx-10.6-intel-2.7/cybrain.o" afterPath="$PROJECT_DIR$/build/temp.macosx-10.6-intel-2.7/cybrain.o" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.so" afterPath="$PROJECT_DIR$/cybrain.so" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/XOR_example.py" afterPath="$PROJECT_DIR$/XOR_example.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.cpp" afterPath="$PROJECT_DIR$/cybrain.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.pyx" afterPath="$PROJECT_DIR$/cybrain.pyx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/testing.py" afterPath="$PROJECT_DIR$/testing.py" />
     </list>
     <ignored path="cybrain.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -18,8 +20,8 @@
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/cybrain$Unittests_in_testing.coverage" NAME="Unittests in testing Coverage Results" MODIFIED="1390937927314" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/nets/layers" />
-    <SUITE FILE_PATH="coverage/cybrain$test__1_.coverage" NAME="test (1) Coverage Results" MODIFIED="1392391659258" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/cybrain$test.coverage" NAME="test Coverage Results" MODIFIED="1392391578731" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/" />
+    <SUITE FILE_PATH="coverage/cybrain$test__1_.coverage" NAME="test (1) Coverage Results" MODIFIED="1392393051601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/cybrain$test.coverage" NAME="test Coverage Results" MODIFIED="1392393346529" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/" />
     <SUITE FILE_PATH="coverage/cybrain$test2.coverage" NAME="test2 Coverage Results" MODIFIED="1392391621825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/cybrain$setup.coverage" NAME="setup Coverage Results" MODIFIED="1390684848762" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/nets/layers" />
     <SUITE FILE_PATH="coverage/cybrain$cybrain_pyx.coverage" NAME="cybrain.pyx Coverage Results" MODIFIED="1392191712170" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -44,18 +46,18 @@
       <file leaf-file-name="cybrain.pyx" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cybrain.pyx">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="11" column="39" selection-start="304" selection-end="304" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="10200">
+            <state line="400" column="18" selection-start="11305" selection-end="11305" vertical-scroll-proportion="-8.461538" vertical-offset="5765" max-vertical-offset="10215">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="XOR_example.py" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="XOR_example.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/XOR_example.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="38" column="0" selection-start="940" selection-end="940" vertical-scroll-proportion="0.0" vertical-offset="332" max-vertical-offset="795">
+            <state line="30" column="23" selection-start="808" selection-end="808" vertical-scroll-proportion="0.8099352" vertical-offset="75" max-vertical-offset="750">
               <folding>
-                <element signature="e#24#127#0" expanded="true" />
+                <element signature="e#0#103#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -75,16 +77,16 @@
       <file leaf-file-name="setup.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/setup.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="25" column="0" selection-start="733" selection-end="733" vertical-scroll-proportion="0.0" vertical-offset="375" max-vertical-offset="630">
+            <state line="25" column="0" selection-start="733" selection-end="733" vertical-scroll-proportion="0.0" vertical-offset="109" max-vertical-offset="585">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="testComparison.py" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="testComparison.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/testComparison.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="38" selection-start="510" selection-end="510" vertical-scroll-proportion="0.4859611" vertical-offset="0" max-vertical-offset="1200">
+            <state line="17" column="38" selection-start="510" selection-end="510" vertical-scroll-proportion="0.0" vertical-offset="272" max-vertical-offset="1200">
               <folding />
             </state>
           </provider>
@@ -93,7 +95,7 @@
       <file leaf-file-name="testTBrain.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/testTBrain.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="14" column="0" selection-start="536" selection-end="536" vertical-scroll-proportion="0.0" vertical-offset="587" max-vertical-offset="2265">
+            <state line="14" column="0" selection-start="536" selection-end="536" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2265">
               <folding>
                 <element signature="e#24#119#0" expanded="true" />
               </folding>
@@ -133,8 +135,9 @@
         <option value="$PROJECT_DIR$/nets/layers/main.py" />
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/test.py" />
-        <option value="$PROJECT_DIR$/cybrain.pyx" />
         <option value="$PROJECT_DIR$/test2.py" />
+        <option value="$PROJECT_DIR$/testing.py" />
+        <option value="$PROJECT_DIR$/cybrain.pyx" />
         <option value="$PROJECT_DIR$/XOR_example.py" />
       </list>
     </option>
@@ -244,7 +247,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.test (1)">
+  <component name="RunManager" selected="Python.test">
     <configuration default="false" name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -507,9 +510,9 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.test (1)" />
-        <item index="1" class="java.lang.String" itemvalue="Python.test2" />
-        <item index="2" class="java.lang.String" itemvalue="Python.test" />
+        <item index="0" class="java.lang.String" itemvalue="Python.test" />
+        <item index="1" class="java.lang.String" itemvalue="Python.test (1)" />
+        <item index="2" class="java.lang.String" itemvalue="Python.test2" />
         <item index="3" class="java.lang.String" itemvalue="Python.cybrain.pyx" />
         <item index="4" class="java.lang.String" itemvalue="Python tests.Unittests in testing" />
       </list>
@@ -579,7 +582,7 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39814815" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32625994" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33509234" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33509234" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3275862" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" x="100" y="122" width="1240" height="674" />
@@ -664,7 +667,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="74" column="21" selection-start="1903" selection-end="1903" vertical-scroll-proportion="0.0" vertical-offset="1110" max-vertical-offset="1950">
           <folding>
-            <element signature="e#24#127#0" expanded="true" />
+            <element signature="e#0#103#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -703,7 +706,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="74" column="21" selection-start="1903" selection-end="1903" vertical-scroll-proportion="0.0" vertical-offset="1110" max-vertical-offset="1950">
           <folding>
-            <element signature="e#24#127#0" expanded="true" />
+            <element signature="e#0#103#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -742,7 +745,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="74" column="21" selection-start="1903" selection-end="1903" vertical-scroll-proportion="0.0" vertical-offset="1110" max-vertical-offset="1950">
           <folding>
-            <element signature="e#24#127#0" expanded="true" />
+            <element signature="e#0#103#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -781,7 +784,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="68" column="0" selection-start="1810" selection-end="2313" vertical-scroll-proportion="0.0" vertical-offset="1020" max-vertical-offset="1920">
           <folding>
-            <element signature="e#24#127#0" expanded="true" />
+            <element signature="e#0#103#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -802,7 +805,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="68" column="0" selection-start="1810" selection-end="2313" vertical-scroll-proportion="0.0" vertical-offset="1020" max-vertical-offset="1920">
           <folding>
-            <element signature="e#24#127#0" expanded="true" />
+            <element signature="e#0#103#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -823,7 +826,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="6" column="0" selection-start="154" selection-end="434" vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="1305">
           <folding>
-            <element signature="e#24#127#0" expanded="true" />
+            <element signature="e#0#103#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -844,7 +847,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="12" column="0" selection-start="363" selection-end="363" vertical-scroll-proportion="0.0" vertical-offset="180" max-vertical-offset="1305">
           <folding>
-            <element signature="e#24#127#0" expanded="true" />
+            <element signature="e#0#103#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -865,7 +868,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="24" column="20" selection-start="586" selection-end="586" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1275">
           <folding>
-            <element signature="e#24#127#0" expanded="true" />
+            <element signature="e#0#103#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -886,7 +889,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="34" column="39" selection-start="573" selection-end="573" vertical-scroll-proportion="0.0" vertical-offset="322" max-vertical-offset="1095">
           <folding>
-            <element signature="e#24#127#0" expanded="true" />
+            <element signature="e#0#103#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -909,7 +912,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="19" column="0" selection-start="269" selection-end="269" vertical-scroll-proportion="0.0" vertical-offset="285" max-vertical-offset="675">
           <folding>
-            <element signature="e#24#127#0" expanded="true" />
+            <element signature="e#0#103#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -932,7 +935,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="13" column="19" selection-start="241" selection-end="241" vertical-scroll-proportion="0.0" vertical-offset="77" max-vertical-offset="645">
           <folding>
-            <element signature="e#24#127#0" expanded="true" />
+            <element signature="e#0#103#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -963,21 +966,9 @@
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.71428573" vertical-offset="510" max-vertical-offset="83775" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="0" selection-start="733" selection-end="733" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="585">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/testing.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="50" column="0" selection-start="1339" selection-end="1339" vertical-scroll-proportion="0.5263158" vertical-offset="20" max-vertical-offset="495" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cybrain.pyx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="39" selection-start="304" selection-end="304" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="10200">
+        <state line="9" column="27" selection-start="192" selection-end="192" vertical-scroll-proportion="0.1986755" vertical-offset="0" max-vertical-offset="1380">
           <folding />
         </state>
       </provider>
@@ -991,12 +982,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/XOR_example.py">
+    <entry file="file://$PROJECT_DIR$/setup.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="0" selection-start="940" selection-end="940" vertical-scroll-proportion="0.0" vertical-offset="332" max-vertical-offset="795">
-          <folding>
-            <element signature="e#24#127#0" expanded="true" />
-          </folding>
+        <state line="25" column="0" selection-start="733" selection-end="733" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="585">
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1011,8 +1000,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/testComparison.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="38" selection-start="510" selection-end="510" vertical-scroll-proportion="0.4859611" vertical-offset="0" max-vertical-offset="1200">
+        <state line="17" column="38" selection-start="510" selection-end="510" vertical-scroll-proportion="0.0" vertical-offset="300" max-vertical-offset="1200">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cybrain.pyx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="400" column="18" selection-start="11305" selection-end="11305" vertical-scroll-proportion="-8.461538" vertical-offset="5765" max-vertical-offset="10215">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/XOR_example.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="30" column="23" selection-start="808" selection-end="808" vertical-scroll-proportion="0.8099352" vertical-offset="75" max-vertical-offset="750">
+          <folding>
+            <element signature="e#0#103#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
