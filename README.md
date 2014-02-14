@@ -64,6 +64,7 @@ Same Example in PyBrain
     from pybrain.supervised.trainers.backprop import BackpropTrainer
     from pybrain.structure.modules.tanhlayer import TanhLayer
     from pybrain.datasets import SupervisedDataSet
+    from time import time
     
     
     ds = SupervisedDataSet(2,1 )
