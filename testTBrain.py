@@ -103,32 +103,32 @@ print "Time {}".format(time()-t1)
 # nnet.activateWith( xin[0].copy() )
 # nnet.backpropagateWith( yout[0].copy() )
 
-w13, w14, w23, w24, w35, w45, w03, w04, w05 = connections[0].weight, connections[1].weight, connections[2].weight, connections[3].weight, connections[4].weight, connections[5].weight, connections[6].weight ,connections[7].weight, connections[8].weight
-w = [ w13, w14, w23, w24, w35, w45, w03, w04, w05 ]
-
-y0, y1, y2, t = 1.0, dscalar('y0'), dscalar('y1'), dscalar('t')
-
-
-z3 = y0*w03 + y1*w13 + y2*w23
-
-z4 = w04 + y1*w14 + y2*w24
-y3 = 1.0 / ( 1.0 + exp(-z3 ) )
-y4 = 1.0 / ( 1.0 + exp(-z4 ) )
-
-z5 = w05 + y3*w35 + y4*w45
-y5 = 1.0 / ( 1.0 + exp(-z5 ) )
-
-E = -t*log(y5) - (1.0 - t)*log(1.0-y5)
-
-dw = grad(E,w)
-dEdz = grad(E,[z3,z4,z5])
-dydz = [ grad( y3 , z3 ), grad(y4,z4)  ]
-
-fz = function( [y1,y2,t], [z3,z4,z5], on_unused_input='ignore' )
-fdw = function( [y1,y2,t], dw , on_unused_input='ignore')
-fy = function( [y1,y2,t], [y3,y4,y5] , on_unused_input='ignore')
-fdEdz = function( [y1,y2,t], dEdz , on_unused_input='ignore')
-fdydz = function( [y1,y2,t], dydz , on_unused_input='ignore' )
+# w13, w14, w23, w24, w35, w45, w03, w04, w05 = connections[0].weight, connections[1].weight, connections[2].weight, connections[3].weight, connections[4].weight, connections[5].weight, connections[6].weight ,connections[7].weight, connections[8].weight
+# w = [ w13, w14, w23, w24, w35, w45, w03, w04, w05 ]
+#
+# y0, y1, y2, t = 1.0, dscalar('y0'), dscalar('y1'), dscalar('t')
+#
+#
+# z3 = y0*w03 + y1*w13 + y2*w23
+#
+# z4 = w04 + y1*w14 + y2*w24
+# y3 = 1.0 / ( 1.0 + exp(-z3 ) )
+# y4 = 1.0 / ( 1.0 + exp(-z4 ) )
+#
+# z5 = w05 + y3*w35 + y4*w45
+# y5 = 1.0 / ( 1.0 + exp(-z5 ) )
+#
+# E = -t*log(y5) - (1.0 - t)*log(1.0-y5)
+#
+# dw = grad(E,w)
+# dEdz = grad(E,[z3,z4,z5])
+# dydz = [ grad( y3 , z3 ), grad(y4,z4)  ]
+#
+# fz = function( [y1,y2,t], [z3,z4,z5], on_unused_input='ignore' )
+# fdw = function( [y1,y2,t], dw , on_unused_input='ignore')
+# fy = function( [y1,y2,t], [y3,y4,y5] , on_unused_input='ignore')
+# fdEdz = function( [y1,y2,t], dEdz , on_unused_input='ignore')
+# fdydz = function( [y1,y2,t], dydz , on_unused_input='ignore' )
 
 
 #
