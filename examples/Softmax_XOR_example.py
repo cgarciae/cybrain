@@ -1,7 +1,6 @@
-from cybrain import Neuron, LogisticNeuron, Connection, Layer, Network, BiasUnit, Trainer, SoftMaxLayer
+import cybrain as cb
 import numpy as np
 from time import time
-nnet = Network()
 
 #TRUTH TABLE (DATA)
 X =     [[0.0,0.0]];     Y = [[0.0,1.0]]
@@ -9,15 +8,17 @@ X.append([1.0,0.0]); Y.append([1.0,0.0])
 X.append([0.0,1.0]); Y.append([1.0,0.0])
 X.append([1.0,1.0]); Y.append([0.0,1.0])
 
-
 #CONVERT DATA TO NUMPY ARRAY
 X, Y = np.array(X), np.array(Y)
 
+#CREATE NETWORK
+nnet = cb.Network()
+
 #CREATE LAYERS
-Lin = Layer( 2, names= ['a','b'] )
-Lhidden = Layer( 2, LogisticNeuron , names= ['c','d'] )
-Lout = SoftMaxLayer( 2 , names= ['e','f'] )
-bias = Layer( 1, BiasUnit, names= ['bias'] )
+Lin = cb.Layer( 2, names= ['a','b'] )
+Lhidden = cb.Layer( 2, cb.LogisticNeuron , names= ['c','d'] )
+Lout = cb.SoftMaxLayer( 2 , names= ['e', 'f'] )
+bias = cb.Layer( 1, cb.BiasUnit, names= ['bias'] )
 
 #ADD LAYERS TO NETWORK
 nnet.addInputLayer(Lin)
@@ -33,7 +34,7 @@ bias.connectTo(Lout)
 
 #CREATE BATCH TRAINER
 rate = 0.1
-batch = Trainer( nnet, X, Y, rate )
+batch = cb.Trainer( nnet, X, Y, rate )
 
 #TRAIN
 t1 = time()

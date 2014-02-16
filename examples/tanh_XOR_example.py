@@ -1,7 +1,6 @@
 import cybrain as cb
 import numpy as np
 from time import time
-nnet = cb.Network()
 
 #TRUTH TABLE (DATA)
 X =     [[0.0,0.0]];     Y = [[-1.0]]
@@ -9,9 +8,11 @@ X.append([1.0,0.0]); Y.append([1.0])
 X.append([0.0,1.0]); Y.append([1.0])
 X.append([1.0,1.0]); Y.append([-1.0])
 
-
 #CONVERT DATA TO NUMPY ARRAY
 X, Y = np.array(X), np.array(Y)
+
+#CREATE NETWORK
+nnet = cb.Network()
 
 #CREATE LAYERS
 Lin = cb.Layer( 2, names= ['a','b'] )
