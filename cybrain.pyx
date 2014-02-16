@@ -77,9 +77,11 @@ cdef class Neuron(object):
             self.is_active_sum = True
             self.z = 0.0
             if self.number_backward_connections > 0:
+                self.z = 0.0
                 for connection in self.backward_connections:
-                    signals.append( connection.activate() )
-                self.z = sum(signals)
+                    self.z += connection.activate()
+                    # signals.append( connection.activate() )
+                # self.z = sum(signals)
             else:
                 self.z = self.x
 
@@ -110,8 +112,11 @@ cdef class Neuron(object):
             signals = []
             self.dEdy = 0.0
             if self.number_forward_connections > 0:
-                signals = [ connection.errorActivate() for connection in self.forward_connections ]
-                self.dEdy = sum(signals)
+                self.dEdy = 0.0
+                for connection in self.forward_connections:
+                    self.dEdy += connection.errorActivate()
+                # signals = [ connection.errorActivate() for connection in self.forward_connections ]
+                # self.dEdy = sum(signals)
     
     cdef dEdzFromNeurons(self):
         self.dEdz = self.dEdy * self.dydz()
