@@ -1,4 +1,5 @@
 __author__ = 'Cristian'
+#CYBRAIN
 from cybrain import Neuron, LogisticNeuron, Connection, Layer, Network, BiasUnit, Trainer, SoftMaxLayer
 import numpy as np
 from time import time
@@ -48,6 +49,7 @@ for x in X:
 
 print
 
+#PYBRAIN
 from pybrain.tools.shortcuts import buildNetwork
 from pybrain import LinearLayer, SigmoidLayer, FeedForwardNetwork, FullConnection, BiasUnit, SoftmaxLayer
 from pybrain.supervised.trainers.backprop import BackpropTrainer
