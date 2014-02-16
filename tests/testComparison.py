@@ -22,13 +22,13 @@ bias = Layer( 1, BiasUnit, names=['b'] )
 
 #ADD LAYERS TO NETWORK
 nnet.addInputLayer(Lin)
-nnet.addLayer(Lhidden)
-nnet.addOutputLayer(Lout)
+nnet.addOutputLayer(Lhidden)
+nnet.addLayer(Lout)
 nnet.addAutoInputLayer(bias)
 
 #CONNECT LAYERS
-Lin.connectTo(Lhidden)
-Lhidden.connectTo(Lout)
+Lin.connectTo(Lout)
+Lout.connectTo(Lhidden)
 bias.connectTo(Lhidden)
 bias.connectTo(Lout)
 
