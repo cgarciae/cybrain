@@ -21,7 +21,7 @@ X, Y = np.array(X), np.array(Y)
 #CREATE LAYERS
 Lin = Layer( 2, names= ['a','b'] )
 Lhidden = SoftMaxLayer( 2, names= ['c','d'] )
-Lout = Layer( 2, LogisticNeuron , names= ['e'] )
+Lout = Layer( 2, LogisticNeuron , names= ['e', 'f'] )
 bias = Layer( 1, BiasUnit, names= ['bias'] )
 
 #ADD LAYERS TO NETWORK
@@ -55,12 +55,12 @@ connections[11].weight = ( -0.246 )
 nnet.activateWith(X[3])
 nnet.backpropagateWith(Y[3])
 
-batch = Trainer(nnet,X,Y,0.1)
-batch.epochs(2000)
-
-#PRINT RESULTS
-for x in X:
-    print "{} ==> {}".format( x, nnet.activateWith(x, return_value= True) )
+# batch = Trainer(nnet,X,Y,0.1)
+# batch.epochs(2000)
+#
+# #PRINT RESULTS
+# for x in X:
+#     print "{} ==> {}".format( x, nnet.activateWith(x, return_value= True) )
 
 
 ##Validation##

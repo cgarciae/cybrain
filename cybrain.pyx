@@ -92,7 +92,7 @@ cdef class Neuron(object):
         if not self.is_active_state:
             self.is_active_state = True
             self.activateLayer()
-            self.activationFuntion()
+            self.activationFunction()
         #print "\nF => Neuron {}, Y = {}, Z = {}\n".format( self.name, self.y, self.z )
 
         return self.y
@@ -112,9 +112,8 @@ cdef class Neuron(object):
             signals = []
             self.dEdy = 0.0
             if self.number_forward_connections > 0:
-                self.dEdz = 0.0
                 for connection in self.forward_connections:
-                    self.dEdz += connection.errorActivate()
+                    self.dEdy += connection.errorActivate()
                 signals = [ connection.errorActivate() for connection in self.forward_connections ]
                 #print "\nB => Neuron {}, Signal = {}\n".format( self.name, signals )
     
@@ -146,7 +145,7 @@ cdef class Neuron(object):
     def errorLayerCalculations(self):
         pass
 
-    cdef activationFuntion(self):
+    cdef activationFunction(self):
         self.y = self.z
 
     cdef double dydz(self):
@@ -173,7 +172,7 @@ cdef class LogisticNeuron(Neuron):
     def __init__(self):
         Neuron.__init__(self)
 
-    cpdef activationFuntion(self):
+    cpdef activationFunction(self):
         self.y = 1.0 / ( 1.0 + math.exp(-self.z ) )
 
     cpdef double dydz(self):
@@ -181,6 +180,21 @@ cdef class LogisticNeuron(Neuron):
 
     cpdef double E(self):
         return -math.log(self.y) if self.t == 1 else -math.log( 1.0 - self.y )
+
+
+cdef class TanhNeuron(Neuron):
+
+    def __init__(self):
+        Neuron.__init__(self)
+
+    cpdef activationFunction(self):
+        self.y = 2.0 / ( 1.0 + math.exp( -2.0*self.z ) ) - 1.0
+
+    cpdef double dydz(self):
+        return 1.0 - self.y**2
+
+    cpdef double E(self):
+        return -math.log( (self.y + 1.0) / 2.0 ) if self.t == 1 else -math.log( 1.0 - (self.y + 1.0) / 2.0 )
 
 cdef class BiasUnit(Neuron):
 
@@ -190,7 +204,7 @@ cdef class BiasUnit(Neuron):
         self.y = 1.0
         self.is_active_sum = True
 
-    cdef activationFuntion(self):
+    cdef activationFunction(self):
         self.y = 1.0
 
 cdef class LayerActivatedNeuron(Neuron):
@@ -236,7 +250,7 @@ cdef class SoftMaxNeuron(LayerActivatedNeuron):
         self.layer.sum = sum( [ math.exp( neuron.z - self.layer.max ) for neuron in self.layer.neurons] )
 
 
-    cdef activationFuntion(self):
+    cdef activationFunction(self):
         self.y = math.exp( self.z - self.layer.max ) / self.layer.sum
         
     cdef dEdzFromNeurons(self):
