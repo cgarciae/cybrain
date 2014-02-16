@@ -2,14 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d8edb8c6-9aef-472f-81b9-d1baaf365961" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tests/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tests/testSoftmax.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/XOR_example.py" afterPath="$PROJECT_DIR$/tests/XOR_example.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/testComparison.py" afterPath="$PROJECT_DIR$/tests/testComparison.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/testTBrain.py" afterPath="$PROJECT_DIR$/tests/testTBrain.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/testing.py" afterPath="$PROJECT_DIR$/tests/testing.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tests/testSoftmaxAsOutput.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/testSoftmax.py" afterPath="$PROJECT_DIR$/tests/testSoftmaxAsLayer.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/temp.macosx-10.6-intel-2.7/cybrain.o" afterPath="$PROJECT_DIR$/build/temp.macosx-10.6-intel-2.7/cybrain.o" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.so" afterPath="$PROJECT_DIR$/cybrain.so" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.cpp" afterPath="$PROJECT_DIR$/cybrain.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.pyx" afterPath="$PROJECT_DIR$/cybrain.pyx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/testComparison.py" afterPath="$PROJECT_DIR$/tests/testComparison.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="cybrain.iws" />
@@ -23,11 +22,12 @@
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/cybrain$Unittests_in_testing.coverage" NAME="Unittests in testing Coverage Results" MODIFIED="1390937927314" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/nets/layers" />
-    <SUITE FILE_PATH="coverage/cybrain$test__1_.coverage" NAME="test (1) Coverage Results" MODIFIED="1392424365344" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/cybrain$test.coverage" NAME="test Coverage Results" MODIFIED="1392393346529" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/" />
-    <SUITE FILE_PATH="coverage/cybrain$testSoftmax.coverage" NAME="testSoftmax Coverage Results" MODIFIED="1392424489937" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
-    <SUITE FILE_PATH="coverage/cybrain$setup.coverage" NAME="setup Coverage Results" MODIFIED="1390684848762" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/nets/layers" />
+    <SUITE FILE_PATH="coverage/cybrain$test__1_.coverage" NAME="test (1) Coverage Results" MODIFIED="1392531672656" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/cybrain$test.coverage" NAME="test Coverage Results" MODIFIED="1392531726561" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/" />
+    <SUITE FILE_PATH="coverage/cybrain$testSoftmax.coverage" NAME="testSoftmax Coverage Results" MODIFIED="1392529837402" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/cybrain$test2.coverage" NAME="test2 Coverage Results" MODIFIED="1392391621825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/cybrain$setup.coverage" NAME="setup Coverage Results" MODIFIED="1390684848762" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/nets/layers" />
+    <SUITE FILE_PATH="coverage/cybrain$testSoftmaxAsLayer.coverage" NAME="testSoftmaxAsLayer Coverage Results" MODIFIED="1392531825186" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/cybrain$cybrain_pyx.coverage" NAME="cybrain.pyx Coverage Results" MODIFIED="1392191712170" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="CreatePatchCommitExecutor">
@@ -47,10 +47,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="cybrain.pyx" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="cybrain.pyx" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cybrain.pyx">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="78" column="52" selection-start="2334" selection-end="2334" vertical-scroll-proportion="0.0" vertical-offset="953" max-vertical-offset="10230">
+            <state line="658" column="16" selection-start="19175" selection-end="19175" vertical-scroll-proportion="0.6520619" vertical-offset="9617" max-vertical-offset="10350">
               <folding>
                 <element signature="e#130#149#0" expanded="true" />
               </folding>
@@ -61,7 +61,7 @@
       <file leaf-file-name="XOR_example.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/XOR_example.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="21" column="22" selection-start="0" selection-end="1084" vertical-scroll-proportion="0.0" vertical-offset="266" max-vertical-offset="720">
+            <state line="42" column="0" selection-start="982" selection-end="1084" vertical-scroll-proportion="0.0" vertical-offset="255" max-vertical-offset="720">
               <folding />
             </state>
           </provider>
@@ -70,7 +70,7 @@
       <file leaf-file-name="TBrain.pyx" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/TBrain.pyx">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="4" column="0" selection-start="113" selection-end="113" vertical-scroll-proportion="0.0" vertical-offset="60" max-vertical-offset="7575">
+            <state line="4" column="0" selection-start="113" selection-end="113" vertical-scroll-proportion="0.0" vertical-offset="60" max-vertical-offset="7590">
               <folding />
             </state>
           </provider>
@@ -88,20 +88,39 @@
       <file leaf-file-name="testComparison.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/testComparison.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="35" selection-start="334" selection-end="334" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1260">
+            <state line="32" column="20" selection-start="864" selection-end="864" vertical-scroll-proportion="0.0" vertical-offset="630" max-vertical-offset="1230">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="testSoftmaxAsOutput.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tests/testSoftmaxAsOutput.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="82" column="14" selection-start="2502" selection-end="2502" vertical-scroll-proportion="0.0" vertical-offset="593" max-vertical-offset="1650">
               <folding>
-                <element signature="e#33#136#0" expanded="true" />
+                <element signature="e#24#65#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="testSoftmax.py" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/tests/testSoftmax.py">
+      <file leaf-file-name="testSoftmaxAsLayer.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tests/testSoftmaxAsLayer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="14" selection-start="986" selection-end="986" vertical-scroll-proportion="0.5874126" vertical-offset="0" max-vertical-offset="1665">
+            <state line="62" column="75" selection-start="1752" selection-end="1752" vertical-scroll-proportion="0.0" vertical-offset="600" max-vertical-offset="1665">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="gradient.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/theano/gradient.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="427" column="0" selection-start="15841" selection-end="15841" vertical-scroll-proportion="0.0" vertical-offset="2076" max-vertical-offset="5310">
               <folding>
-                <element signature="e#24#65#0" expanded="true" />
+                <element signature="e#27540#27595#2" expanded="true" />
+                <element signature="e#27644#27787#2" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -110,10 +129,8 @@
       <file leaf-file-name="testTBrain.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/testTBrain.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="33" column="0" selection-start="944" selection-end="1282" vertical-scroll-proportion="0.0" vertical-offset="435" max-vertical-offset="2265">
-              <folding>
-                <element signature="e#24#119#0" expanded="true" />
-              </folding>
+            <state line="40" column="35" selection-start="1214" selection-end="1214" vertical-scroll-proportion="0.0" vertical-offset="375" max-vertical-offset="2205">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -153,9 +170,12 @@
         <option value="$PROJECT_DIR$/test2.py" />
         <option value="$PROJECT_DIR$/testing.py" />
         <option value="$PROJECT_DIR$/XOR_example.py" />
-        <option value="$PROJECT_DIR$/cybrain.pyx" />
         <option value="$PROJECT_DIR$/testComparison.py" />
         <option value="$PROJECT_DIR$/tests/testSoftmax.py" />
+        <option value="$PROJECT_DIR$/cybrain.pyx" />
+        <option value="$PROJECT_DIR$/tests/testComparison.py" />
+        <option value="$PROJECT_DIR$/tests/XOR_example.py" />
+        <option value="$PROJECT_DIR$/tests/testSoftmaxAsLayer.py" />
       </list>
     </option>
   </component>
@@ -215,7 +235,38 @@
     <panes>
       <pane id="Scope" />
       <pane id="ProjectPane">
-        <subPane />
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cybrain" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cybrain" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cybrain" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cybrain" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cybrain" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tests" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
       </pane>
     </panes>
   </component>
@@ -239,12 +290,15 @@
     </option>
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/tests" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/tests" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.testSoftmax">
+  <component name="RunManager" selected="Python.testSoftmaxAsLayer">
     <configuration default="false" name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -285,25 +339,6 @@
       <ConfigurationWrapper RunnerId="PythonRunner" />
       <method />
     </configuration>
-    <configuration default="false" name="cybrain.pyx" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="cybrain" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cybrain.pyx" />
-      <option name="PARAMETERS" value="" />
-      <RunnerSettings RunnerId="PythonRunner" />
-      <ConfigurationWrapper RunnerId="PythonRunner" />
-      <method />
-    </configuration>
     <configuration default="false" name="test2" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -336,7 +371,26 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="cybrain" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/testSoftmax.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/testSoftmaxAsOutput.py" />
+      <option name="PARAMETERS" value="" />
+      <RunnerSettings RunnerId="PythonRunner" />
+      <ConfigurationWrapper RunnerId="PythonRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="testSoftmaxAsLayer" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="cybrain" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/testSoftmaxAsLayer.py" />
       <option name="PARAMETERS" value="" />
       <RunnerSettings RunnerId="PythonRunner" />
       <ConfigurationWrapper RunnerId="PythonRunner" />
@@ -426,6 +480,9 @@
       <option name="PARAMETERS" value="" />
       <method />
     </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true">
+      <method />
+    </configuration>
     <configuration default="true" type="tests" factoryName="Unittests">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -447,9 +504,6 @@
       <option name="PUREUNITTEST" value="true" />
       <option name="PARAMS" value="" />
       <option name="USE_PARAM" value="false" />
-      <method />
-    </configuration>
-    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true">
       <method />
     </configuration>
     <configuration default="true" type="tests" factoryName="Doctests">
@@ -495,17 +549,17 @@
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Python.test" />
       <item index="1" class="java.lang.String" itemvalue="Python.test (1)" />
-      <item index="2" class="java.lang.String" itemvalue="Python.cybrain.pyx" />
-      <item index="3" class="java.lang.String" itemvalue="Python.test2" />
-      <item index="4" class="java.lang.String" itemvalue="Python.testSoftmax" />
+      <item index="2" class="java.lang.String" itemvalue="Python.test2" />
+      <item index="3" class="java.lang.String" itemvalue="Python.testSoftmax" />
+      <item index="4" class="java.lang.String" itemvalue="Python.testSoftmaxAsLayer" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.testSoftmax" />
-        <item index="1" class="java.lang.String" itemvalue="Python.test (1)" />
-        <item index="2" class="java.lang.String" itemvalue="Python.test" />
-        <item index="3" class="java.lang.String" itemvalue="Python.test2" />
-        <item index="4" class="java.lang.String" itemvalue="Python.cybrain.pyx" />
+        <item index="0" class="java.lang.String" itemvalue="Python.testSoftmaxAsLayer" />
+        <item index="1" class="java.lang.String" itemvalue="Python.test" />
+        <item index="2" class="java.lang.String" itemvalue="Python.test (1)" />
+        <item index="3" class="java.lang.String" itemvalue="Python.testSoftmax" />
+        <item index="4" class="java.lang.String" itemvalue="Python.test2" />
       </list>
     </recent_temporary>
   </component>
@@ -565,25 +619,25 @@
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32891247" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33377308" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33245382" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32891247" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32998565" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20171674" sideWeight="0.67460316" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24034335" sideWeight="0.67374" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24034335" sideWeight="0.67374" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39814815" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32625994" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33333334" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33245382" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3275862" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" x="100" y="122" width="1240" height="674" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32804233" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
     </layout>
     <layout-to-restore>
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -603,9 +657,9 @@
       <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20171674" sideWeight="0.67460316" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24034335" sideWeight="0.67374" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33377308" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout-to-restore>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -631,24 +685,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/tests/testTBrain.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2265">
-          <folding>
-            <element signature="e#24#119#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cybrain.pyx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="51" column="45" selection-start="1506" selection-end="1506" vertical-scroll-proportion="0.0" vertical-offset="765" max-vertical-offset="10200">
-          <folding>
-            <element signature="e#130#149#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/XOR_example.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="74" column="21" selection-start="1903" selection-end="1903" vertical-scroll-proportion="0.0" vertical-offset="1110" max-vertical-offset="1950">
@@ -666,18 +702,14 @@
     <entry file="file://$PROJECT_DIR$/tests/testComparison.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="1" column="0" selection-start="24" selection-end="1124" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="1230">
-          <folding>
-            <element signature="e#33#136#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/testTBrain.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2265">
-          <folding>
-            <element signature="e#24#119#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -707,18 +739,14 @@
     <entry file="file://$PROJECT_DIR$/tests/testComparison.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="1" column="0" selection-start="24" selection-end="1124" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="1230">
-          <folding>
-            <element signature="e#33#136#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/testTBrain.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2265">
-          <folding>
-            <element signature="e#24#119#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -748,18 +776,14 @@
     <entry file="file://$PROJECT_DIR$/tests/testComparison.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="1" column="0" selection-start="24" selection-end="1124" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="1200">
-          <folding>
-            <element signature="e#33#136#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/testTBrain.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2265">
-          <folding>
-            <element signature="e#24#119#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -960,30 +984,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/testing.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="27" selection-start="192" selection-end="192" vertical-scroll-proportion="0.1986755" vertical-offset="0" max-vertical-offset="1380">
-          <folding />
-        </state>
+        <state line="9" column="27" selection-start="192" selection-end="192" vertical-scroll-proportion="0.1986755" vertical-offset="0" max-vertical-offset="1380" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/setup.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="25" column="0" selection-start="733" selection-end="733" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="585">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cybrain.pyx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="78" column="52" selection-start="2334" selection-end="2334" vertical-scroll-proportion="0.0" vertical-offset="953" max-vertical-offset="10230">
-          <folding>
-            <element signature="e#130#149#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/XOR_example.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="22" selection-start="0" selection-end="1084" vertical-scroll-proportion="0.0" vertical-offset="266" max-vertical-offset="720">
           <folding />
         </state>
       </provider>
@@ -995,29 +1001,58 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/testTBrain.py">
+    <entry file="file://$USER_HOME$/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/theano/gradient.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="0" selection-start="944" selection-end="1282" vertical-scroll-proportion="0.0" vertical-offset="435" max-vertical-offset="2265">
+        <state line="427" column="0" selection-start="15841" selection-end="15841" vertical-scroll-proportion="0.0" vertical-offset="2076" max-vertical-offset="5310">
           <folding>
-            <element signature="e#24#119#0" expanded="true" />
+            <element signature="e#27540#27595#2" expanded="true" />
+            <element signature="e#27644#27787#2" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/testComparison.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="35" selection-start="334" selection-end="334" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1260">
+        <state line="32" column="20" selection-start="864" selection-end="864" vertical-scroll-proportion="0.0" vertical-offset="105" max-vertical-offset="1230">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/testTBrain.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="35" selection-start="1214" selection-end="1214" vertical-scroll-proportion="0.0" vertical-offset="375" max-vertical-offset="2205">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/testSoftmaxAsOutput.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="82" column="14" selection-start="2502" selection-end="2502" vertical-scroll-proportion="0.0" vertical-offset="1095" max-vertical-offset="1650">
           <folding>
-            <element signature="e#33#136#0" expanded="true" />
+            <element signature="e#24#65#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/testSoftmax.py">
+    <entry file="file://$PROJECT_DIR$/tests/XOR_example.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="14" selection-start="986" selection-end="986" vertical-scroll-proportion="0.5874126" vertical-offset="0" max-vertical-offset="1665">
+        <state line="42" column="0" selection-start="982" selection-end="1084" vertical-scroll-proportion="0.0" vertical-offset="255" max-vertical-offset="720">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/testSoftmaxAsLayer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="62" column="75" selection-start="1752" selection-end="1752" vertical-scroll-proportion="0.0" vertical-offset="600" max-vertical-offset="1665">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cybrain.pyx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="658" column="16" selection-start="19175" selection-end="19175" vertical-scroll-proportion="0.6520619" vertical-offset="9617" max-vertical-offset="10350">
           <folding>
-            <element signature="e#24#65#0" expanded="true" />
+            <element signature="e#130#149#0" expanded="true" />
           </folding>
         </state>
       </provider>

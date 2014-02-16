@@ -77,9 +77,11 @@ cdef class Neuron(object):
             self.is_active_sum = True
             self.z = 0.0
             if self.number_backward_connections > 0:
+                self.z = 0.0
                 for connection in self.backward_connections:
+                    self.z += connection.activate()
                     signals.append( connection.activate() )
-                self.z = sum(signals)
+                #print "\nF => Neuron {}, Signal = {}\n".format( self.name, signals )
             else:
                 self.z = self.x
 
@@ -91,7 +93,7 @@ cdef class Neuron(object):
             self.is_active_state = True
             self.activateLayer()
             self.activationFuntion()
-        #print "\nF => Neuron {}, Y = {}, Z = {}, Signal = {}\n".format( self.name, self.y, self.z, signals )
+        #print "\nF => Neuron {}, Y = {}, Z = {}\n".format( self.name, self.y, self.z )
 
         return self.y
 
@@ -104,14 +106,17 @@ cdef class Neuron(object):
     cpdef calculated_dEdy(self):
         cdef:
             Connection connection
-            list signals
+            list signals = []
         if not self.is_error_derivative_active:
             self.is_error_derivative_active = True
             signals = []
             self.dEdy = 0.0
             if self.number_forward_connections > 0:
+                self.dEdz = 0.0
+                for connection in self.forward_connections:
+                    self.dEdz += connection.errorActivate()
                 signals = [ connection.errorActivate() for connection in self.forward_connections ]
-                self.dEdy = sum(signals)
+                #print "\nB => Neuron {}, Signal = {}\n".format( self.name, signals )
     
     cdef dEdzFromNeurons(self):
         self.dEdz = self.dEdy * self.dydz()
@@ -131,7 +136,7 @@ cdef class Neuron(object):
             self.is_local_gradient_active = True
             self.errorActivateLayer()
             self.calculate_dEdz()
-            #print "\nB => Neuron {}, Local Gradient = {}, Function Derivative = {}, Error Derivative = {}, Signal = {}\n".format( self.name, self.local_gradient, self.stateDerivative(), self.dEdy, signals )
+            #print "\nB => Neuron {}, Local Gradient = {}, Function Derivative = {}, Error Derivative = {}\n".format( self.name, self.dEdz, self.dydz(), self.dEdy )
 
         return self.dEdz
 
@@ -636,20 +641,23 @@ cdef class Trainer(object):
         cdef:
             int i
         for i in range(self.len_gradient):
-            print(self.total_gradient[i],)
+            #print(self.total_gradient[i],)
+            pass
 
     cdef printActualGradient(self):
         cdef:
             int i
         for i in range(self.len_gradient):
-            print(self._gradient[i][0],)
+            #print(self._gradient[i][0],)
+            pass
 
     cdef printWeights(self):
         cdef:
             int i
         for i in range(self.len_gradient):
-            print self._weights[i][0],
-        #print
+            #print self._weights[i][0],
+            pass
+        ##print
 
     cdef addToGradient( self ):
         cdef:
