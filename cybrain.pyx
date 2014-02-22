@@ -73,6 +73,7 @@ cdef class Neuron(object):
         cdef:
             Connection connection
             list signals = []
+            float sig
         if not self.is_active_sum:
             self.is_active_sum = True
             self.z = 0.0
@@ -80,7 +81,7 @@ cdef class Neuron(object):
                 self.z = 0.0
                 for connection in self.backward_connections:
                     self.z += connection.activate()
-                    signals.append( connection.activate() )
+                    #signals.append( connection.activate() )
                 #print "\nF => Neuron {}, Signal = {}\n".format( self.name, signals )
             else:
                 self.z = self.x
@@ -93,7 +94,7 @@ cdef class Neuron(object):
             self.is_active_state = True
             self.activateLayer()
             self.activationFunction()
-        #print "\nF => Neuron {}, Y = {}, Z = {}\n".format( self.name, self.y, self.z )
+            #print "\nF => Neuron {}, Y = {}, Z = {}\n".format( self.name, self.y, self.z )
 
         return self.y
 
@@ -165,7 +166,7 @@ cdef class Neuron(object):
         return self.forward_connections
 
     def __repr__(self):
-        return str(self.y)
+        return self.name + ' ' + str(self.y)
 
 cdef class LogisticNeuron(Neuron):
 
@@ -441,6 +442,9 @@ cdef class Layer(object):
     def __getitem__(self, item):
         return self.neurons[item]
 
+    def __len__(self):
+        return len(self.neurons)
+
 cdef class NeuronActivatedLayer(Layer):
     cdef:
         public bint is_active
@@ -469,6 +473,43 @@ cdef class SoftMaxLayer(NeuronActivatedLayer):
         NeuronActivatedLayer.clear(self)
         self.max = -1000000000000.0
         self.sum = 0.0
+
+cdef class SparseLinearInt(Layer):
+    cdef:
+        int last_input_data
+        int last_target_data
+
+    def __init__(self, *args, neuron_type = Neuron, list names = [] ):
+        Layer.__init__(self,*args, neuron_type = neuron_type, names = names )
+        self.last_input_data = 0
+        self.last_target_data = 0
+
+    cpdef setData(self, double[:] data ):
+        cdef:
+            int i = int(data[0])
+            Neuron neuron = self[i]
+        neuron.setData(1.0)
+        self.last_input_data = i
+
+    cpdef setTarget(self, double[:] target ):
+        cdef:
+            int i = int(target[0])
+            Neuron neuron = self[i]
+        neuron.setTarget(1.0)
+        self.last_target_data = i
+
+    cpdef clear(self):
+        Layer.clear(self)
+
+        cdef Neuron neuron
+        neuron = self[self.last_input_data]
+        neuron.x = 0.0
+        neuron = self[self.last_target_data]
+        neuron.t = 0.0
+
+
+    def __len__(self):
+        return 1
 
 
 cdef class Network(object):
@@ -514,18 +555,20 @@ cdef class Network(object):
         cdef:
             Layer layer
             Neuron neuron
-            int neuron_count = 0
+            int input_count = 0
             int layer_length, i
             list values
             float[:] output
 
         self.clearLayers()
         for layer in self.input_layers:
-            layer_length = len(layer.neurons)
-            layer.setData(input_data[neuron_count:neuron_count+layer_length])
-            neuron_count += layer_length
 
-        if len(input_data) != neuron_count:
+            layer_length = len(layer)
+            layer.setData(input_data[input_count:input_count+layer_length])
+            input_count += layer_length
+            #print("Layer {}".format([n.x for n in layer.neurons]))
+
+        if len(input_data) != input_count:
             raise IndexError("Input dimension dont match the number of input neurons")
 
         for layer in self.output_layers + self.fake_outputs:

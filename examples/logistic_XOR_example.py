@@ -38,9 +38,33 @@ batch = cb.Trainer( nnet, X, Y, rate )
 
 #TRAIN
 t1 = time()
-batch.epochs(2000)
+batch.epochs(2)
 print "Time CyBrain {}".format(time()-t1)
 
 #PRINT RESULTS
 for x in X:
     print "{} ==> {}".format( x, nnet.activateWith(x, return_value= True) )
+
+
+x = X[0]
+nnet.activateWith(x)
+print "x {}, Lout {}".format(x, [ (n.x,n.z,n.y) for n in Lout.neurons ] )
+
+x = X[1]
+nnet.activateWith(x)
+print "x {}, Lout {}".format(x, [ (n.x,n.z,n.y) for n in Lout.neurons ] )
+
+x = X[2]
+nnet.activateWith(x)
+print "x {}, Lout {}".format(x, [ (n.x,n.z,n.y) for n in Lout.neurons ] )
+
+x = X[3]
+nnet.activateWith(x)
+print "x {}, Lout {}".format(x, [ (n.x,n.z,n.y) for n in Lout.neurons ] )
+
+nnet.clearLayers()
+
+#PRINT RESULTS
+for x in X:
+    nnet.activateWith(x)
+    print "{} ==> {}, {}".format( x, Lout, [ (n.x,n.z,n.y) for n in Lout.neurons ] )
