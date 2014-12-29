@@ -33,5 +33,5 @@ tbrain = Extension( "tbrain",
 setup(
     cmdclass = {'build_ext': build_ext},
 #     ext_modules = [ neurons, connections, layers ]
-    ext_modules = [ cybrain, tbrain ]
+    ext_modules = [ cybrain, tbrain]
 )
