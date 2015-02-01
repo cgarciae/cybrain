@@ -10,22 +10,48 @@ cdef public int neuronCount = 0
 cdef class Neuron2 (object):
 
     cdef:
-        public double z
+        public double _z
         public double y
         public double dEdy
         public double dEdz
+        public bint active
 
         public list forwardConnections
         public list backwardConnections
 
+    property z:
+        def __get__(self):
+            cdef Connection2 connection
+            if not self.active:
+                self.active = True
+
+                self._z = sum([connection.value for connection in self.backwardConnections])
+
+            return self._z
+
+
     def __init__(self):
-        self.z = 0
+        self._z = 0
         self.y = 0
         self.dEdy = 0
         self.dEdz = 0
+        self.active = False
 
         self.forwardConnections = []
         self.backwardConnections = []
+
+cdef class InputNeuron2 (Neuron2):
+
+    cdef:
+        public double x
+
+    def __init__(self):
+        Neuron2.__init__(self)
+
+        self.x = 0
+
+
+
 
 cdef class Connection2 (object):
 
@@ -49,6 +75,17 @@ cdef class Connection2 (object):
         source .forwardConnections .append (self)
         receiver .backwardConnections .append (self)
 
+    property value:
+        def __get__(self):
+            return self.source.y * self.w
+
+    property w:
+        def __get__(self):
+            return self._w[0]
+
+        def __set__(self, double value):
+            self._w[0] = value
+
     cpdef disconnect (self):
         self.source.forwardConnections.remove (self)
         self.receiver.backwardConnections.remove (self)
@@ -61,13 +98,38 @@ cdef class Layer2 (object):
         public list neurons
         public list forwardLayers
         public list backwardLayers
+        public bint active
 
-    def __init__(self, int neuron_number):
+    def __init__(self, int neuron_number, neuronType = Neuron2):
 
+        self.forwardLayers = []
+        self.backwardLayers = []
         self.neurons = []
+        self.active = False
 
         for _ in range (neuron_number):
-            self.neurons.append (Neuron2 ())
+            self.neurons.append (neuronType ())
+
+    cpdef signalForwardActivation (self):
+        cdef:
+            Layer2 layer
+
+        for layer in self.backwardLayers:
+            layer.activate()
+
+    cdef activationFunction (self):
+        cdef:
+            Neuron2 neuron
+
+        for neuron in self.neurons:
+            neuron.y = neuron.z
+
+    cpdef activate (self):
+        if not self.active:
+            self.active = True
+
+            self.signalForwardActivation()
+            self.activationFunction()
 
     cpdef fullConnectionTo (self, Layer2 receiver):
         cdef:
@@ -105,6 +167,32 @@ cdef class Layer2 (object):
                 if connection.receiver in receiver.neurons:
                     connection.disconnect()
 
+
+cdef class InputLayer2 (Layer2):
+
+    def __init__(self, int neuron_number):
+        Layer2.__init__(self, neuron_number, InputNeuron2)
+
+
+    cdef activationFunction (self):
+        cdef InputNeuron2 neuron
+        for neuron in self.neurons:
+            neuron.y = neuron.x
+
+    cpdef setData(self, double[:] data):
+        cdef:
+            InputNeuron2 neuron
+            int i = 0
+            int lengthNeurons
+
+        lengthNeurons = len(self.neurons)
+
+        if lengthNeurons != len(data):
+            raise IndexError("data and layer dimensions are not equal")
+
+        for i in range (lengthNeurons):
+            neuron = self.neurons[i]
+            neuron.x = data[i]
 
 cdef class Net2 (object):
 
