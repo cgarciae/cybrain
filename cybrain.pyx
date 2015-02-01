@@ -5,6 +5,114 @@ from cython.view cimport array
 import random as rn
 import math
 
+cdef public int neuronCount = 0
+
+cdef class Neuron2 (object):
+
+    cdef:
+        public double z
+        public double y
+        public double dEdy
+        public double dEdz
+
+        public list forwardConnections
+        public list backwardConnections
+
+    def __init__(self):
+        self.z = 0
+        self.y = 0
+        self.dEdy = 0
+        self.dEdz = 0
+
+        self.forwardConnections = []
+        self.backwardConnections = []
+
+cdef class Connection2 (object):
+
+    cdef:
+        public int id;
+        public Neuron2 source
+        public Neuron2 receiver
+        double * _w
+        double * _dw
+
+    def __init__(self, Neuron2 source, Neuron2 receiver, double weight = 0):
+
+        self._w  = <double *> malloc (sizeof (double *))
+        self._dw = <double *> malloc (sizeof (double *))
+
+        self.source = source
+        self.receiver = receiver
+        self._w[0] = weight
+        self._dw[0] = 0
+
+        source .forwardConnections .append (self)
+        receiver .backwardConnections .append (self)
+
+    cpdef disconnect (self):
+        self.source.forwardConnections.remove (self)
+        self.receiver.backwardConnections.remove (self)
+        self.source = None
+        self.receiver = None
+
+cdef class Layer2 (object):
+
+    cdef:
+        public list neurons
+        public list forwardLayers
+        public list backwardLayers
+
+    def __init__(self, int neuron_number):
+
+        self.neurons = []
+
+        for _ in range (neuron_number):
+            self.neurons.append (Neuron2 ())
+
+    cpdef fullConnectionTo (self, Layer2 receiver):
+        cdef:
+            Neuron2 neuronSource
+            Neuron2 neuronReceiver
+
+        for neuronSource in self.neurons:
+            for neuronReceiver in receiver.neurons:
+                Connection2 (neuronSource, neuronReceiver)
+
+    cpdef linearConnectionTo (self, Layer2 receiver):
+        cdef:
+            Neuron2 neuronSource
+            Neuron2 neuronReceiver
+
+        for (neuronSource, neuronReceiver) in zip (self.neurons, receiver.neurons):
+            Connection2 (neuronSource, neuronReceiver)
+
+    cpdef disconnectFrom (self, Layer2 receiver):
+        cdef:
+            Neuron2 neuronSource
+            Connection2 connection
+
+        for neuronSource in self.neurons:
+            for connection in neuronSource.forwardConnections:
+                if connection.receiver in receiver.neurons:
+                    connection.disconnect()
+
+
+cdef  class Net2 (object):
+
+    cdef:
+        public list inputLayers
+        public list hiddenLayers
+        public list outputLayers
+        public list constantInput
+
+    def __init__(self):
+        self.inputLayers = []
+        self.hiddenLayers = []
+        self.outputLayers = []
+
+
+
+
 cdef class Neuron(object):
     cdef:
         public str name
@@ -290,7 +398,7 @@ cdef class Connection(object):
         self.destination = destination
         destination.addBackwardConnection( self )
 
-        self._weight[0] = weight if weight else rn.uniform(-1,1);
+        self._weight[0] = weight if weight != 0 else rn.uniform(-1,1)
         self._weight_diff[0] = 0.0
 
     property weight:
@@ -696,3 +804,5 @@ cdef class Trainer(object):
 
         for i in range(self.len_gradient):
             self._weights[i][0] -= self.learning_rate * self.total_gradient[i]
+
+
