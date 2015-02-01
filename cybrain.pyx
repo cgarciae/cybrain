@@ -74,6 +74,9 @@ cdef class Layer2 (object):
             Neuron2 neuronSource
             Neuron2 neuronReceiver
 
+        self.forwardLayers.append (receiver)
+        receiver.backwardLayers.append (self)
+
         for neuronSource in self.neurons:
             for neuronReceiver in receiver.neurons:
                 Connection2 (neuronSource, neuronReceiver)
@@ -83,6 +86,9 @@ cdef class Layer2 (object):
             Neuron2 neuronSource
             Neuron2 neuronReceiver
 
+        self.forwardLayers.append (receiver)
+        receiver.backwardLayers.append (self)
+
         for (neuronSource, neuronReceiver) in zip (self.neurons, receiver.neurons):
             Connection2 (neuronSource, neuronReceiver)
 
@@ -91,13 +97,16 @@ cdef class Layer2 (object):
             Neuron2 neuronSource
             Connection2 connection
 
+        self.forwardLayers.remove (receiver)
+        receiver.backwardLayers.remove (self)
+
         for neuronSource in self.neurons:
             for connection in neuronSource.forwardConnections:
                 if connection.receiver in receiver.neurons:
                     connection.disconnect()
 
 
-cdef  class Net2 (object):
+cdef class Net2 (object):
 
     cdef:
         public list inputLayers

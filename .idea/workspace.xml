@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d8edb8c6-9aef-472f-81b9-d1baaf365961" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.c" afterPath="$PROJECT_DIR$/cybrain.c" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.html" afterPath="$PROJECT_DIR$/cybrain.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.pyx" afterPath="$PROJECT_DIR$/cybrain.pyx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="cybrain.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -51,8 +48,8 @@
       <file leaf-file-name="cybrain.pyx" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cybrain.pyx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="1.1922078" vertical-offset="0" max-vertical-offset="13838">
-              <caret line="27" column="37" selection-start-line="27" selection-start-column="37" selection-end-line="27" selection-end-column="37" />
+            <state vertical-scroll-proportion="-0.015584416" vertical-offset="1825" max-vertical-offset="13991">
+              <caret line="107" column="0" selection-start-line="107" selection-start-column="0" selection-end-line="107" selection-end-column="0" />
               <folding>
                 <element signature="e#130#149#0" expanded="true" />
               </folding>
@@ -1061,8 +1058,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cybrain.pyx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.1922078" vertical-offset="0" max-vertical-offset="13838">
-          <caret line="27" column="37" selection-start-line="27" selection-start-column="37" selection-end-line="27" selection-end-column="37" />
+        <state vertical-scroll-proportion="-0.015584416" vertical-offset="1825" max-vertical-offset="13991">
+          <caret line="107" column="0" selection-start-line="107" selection-start-column="0" selection-end-line="107" selection-end-column="0" />
           <folding>
             <element signature="e#130#149#0" expanded="true" />
           </folding>
