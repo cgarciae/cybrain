@@ -1,3 +1,0 @@
-LIBRARY cybrain.pyd
-EXPORTS
-initcybrain
