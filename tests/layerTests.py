@@ -7,8 +7,10 @@ import unittest
 class TestLayerFunctions(unittest.TestCase):
 
     def setUp (self):
-        self.layerA = cb.InputLayer2(3)
+        self.layerA = cb.Layer2(3)
         self.layerB = cb.Layer2(2)
+
+        self.layerA.input = True
 
         self.layerA.setData(np.array([1., 2., 3.]))
         self.layerA.fullConnectionTo (self.layerB)
@@ -16,8 +18,6 @@ class TestLayerFunctions(unittest.TestCase):
         for neuron in self.layerA.neurons:
             for (connection, value) in zip(neuron.forwardConnections, [1, 2]):
                 connection.w = value
-
-
 
 
     def testConnectionNumber (self):

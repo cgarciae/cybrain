@@ -14,7 +14,7 @@ cdef class Neuron2 (object):
         public double y
         public double dEdy
         public double dEdz
-        public bint active, input
+        public bint active, input, output
 
         public list forwardConnections
         public list backwardConnections
@@ -25,7 +25,8 @@ cdef class Neuron2 (object):
         self.dEdy = 0
         self.dEdz = 0
         self.active = False
-        self.input = True
+        self.input = False
+        self.output = False
 
         self.forwardConnections = []
         self.backwardConnections = []
@@ -38,6 +39,10 @@ cdef class Neuron2 (object):
                 self._z = sum([connection.value for connection in self.backwardConnections])
 
             return self._z
+
+
+        def __set__(self, value):
+            self._z = value
 
 
 
@@ -88,7 +93,7 @@ cdef class Layer2 (object):
         public list neurons
         public list forwardLayers
         public list backwardLayers
-        public bint active
+        public bint active, _input, _output
 
     def __init__(self, int neuron_number, neuronType = Neuron2):
 
@@ -96,6 +101,8 @@ cdef class Layer2 (object):
         self.backwardLayers = []
         self.neurons = []
         self.active = False
+        self._input = False
+        self._output = False
 
         for _ in range (neuron_number):
             self.neurons.append (neuronType ())
@@ -158,24 +165,14 @@ cdef class Layer2 (object):
                     connection.disconnect()
 
 
-
-
-cdef class InputLayer2 (Layer2):
-
-    def __init__(self, int neuron_number):
-        Layer2.__init__(self, neuron_number, InputNeuron2)
-
-
-    cdef activationFunction (self):
-        cdef InputNeuron2 neuron
-        for neuron in self.neurons:
-            neuron.y = neuron.x
-
     cpdef setData(self, double[:] data):
         cdef:
-            InputNeuron2 neuron
+            Neuron2 neuron
             int i = 0
             int lengthNeurons
+
+        if not self.input:
+            raise RuntimeError ("Attempt to set data to a layer that is not an input")
 
         lengthNeurons = len(self.neurons)
 
@@ -184,7 +181,42 @@ cdef class InputLayer2 (Layer2):
 
         for i in range (lengthNeurons):
             neuron = self.neurons[i]
-            neuron.x = data[i]
+            neuron.z = data[i]
+
+
+    property input:
+        def __set__(self, bint isInput):
+            cdef Neuron2 neuron
+
+            self._input = isInput
+
+            for neuron in self.neurons:
+                neuron.input = isInput
+
+                if isInput:
+                    neuron.output = False
+                    self._output = False
+
+        def __get__(self):
+            return self._input
+
+    property output:
+        def __set__(self, bint isOutput):
+            cdef Neuron2 neuron
+
+            self._output = isOutput
+
+            for neuron in self.neurons:
+                neuron.output = isOutput
+
+                if isOutput:
+                    neuron.input = False
+                    self._input = False
+
+        def __get__(self):
+            return self._output
+
+
 
 cdef class Net2 (object):
 
