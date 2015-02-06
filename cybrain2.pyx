@@ -31,18 +31,24 @@ cdef class Neuron2 (object):
         self.forwardConnections = []
         self.backwardConnections = []
 
-    property z:
-        def __get__(self):
-            cdef Connection2 connection
-            if not self.active and not self.input:
-                self.active = True
-                self._z = sum([connection.value for connection in self.backwardConnections])
 
-            return self._z
+    cdef double getZ(self):
+        cdef:
+            Connection2 connection
 
 
-        def __set__(self, value):
-            self._z = value
+        if not self.active and not self.input:
+            self.active = True
+            self._z = 0
+
+            for connection in self.backwardConnections:
+                self._z += connection.value()
+
+        return self._z
+
+
+    cdef setZ (self, double value):
+        self._z = value
 
 
 
@@ -70,16 +76,16 @@ cdef class Connection2 (object):
         source .forwardConnections .append (self)
         receiver .backwardConnections .append (self)
 
-    property value:
-        def __get__(self):
-            return self.source.y * self.w
 
-    property w:
-        def __get__(self):
-            return self._w[0]
+    cdef double value (self):
+        return self.source.y * self._w[0]
 
-        def __set__(self, double value):
-            self._w[0] = value
+
+    cpdef double getW (self):
+        return self._w[0]
+
+    cpdef setW (self, double value):
+        self._w[0] = value
 
     cpdef disconnect (self):
         self.source.forwardConnections.remove (self)
@@ -119,7 +125,7 @@ cdef class Layer2 (object):
             Neuron2 neuron
 
         for neuron in self.neurons:
-            neuron.y = neuron.z
+            neuron.y = neuron.getZ()
 
     cpdef activate (self):
         if not self.active:
@@ -181,7 +187,7 @@ cdef class Layer2 (object):
 
         for i in range (lengthNeurons):
             neuron = self.neurons[i]
-            neuron.z = data[i]
+            neuron.setZ (data[i])
 
 
     property input:
