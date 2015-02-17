@@ -21656,14 +21656,14 @@ static int __pyx_pf_7cybrain_7Trainer___init__(struct __pyx_obj_7cybrain_Trainer
  *             Connection connection
  *             list connections
  *             int i = 0             # <<<<<<<<<<<<<<
+ *             double *p;
  *         self.net = net
- *         self.input_data = input_data
  */
   __pyx_v_i = 0;
 
-  /* "cybrain.pyx":841
- *             list connections
+  /* "cybrain.pyx":842
  *             int i = 0
+ *             double *p;
  *         self.net = net             # <<<<<<<<<<<<<<
  *         self.input_data = input_data
  *         self.output_data = output_data
@@ -21674,8 +21674,8 @@ static int __pyx_pf_7cybrain_7Trainer___init__(struct __pyx_obj_7cybrain_Trainer
   __Pyx_DECREF(((PyObject *)__pyx_v_self->net));
   __pyx_v_self->net = __pyx_v_net;
 
-  /* "cybrain.pyx":842
- *             int i = 0
+  /* "cybrain.pyx":843
+ *             double *p;
  *         self.net = net
  *         self.input_data = input_data             # <<<<<<<<<<<<<<
  *         self.output_data = output_data
@@ -21685,7 +21685,7 @@ static int __pyx_pf_7cybrain_7Trainer___init__(struct __pyx_obj_7cybrain_Trainer
   __PYX_INC_MEMVIEW(&__pyx_v_input_data, 0);
   __pyx_v_self->input_data = __pyx_v_input_data;
 
-  /* "cybrain.pyx":843
+  /* "cybrain.pyx":844
  *         self.net = net
  *         self.input_data = input_data
  *         self.output_data = output_data             # <<<<<<<<<<<<<<
@@ -21696,7 +21696,7 @@ static int __pyx_pf_7cybrain_7Trainer___init__(struct __pyx_obj_7cybrain_Trainer
   __PYX_INC_MEMVIEW(&__pyx_v_output_data, 0);
   __pyx_v_self->output_data = __pyx_v_output_data;
 
-  /* "cybrain.pyx":844
+  /* "cybrain.pyx":845
  *         self.input_data = input_data
  *         self.output_data = output_data
  *         self.learning_rate = learning_rate             # <<<<<<<<<<<<<<
@@ -21705,81 +21705,81 @@ static int __pyx_pf_7cybrain_7Trainer___init__(struct __pyx_obj_7cybrain_Trainer
  */
   __pyx_v_self->learning_rate = __pyx_v_learning_rate;
 
-  /* "cybrain.pyx":845
+  /* "cybrain.pyx":846
  *         self.output_data = output_data
  *         self.learning_rate = learning_rate
  *         connections = net.getConnections()             # <<<<<<<<<<<<<<
  *         self.len_gradient = len(connections)
  *         self.len_data = len(input_data)
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_net->__pyx_vtab)->getConnections(__pyx_v_net, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 845; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_net->__pyx_vtab)->getConnections(__pyx_v_net, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 846; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_connections = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":846
+  /* "cybrain.pyx":847
  *         self.learning_rate = learning_rate
  *         connections = net.getConnections()
  *         self.len_gradient = len(connections)             # <<<<<<<<<<<<<<
  *         self.len_data = len(input_data)
- *         self.total_gradient = array(shape=(self.len_gradient,), itemsize=sizeof(double), format="d")
+ * 
  */
   if (unlikely(__pyx_v_connections == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 846; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 847; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_2 = PyList_GET_SIZE(__pyx_v_connections); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 846; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyList_GET_SIZE(__pyx_v_connections); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 847; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->len_gradient = __pyx_t_2;
 
-  /* "cybrain.pyx":847
+  /* "cybrain.pyx":848
  *         connections = net.getConnections()
  *         self.len_gradient = len(connections)
  *         self.len_data = len(input_data)             # <<<<<<<<<<<<<<
+ * 
  *         self.total_gradient = array(shape=(self.len_gradient,), itemsize=sizeof(double), format="d")
- *         for connection in connections:
  */
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_input_data, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 847; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_input_data, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 848; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 847; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 848; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_self->len_data = __pyx_t_2;
 
-  /* "cybrain.pyx":848
- *         self.len_gradient = len(connections)
+  /* "cybrain.pyx":850
  *         self.len_data = len(input_data)
+ * 
  *         self.total_gradient = array(shape=(self.len_gradient,), itemsize=sizeof(double), format="d")             # <<<<<<<<<<<<<<
  *         for connection in connections:
  *             self._weights.push_back(connection._weight)
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 848; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 850; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_self->len_gradient); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 848; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_self->len_gradient); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 850; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 848; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 850; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_3);
   __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_shape, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 848; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_shape, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 850; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 848; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 850; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_itemsize, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 848; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_itemsize, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 850; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_format, __pyx_n_s_d) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 848; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 848; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_format, __pyx_n_s_d) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 850; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 850; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_4);
-  if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 848; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 850; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->total_gradient, 0);
   __pyx_v_self->total_gradient = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "cybrain.pyx":849
- *         self.len_data = len(input_data)
+  /* "cybrain.pyx":851
+ * 
  *         self.total_gradient = array(shape=(self.len_gradient,), itemsize=sizeof(double), format="d")
  *         for connection in connections:             # <<<<<<<<<<<<<<
  *             self._weights.push_back(connection._weight)
@@ -21787,21 +21787,21 @@ static int __pyx_pf_7cybrain_7Trainer___init__(struct __pyx_obj_7cybrain_Trainer
  */
   if (unlikely(__pyx_v_connections == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 849; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 851; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_4 = __pyx_v_connections; __Pyx_INCREF(__pyx_t_4); __pyx_t_2 = 0;
   for (;;) {
     if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_4)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_1 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_2); __Pyx_INCREF(__pyx_t_1); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 849; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_2); __Pyx_INCREF(__pyx_t_1); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 851; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_1 = PySequence_ITEM(__pyx_t_4, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 849; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PySequence_ITEM(__pyx_t_4, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 851; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #endif
-    if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7cybrain_Connection))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 849; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7cybrain_Connection))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 851; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XDECREF_SET(__pyx_v_connection, ((struct __pyx_obj_7cybrain_Connection *)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "cybrain.pyx":850
+    /* "cybrain.pyx":852
  *         self.total_gradient = array(shape=(self.len_gradient,), itemsize=sizeof(double), format="d")
  *         for connection in connections:
  *             self._weights.push_back(connection._weight)             # <<<<<<<<<<<<<<
@@ -21810,7 +21810,7 @@ static int __pyx_pf_7cybrain_7Trainer___init__(struct __pyx_obj_7cybrain_Trainer
  */
     __pyx_v_self->_weights.push_back(__pyx_v_connection->_weight);
 
-    /* "cybrain.pyx":851
+    /* "cybrain.pyx":853
  *         for connection in connections:
  *             self._weights.push_back(connection._weight)
  *             self._gradient.push_back(connection._weight_diff)             # <<<<<<<<<<<<<<
@@ -21819,8 +21819,8 @@ static int __pyx_pf_7cybrain_7Trainer___init__(struct __pyx_obj_7cybrain_Trainer
  */
     __pyx_v_self->_gradient.push_back(__pyx_v_connection->_weight_diff);
 
-    /* "cybrain.pyx":849
- *         self.len_data = len(input_data)
+    /* "cybrain.pyx":851
+ * 
  *         self.total_gradient = array(shape=(self.len_gradient,), itemsize=sizeof(double), format="d")
  *         for connection in connections:             # <<<<<<<<<<<<<<
  *             self._weights.push_back(connection._weight)
@@ -21856,7 +21856,7 @@ static int __pyx_pf_7cybrain_7Trainer___init__(struct __pyx_obj_7cybrain_Trainer
   return __pyx_r;
 }
 
-/* "cybrain.pyx":853
+/* "cybrain.pyx":855
  *             self._gradient.push_back(connection._weight_diff)
  * 
  *     cdef restartGradient(self):             # <<<<<<<<<<<<<<
@@ -21877,7 +21877,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_restartGradient(struct __pyx_obj_7cyb
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("restartGradient", 0);
 
-  /* "cybrain.pyx":856
+  /* "cybrain.pyx":858
  *         cdef:
  *             int i
  *         for i in range(self.len_gradient):             # <<<<<<<<<<<<<<
@@ -21888,14 +21888,14 @@ static PyObject *__pyx_f_7cybrain_7Trainer_restartGradient(struct __pyx_obj_7cyb
   for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
 
-    /* "cybrain.pyx":857
+    /* "cybrain.pyx":859
  *             int i
  *         for i in range(self.len_gradient):
  *             self.total_gradient[i] = 0.0             # <<<<<<<<<<<<<<
  * 
  *     cdef printGradient(self):
  */
-    if (unlikely(!__pyx_v_self->total_gradient.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 857; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+    if (unlikely(!__pyx_v_self->total_gradient.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 859; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
     __pyx_t_3 = __pyx_v_i;
     __pyx_t_4 = -1;
     if (__pyx_t_3 < 0) {
@@ -21904,12 +21904,12 @@ static PyObject *__pyx_f_7cybrain_7Trainer_restartGradient(struct __pyx_obj_7cyb
     } else if (unlikely(__pyx_t_3 >= __pyx_v_self->total_gradient.shape[0])) __pyx_t_4 = 0;
     if (unlikely(__pyx_t_4 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_4);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 857; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 859; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     *((double *) ( /* dim=0 */ (__pyx_v_self->total_gradient.data + __pyx_t_3 * __pyx_v_self->total_gradient.strides[0]) )) = 0.0;
   }
 
-  /* "cybrain.pyx":853
+  /* "cybrain.pyx":855
  *             self._gradient.push_back(connection._weight_diff)
  * 
  *     cdef restartGradient(self):             # <<<<<<<<<<<<<<
@@ -21929,7 +21929,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_restartGradient(struct __pyx_obj_7cyb
   return __pyx_r;
 }
 
-/* "cybrain.pyx":859
+/* "cybrain.pyx":861
  *             self.total_gradient[i] = 0.0
  * 
  *     cdef printGradient(self):             # <<<<<<<<<<<<<<
@@ -21945,7 +21945,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_printGradient(struct __pyx_obj_7cybra
   int __pyx_t_2;
   __Pyx_RefNannySetupContext("printGradient", 0);
 
-  /* "cybrain.pyx":862
+  /* "cybrain.pyx":864
  *         cdef:
  *             int i
  *         for i in range(self.len_gradient):             # <<<<<<<<<<<<<<
@@ -21957,7 +21957,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_printGradient(struct __pyx_obj_7cybra
     __pyx_v_i = __pyx_t_2;
   }
 
-  /* "cybrain.pyx":859
+  /* "cybrain.pyx":861
  *             self.total_gradient[i] = 0.0
  * 
  *     cdef printGradient(self):             # <<<<<<<<<<<<<<
@@ -21972,7 +21972,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_printGradient(struct __pyx_obj_7cybra
   return __pyx_r;
 }
 
-/* "cybrain.pyx":866
+/* "cybrain.pyx":868
  *             pass
  * 
  *     cdef printActualGradient(self):             # <<<<<<<<<<<<<<
@@ -21988,7 +21988,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_printActualGradient(struct __pyx_obj_
   int __pyx_t_2;
   __Pyx_RefNannySetupContext("printActualGradient", 0);
 
-  /* "cybrain.pyx":869
+  /* "cybrain.pyx":871
  *         cdef:
  *             int i
  *         for i in range(self.len_gradient):             # <<<<<<<<<<<<<<
@@ -22000,7 +22000,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_printActualGradient(struct __pyx_obj_
     __pyx_v_i = __pyx_t_2;
   }
 
-  /* "cybrain.pyx":866
+  /* "cybrain.pyx":868
  *             pass
  * 
  *     cdef printActualGradient(self):             # <<<<<<<<<<<<<<
@@ -22015,7 +22015,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_printActualGradient(struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "cybrain.pyx":873
+/* "cybrain.pyx":875
  *             pass
  * 
  *     cdef printWeights(self):             # <<<<<<<<<<<<<<
@@ -22031,7 +22031,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_printWeights(struct __pyx_obj_7cybrai
   int __pyx_t_2;
   __Pyx_RefNannySetupContext("printWeights", 0);
 
-  /* "cybrain.pyx":876
+  /* "cybrain.pyx":878
  *         cdef:
  *             int i
  *         for i in range(self.len_gradient):             # <<<<<<<<<<<<<<
@@ -22043,7 +22043,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_printWeights(struct __pyx_obj_7cybrai
     __pyx_v_i = __pyx_t_2;
   }
 
-  /* "cybrain.pyx":873
+  /* "cybrain.pyx":875
  *             pass
  * 
  *     cdef printWeights(self):             # <<<<<<<<<<<<<<
@@ -22058,7 +22058,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_printWeights(struct __pyx_obj_7cybrai
   return __pyx_r;
 }
 
-/* "cybrain.pyx":881
+/* "cybrain.pyx":883
  *         ##print
  * 
  *     cdef addToGradient( self ):             # <<<<<<<<<<<<<<
@@ -22079,7 +22079,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_addToGradient(struct __pyx_obj_7cybra
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("addToGradient", 0);
 
-  /* "cybrain.pyx":884
+  /* "cybrain.pyx":886
  *         cdef:
  *             int i
  *         for i in range(self.len_gradient):             # <<<<<<<<<<<<<<
@@ -22090,14 +22090,14 @@ static PyObject *__pyx_f_7cybrain_7Trainer_addToGradient(struct __pyx_obj_7cybra
   for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
 
-    /* "cybrain.pyx":885
+    /* "cybrain.pyx":887
  *             int i
  *         for i in range(self.len_gradient):
  *             self.total_gradient[i] += self._gradient[i][0]             # <<<<<<<<<<<<<<
  * 
  *     cpdef epochs(self, int epochs):
  */
-    if (unlikely(!__pyx_v_self->total_gradient.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 885; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+    if (unlikely(!__pyx_v_self->total_gradient.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 887; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
     __pyx_t_3 = __pyx_v_i;
     __pyx_t_4 = -1;
     if (__pyx_t_3 < 0) {
@@ -22106,12 +22106,12 @@ static PyObject *__pyx_f_7cybrain_7Trainer_addToGradient(struct __pyx_obj_7cybra
     } else if (unlikely(__pyx_t_3 >= __pyx_v_self->total_gradient.shape[0])) __pyx_t_4 = 0;
     if (unlikely(__pyx_t_4 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_4);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 885; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 887; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     *((double *) ( /* dim=0 */ (__pyx_v_self->total_gradient.data + __pyx_t_3 * __pyx_v_self->total_gradient.strides[0]) )) += ((__pyx_v_self->_gradient[__pyx_v_i])[0]);
   }
 
-  /* "cybrain.pyx":881
+  /* "cybrain.pyx":883
  *         ##print
  * 
  *     cdef addToGradient( self ):             # <<<<<<<<<<<<<<
@@ -22131,7 +22131,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_addToGradient(struct __pyx_obj_7cybra
   return __pyx_r;
 }
 
-/* "cybrain.pyx":887
+/* "cybrain.pyx":889
  *             self.total_gradient[i] += self._gradient[i][0]
  * 
  *     cpdef epochs(self, int epochs):             # <<<<<<<<<<<<<<
@@ -22160,11 +22160,11 @@ static PyObject *__pyx_f_7cybrain_7Trainer_epochs(struct __pyx_obj_7cybrain_Trai
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_epochs); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 887; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_epochs); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 889; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_7Trainer_3epochs)) {
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_epochs); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 887; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_epochs); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 889; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_1);
       __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -22178,17 +22178,17 @@ static PyObject *__pyx_f_7cybrain_7Trainer_epochs(struct __pyx_obj_7cybrain_Trai
         }
       }
       if (!__pyx_t_5) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 887; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 889; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else {
-        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 887; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 889; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_6);
         PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __Pyx_GIVEREF(__pyx_t_5); __pyx_t_5 = NULL;
         PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
         __Pyx_GIVEREF(__pyx_t_3);
         __pyx_t_3 = 0;
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 887; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 889; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
@@ -22201,7 +22201,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_epochs(struct __pyx_obj_7cybrain_Trai
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":890
+  /* "cybrain.pyx":892
  *         cdef:
  *             int i
  *         for i in range(epochs):             # <<<<<<<<<<<<<<
@@ -22212,19 +22212,19 @@ static PyObject *__pyx_f_7cybrain_7Trainer_epochs(struct __pyx_obj_7cybrain_Trai
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "cybrain.pyx":891
+    /* "cybrain.pyx":893
  *             int i
  *         for i in range(epochs):
  *             self.fullBatch()             # <<<<<<<<<<<<<<
  * 
  *     cdef fullBatch(self):
  */
-    __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Trainer *)__pyx_v_self->__pyx_vtab)->fullBatch(__pyx_v_self); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 891; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Trainer *)__pyx_v_self->__pyx_vtab)->fullBatch(__pyx_v_self); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 893; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":887
+  /* "cybrain.pyx":889
  *             self.total_gradient[i] += self._gradient[i][0]
  * 
  *     cpdef epochs(self, int epochs):             # <<<<<<<<<<<<<<
@@ -22261,7 +22261,7 @@ static PyObject *__pyx_pw_7cybrain_7Trainer_3epochs(PyObject *__pyx_v_self, PyOb
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("epochs (wrapper)", 0);
   assert(__pyx_arg_epochs); {
-    __pyx_v_epochs = __Pyx_PyInt_As_int(__pyx_arg_epochs); if (unlikely((__pyx_v_epochs == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 887; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_epochs = __Pyx_PyInt_As_int(__pyx_arg_epochs); if (unlikely((__pyx_v_epochs == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 889; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -22285,7 +22285,7 @@ static PyObject *__pyx_pf_7cybrain_7Trainer_2epochs(struct __pyx_obj_7cybrain_Tr
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("epochs", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_7cybrain_7Trainer_epochs(__pyx_v_self, __pyx_v_epochs, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 887; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_f_7cybrain_7Trainer_epochs(__pyx_v_self, __pyx_v_epochs, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 889; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -22302,7 +22302,7 @@ static PyObject *__pyx_pf_7cybrain_7Trainer_2epochs(struct __pyx_obj_7cybrain_Tr
   return __pyx_r;
 }
 
-/* "cybrain.pyx":893
+/* "cybrain.pyx":895
  *             self.fullBatch()
  * 
  *     cdef fullBatch(self):             # <<<<<<<<<<<<<<
@@ -22330,18 +22330,18 @@ static PyObject *__pyx_f_7cybrain_7Trainer_fullBatch(struct __pyx_obj_7cybrain_T
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("fullBatch", 0);
 
-  /* "cybrain.pyx":896
+  /* "cybrain.pyx":898
  *         cdef:
  *             int i
  *         self.restartGradient()             # <<<<<<<<<<<<<<
  *         for i in range(self.len_data):
  *             self.net.activateWith(self.input_data[i] )
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Trainer *)__pyx_v_self->__pyx_vtab)->restartGradient(__pyx_v_self); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 896; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Trainer *)__pyx_v_self->__pyx_vtab)->restartGradient(__pyx_v_self); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 898; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":897
+  /* "cybrain.pyx":899
  *             int i
  *         self.restartGradient()
  *         for i in range(self.len_data):             # <<<<<<<<<<<<<<
@@ -22352,14 +22352,14 @@ static PyObject *__pyx_f_7cybrain_7Trainer_fullBatch(struct __pyx_obj_7cybrain_T
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "cybrain.pyx":898
+    /* "cybrain.pyx":900
  *         self.restartGradient()
  *         for i in range(self.len_data):
  *             self.net.activateWith(self.input_data[i] )             # <<<<<<<<<<<<<<
  *             self.net.backpropagateWith( self.output_data[i] )
  *             self.addToGradient()
  */
-    if (unlikely(!__pyx_v_self->input_data.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 898; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+    if (unlikely(!__pyx_v_self->input_data.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 900; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
     __pyx_t_4 = __pyx_v_self->input_data;
     __PYX_INC_MEMVIEW(&__pyx_t_4, 1);
     __pyx_t_6 = -1;
@@ -22374,7 +22374,7 @@ static PyObject *__pyx_f_7cybrain_7Trainer_fullBatch(struct __pyx_obj_7cybrain_T
         __pyx_tmp_idx += __pyx_tmp_shape;
     if (1 && (__pyx_tmp_idx < 0 || __pyx_tmp_idx >= __pyx_tmp_shape)) {
         PyErr_SetString(PyExc_IndexError, "Index out of bounds (axis 0)");
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 898; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 900; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
         __pyx_t_5.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -22384,19 +22384,19 @@ __pyx_t_5.strides[0] = __pyx_t_4.strides[1];
     __pyx_t_5.suboffsets[0] = -1;
 
 __PYX_XDEC_MEMVIEW(&__pyx_t_4, 1);
-    __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->net->__pyx_vtab)->activateWith(__pyx_v_self->net, __pyx_t_5, 0, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 898; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->net->__pyx_vtab)->activateWith(__pyx_v_self->net, __pyx_t_5, 0, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 900; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "cybrain.pyx":899
+    /* "cybrain.pyx":901
  *         for i in range(self.len_data):
  *             self.net.activateWith(self.input_data[i] )
  *             self.net.backpropagateWith( self.output_data[i] )             # <<<<<<<<<<<<<<
  *             self.addToGradient()
  * 
  */
-    if (unlikely(!__pyx_v_self->output_data.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 899; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+    if (unlikely(!__pyx_v_self->output_data.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 901; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
     __pyx_t_7 = __pyx_v_self->output_data;
     __PYX_INC_MEMVIEW(&__pyx_t_7, 1);
     __pyx_t_6 = -1;
@@ -22411,7 +22411,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_4, 1);
         __pyx_tmp_idx += __pyx_tmp_shape;
     if (1 && (__pyx_tmp_idx < 0 || __pyx_tmp_idx >= __pyx_tmp_shape)) {
         PyErr_SetString(PyExc_IndexError, "Index out of bounds (axis 0)");
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 899; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 901; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
         __pyx_t_8.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -22421,24 +22421,24 @@ __pyx_t_8.strides[0] = __pyx_t_7.strides[1];
     __pyx_t_8.suboffsets[0] = -1;
 
 __PYX_XDEC_MEMVIEW(&__pyx_t_7, 1);
-    __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->net->__pyx_vtab)->backpropagateWith(__pyx_v_self->net, __pyx_t_8, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 899; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->net->__pyx_vtab)->backpropagateWith(__pyx_v_self->net, __pyx_t_8, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 901; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __PYX_XDEC_MEMVIEW(&__pyx_t_8, 1);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "cybrain.pyx":900
+    /* "cybrain.pyx":902
  *             self.net.activateWith(self.input_data[i] )
  *             self.net.backpropagateWith( self.output_data[i] )
  *             self.addToGradient()             # <<<<<<<<<<<<<<
  * 
  *         for i in range(self.len_gradient):
  */
-    __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Trainer *)__pyx_v_self->__pyx_vtab)->addToGradient(__pyx_v_self); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 900; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Trainer *)__pyx_v_self->__pyx_vtab)->addToGradient(__pyx_v_self); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 902; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":902
+  /* "cybrain.pyx":904
  *             self.addToGradient()
  * 
  *         for i in range(self.len_gradient):             # <<<<<<<<<<<<<<
@@ -22449,7 +22449,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_7, 1);
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "cybrain.pyx":903
+    /* "cybrain.pyx":905
  * 
  *         for i in range(self.len_gradient):
  *             self._weights[i][0] -= self.learning_rate * self.total_gradient[i]             # <<<<<<<<<<<<<<
@@ -22458,7 +22458,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_7, 1);
  */
     __pyx_t_6 = __pyx_v_i;
     __pyx_t_9 = 0;
-    if (unlikely(!__pyx_v_self->total_gradient.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 903; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+    if (unlikely(!__pyx_v_self->total_gradient.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 905; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
     __pyx_t_10 = __pyx_v_i;
     __pyx_t_11 = -1;
     if (__pyx_t_10 < 0) {
@@ -22467,12 +22467,12 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_7, 1);
     } else if (unlikely(__pyx_t_10 >= __pyx_v_self->total_gradient.shape[0])) __pyx_t_11 = 0;
     if (unlikely(__pyx_t_11 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_11);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 903; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 905; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     ((__pyx_v_self->_weights[__pyx_t_6])[__pyx_t_9]) = (((__pyx_v_self->_weights[__pyx_t_6])[__pyx_t_9]) - (__pyx_v_self->learning_rate * (*((double *) ( /* dim=0 */ (__pyx_v_self->total_gradient.data + __pyx_t_10 * __pyx_v_self->total_gradient.strides[0]) )))));
   }
 
-  /* "cybrain.pyx":893
+  /* "cybrain.pyx":895
  *             self.fullBatch()
  * 
  *     cdef fullBatch(self):             # <<<<<<<<<<<<<<

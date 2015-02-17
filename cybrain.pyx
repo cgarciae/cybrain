@@ -838,6 +838,7 @@ cdef class Trainer(object):
             Connection connection
             list connections
             int i = 0
+            double *p;
         self.net = net
         self.input_data = input_data
         self.output_data = output_data
@@ -845,6 +846,7 @@ cdef class Trainer(object):
         connections = net.getConnections()
         self.len_gradient = len(connections)
         self.len_data = len(input_data)
+
         self.total_gradient = array(shape=(self.len_gradient,), itemsize=sizeof(double), format="d")
         for connection in connections:
             self._weights.push_back(connection._weight)
