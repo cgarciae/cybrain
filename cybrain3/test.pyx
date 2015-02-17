@@ -8,69 +8,79 @@ import random as rn
 import math
 import sys
 
+ctypedef double (*BinaryDoubleFun)(double, double)
+ctypedef double (*UnaryDoubleFun)(double)
 
-
-ctypedef double* DoublePointer
-ctypedef vector[DoublePointer] DoubleVector
-ctypedef vector[DoubleVector] DoubleMatrix
-
-
-cdef DoublePointer newDoublePointer ():
-    return <DoublePointer> malloc (sizeof (DoublePointer))
-
-cdef DoubleVector newDoubleVector (int columns):
+cdef double [:,:] dotMultiply (double [:,:] A, double[:,:] B):
     cdef:
-        int j
-        DoubleVector vector = (new DoubleVector(columns))[0]
+        int i, j, k, m = A.shape[0], n = B.shape[1], o = A.shape[1]
+        double acc
+        double [:,:] result = array ((m, n), sizeof(double), 'd')
 
-    for j in range(columns):
-        vector[j] = newDoublePointer()
+    print m, n
 
-    return vector
+    for i in range(m):
+        for j in range(n):
+            acc = 0.0
+            for k in range(o):
+                acc += A[i,k] * B[k,j]
 
-cdef DoubleMatrix newDoubleMatrix (int rows, int columns):
+            result[i,j] = acc
+
+    return result
+
+cdef double [:,:] elementMultiply (double [:,:] A, double[:,:] B):
     cdef:
-        int i, j
-        DoubleMatrix matrix = (new DoubleMatrix(rows))[0]
+        int i, j, k, m = A.shape[0], n = A.shape[1]
+        double acc
+        double [:,:] result = array ((m, n), sizeof(double), 'd')
 
-    for i in range(rows):
-        matrix[i] = newDoubleVector(columns)
+    print m, n
 
-    return  matrix
+    for i in range(m):
+        for j in range(n):
+            result[i,j] = A[i,j] * B[i,j]
 
-cdef DoubleMatrix m = newDoubleMatrix (3, 3)
+    return result
 
-m [1][1] = m [0][0]
+cdef double[:,:] elementBinaryOperation (double [:,:] A, double [:,:] B, BinaryDoubleFun f):
+    cdef:
+        int i, j, k, m = A.shape[0], n = A.shape[1]
+        double acc
+        double [:,:] result = array ((m, n), sizeof(double), 'd')
 
-m [0][0][0] = 9.9
+    print m, n
 
-print m [1][1][0]
+    for i in range(m):
+        for j in range(n):
+            result[i,j] = f (A[i,j], B[i,j])
 
-cdef DoubleMatrix m2 = (new DoubleMatrix (5))[0]
+    return result
 
-m2[2] = (new DoubleVector (4))[0]
-m2 [2][2] = newDoublePointer()
-m2 [2][2][0] = 7.0
+cdef double[:,:] elementUnaryOperation (double [:,:] A, UnaryDoubleFun f):
+    cdef:
+        int i, j, k, m = A.shape[0], n = A.shape[1]
+        double acc
+        double [:,:] result = array ((m, n), sizeof(double), 'd')
 
-cdef DoublePointer p = newDoublePointer()
-cdef DoublePointer p2 = newDoublePointer()
+    print m, n
 
-p2 = p
+    for i in range(m):
+        for j in range(n):
+            result[i,j] = f (A[i,j])
 
-print p2 == p
+    return result
 
-free (p)
-p = NULL
+cdef double [:,:] A = array((2,3),sizeof(double),'d')
+cdef double [:,:] B = array((3,1),sizeof(double),'d')
 
+A [:,:] = 1.0
+B [:,:] = 1.0
 
-cdef void Free (DoublePointer pp) except *:
-    free (pp)
+cdef double Double (double x):
+    return 2.0 * x
 
-try:
-    Free (p2)
-    Free (p)
-except:
-    "Unexpected error:", sys.exc_info()[0]
+cdef double Add (double x, double y):
+    return x + y
 
-
-print m2[2][2][0]
+print np.asarray (elementBinaryOperation (A, A, Add))
