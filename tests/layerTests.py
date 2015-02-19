@@ -15,6 +15,7 @@ class TestLayerFunctions(unittest.TestCase):
         self.layerA.setData(np.array([1., 2., 3.]))
         self.layerA.fullConnectionTo (self.layerB)
 
+
         for neuron in self.layerA.neurons:
             for (connection, value) in zip(neuron.forwardConnections, [1, 2]):
                 connection.w = value
