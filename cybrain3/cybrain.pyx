@@ -1,15 +1,27 @@
 from libc.stdlib cimport malloc, free
 cimport libc.math as cmath
 from libcpp.vector cimport vector
-from cython.view cimport array
+from cython.view cimport array as cvarray
+from cpython.array cimport array, clone
 import numpy as np
 cimport numpy as np
 import random as rn
 import math
 
+#BUILD: python setup.py build_ext --inplace
+
+####################
+##TYPES AND TEMPS
+####################
+
 ctypedef double (*BinaryDoubleFun)(double, double)
 ctypedef double (*UnaryDoubleFun)(double)
 
+cdef array template = array ('d')
+
+####################
+##CONNECTIONS
+####################
 
 cdef class Connection (object):
 
@@ -20,113 +32,311 @@ cdef class Connection (object):
     def __init__(self):
         pass
 
-    cpdef double[:,:] Zc (self):
+    cdef double[:,:] Zc (self):
         pass
 
-    cpdef double[:,:] H (self):
+    cdef double[:,:] dEdY (self):
         pass
 
-cdef class Layer (object):
-
-    cdef:
-        public list sourceConnections
-        public list receiverConnections
-
-    def __init__(self):
-        self.sourceConnections = []
-        self.receiverConnections = []
-
-    cpdef double[:,:] H (self, double[:,:] Z):
-        pass
-
-    cpdef double[:,:] Y (self):
+    cdef void set_dEdW (self):
         pass
 
 
 cdef class FullConnection (Connection):
 
     cdef:
-        public double[:,:] W
-        public double[:,:] dW
+        double[:,:] W
+        double[:,:] dW
 
-    def __init__(self, int inputNeurons, int outputNeurons):
+    def __init__(self, LinearLayer source, LinearLayer receiver, double weightMagnitud = 1.0):
         Connection.__init__(self)
 
-        self.W = np.empty ((inputNeurons, outputNeurons), dtype='double')
-        self.dW = np.empty ((inputNeurons, outputNeurons), dtype='double')
+        self.W = weightMagnitud * (np.random.rand (source.neuronCount(), receiver.neuronCount()) * 2.0 - 1.0)
+        self.dW = np.empty ((source.neuronCount(), receiver.neuronCount()), dtype='double')
+
+        source.receiverConnections.append (self)
+        receiver.sourceConnections.append (self)
+
+        self.source = source
+        self.receiver = receiver
 
 
-    cpdef double[:,:] Zc (self):
-        cdef double[:,:] res
+    cdef double[:,:] Zc (self):
+        return dotMultiply (self.source.Y(), self.W)
 
-        print "6"
+    cpdef np.ndarray getW (self):
+        return np.asarray (self.W)
 
-        print np.asarray (self.source.Y())
-        print np.asarray (self.W)
+    cpdef setW (self, np.ndarray value):
+        self.W = value
 
-        res = dotMultiply (self.source.Y(), self.W)
+    cpdef np.ndarray get_dW (self):
+        return np.asarray (self.dW)
 
-        print "aca"
+    cpdef set_dW (self, double [:,:] value):
+        self.dW = value
 
-        print np.asarray (res)
+    cdef void set_dEdW (self):
+        ##dW : [n, m]
+        ##(dZdW = Y) : [1, n]
+        ##dEdZ.shape : [1, m]
+        ##(Y.T * dEdZ) : [n, 1] * [1, m]  =  [n, m]
+        self.dW = dotMultiply (self.source.Y().T, self.receiver.dEdZ())
 
-        return res
+    cdef double[:,:] dEdY (self):
+        self.set_dEdW()
+        ##(dZdY = W) : [n, m]
+        ##dEdZ : [1, m]
+        ##dEdY : [1, n]
+        ##(W * dEdZ.T).T :  ([n, m] * [m, 1] = [n, 1]).T = [1, n]
+        ##(W * dEdZ.T).T = dEdZ * W.T : [1, m] * [m, n] = [1, n]
+        return dotMultiply (self.receiver.dEdZ(), self.W.T)
 
+
+
+cdef class LinearConnection (FullConnection):
+
+    def __init__(self, LinearLayer source, LinearLayer receiver, double weightMagnitud = 1.0):
+        FullConnection.__init__(self, source, receiver, weightMagnitud)
+
+        self.W = weightMagnitud * (np.random.rand (1, receiver.neuronCount()) * 2.0 - 1.0)
+        self.dW = np.empty ((1, receiver.neuronCount()), dtype='double')
+
+
+    cdef double[:,:] Zc (self):
+        return elementMultiply (self.source.Y(), self.W)
+
+    cdef void set_dEdW (self):
+        self.dW = elementMultiply (self.source.Y(), self.receiver.dEdZ())
+
+    cdef double[:,:] dEdY (self):
+        self.set_dEdW()
+        return elementMultiply (self.receiver.dEdZ(), self.W)
+
+####################
+##LAYERS
+####################
+
+cdef class Layer (object):
+
+    cdef:
+        public list sourceConnections
+        public list receiverConnections
+        public bint active
+        public bint back_active
+
+    def __init__(self):
+        self.sourceConnections = []
+        self.receiverConnections = []
+
+    cdef double[:,:] H (self, double[:,:] Z):
+        pass
+
+    cdef double[:,:] Y (self):
+        pass
+
+    cdef double[:,:] dEdY (self, double[:,:] T):
+        pass
+
+    cdef double[:,:] dYdZ (self):
+        pass
+
+    cdef double[:,:] dEdZ (self):
+        pass
+
+    cdef double neuronCount (self):
+        pass
+    
+    cpdef setData (self, double [:,:] value):
+        pass
 
 cdef class LinearLayer (Layer):
 
     cdef:
-        public double[:,:] _Y
-        public bint active
-        public bint back_active
+        public double[:,:] _Y, Z, _dEdZ, _dEdY
+
 
     def __init__(self, int neurons):
         Layer.__init__(self)
 
         self._Y = np.empty ((1, neurons), dtype='double')
+        self.Z = np.empty ((1, neurons), dtype='double')
+        self._dEdZ = np.empty ((1, neurons), dtype='double')
+        self._dEdY = np.empty ((1, neurons), dtype='double')
         self.active = False
         self.back_active = False
 
 
-    cpdef double[:,:] H (self, double[:,:] Z):
+    cdef double[:,:] H (self, double[:,:] Z):
         return Z
 
-    cpdef double[:,:] Y (self):
+    cdef double[:,:] Y (self):
         cdef:
-            double[:,:] Z, Zc
             Connection connection
             int i
 
-        print "2"
-
-        print self._Y.shape[0]
 
         if not self.active:
             self.active = True
-            Z = np.zeros ((1, self._Y.shape[1]), dtype="double")
-
-            print "4"
+            self.Z[...] = 0.0
 
             for connection in self.sourceConnections:
-                Zc = connection.Zc()
-                for i in range(Zc.shape[1]):
-                    Z[0,i] += Zc[0,i]
+                self.Z = elementAdd (self.Z, connection.Zc())
 
-            print "5"
-
-            self._Y = self.H (Z)
+            self._Y = self.H (self.Z)
 
         return self._Y
 
+    cdef double[:,:] dEdZ (self):
+        cdef:
+            Connection connection
+            int i
+
+        if not self.back_active:
+            self.back_active = True
+            self._dEdY[...] = 0.0
+
+            for connection in self.receiverConnections:
+                self._dEdY = elementAdd (self._dEdY, connection.dEdY())
+
+            self._dEdZ = elementMultiply (self.dYdZ(), self._dEdY)
+
+        return self._dEdZ
+
+    cpdef np.ndarray get_dEdZ (self):
+        return np.asarray (self.dEdZ())
+
+
+    cpdef np.ndarray getY (self):
+        return np.asarray (self.Y())
+
+    cpdef setData (self, double [:,:] value):
+        #TODO: check dimensions
+        self._Y = value
+        self.active = True
+
+    cpdef setTarget (self, double [:,:] T):
+        cdef double [:,:] dEdY = self.dEdY (T)
+        self._dEdZ = elementMultiply (self.dYdZ(), dEdY)
+        self.back_active = True
+
+    cdef double[:,:] dEdY (self, double[:,:] T):
+        return elementSubtract (self.Y(), T)
+
+    cdef double[:,:] dYdZ (self):
+        return np.ones ((1, self._Y.shape[1]), dtype="double")
+
+    cdef double neuronCount (self):
+        return self._Y.shape[1]
+
+    cpdef LinearLayer fullConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):
+        FullConnection (self, layer, weightMagnitud)
+        return  layer
+
+    cpdef LinearLayer   linearConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):
+        LinearConnection (self, layer, weightMagnitud)
+        return  layer
+
+cdef class LogisticLayer (LinearLayer):
+
+    cdef double[:,:] H (self, double[:,:] Z):
+        return elementUnaryOperation (Z, logisticFunction)
+
+    cdef double[:,:] dEdY (self, double[:,:] T):
+        return elementBinaryOperation (T, self.Y(), logistic_dEdY)
+
+    cdef double[:,:] dYdZ (self):
+        return elementUnaryOperation(self.Y(), logistic_dYdZ)
+
+
+####################
+##NETWORK
+####################
+
+cdef class Network (object):
+    cdef:
+        public list inputLayers, outputLayers, autoInputLayers, autoOutputLayers, layers, hiddenLayers, connections
+
+    def __init__(self):
+        self.inputLayers = []
+        self.outputLayers = []
+        self.autoInputLayers = []
+        self.autoOutputLayers = []
+
+        self.hiddenLayers = []
+        self.layers = []
+        self.connections = []
+
+    cpdef findHiddenComponents (self):
+        cdef:
+            Layer layer
+
+        layers = set()
+        connections = set()
+
+        for layer in self.inputLayers + self.autoInputLayers:
+            self.recursivelyFindLayersAndConnections (layer, layers, connections)
+
+        self.layers = list (layers)
+        self.connections = list (connections)
+
+
+    cdef void recursivelyFindLayersAndConnections (self, Layer layer, layers, connections):
+        cdef:
+            Connection connection
+            Layer nextLayer
+
+        layers.add (layer)
+        for connection in layer.receiverConnections:
+            connections.add (connection)
+            self.recursivelyFindLayersAndConnections (connection.receiver, layers, connections)
+
+    cpdef restartNetwork (self):
+        cdef Layer layer
+
+        for layer in self.layers:
+            layer.active = False
+
+    cpdef setData (self, double [:,:] X):
+        cdef:
+            int start = 0, end
+            Layer layer
+
+        for layer in self.inputLayers:
+            end = start + layer.neuronCount()
+            layer.setData(X [0, start : end])
+
+            #TODO: check if its start = end or start = end + 1
+            start = end + 1
+
+
+
+
+
+
+
+
+####################
+##HELPER FUNCTIONS
+####################
+cdef double logistic_dEdY (double t, double y):
+    return (t - y) / ((-1.0 + y) * y)
+
+cdef double logistic_dYdZ (double y):
+    return y * (1.0 - y)
+
+cdef double quadraticDistance (double a, double b):
+    return 0.5 * (a - b)**2
+
+cdef double logisticFunction (double z):
+    return 1. / (1. + cmath.exp (-z))
 
 cdef double [:,:] dotMultiply (double [:,:] A, double[:,:] B):
     cdef:
         int i, j, k, m = A.shape[0], n = B.shape[1], o = A.shape[1]
         double acc
-        double [:,:] result = array ((m, n), sizeof(double), 'd')
+        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
 
-    print A.shape[0], A.shape[1]
-    print B.shape[0], B.shape[1]
 
     for i in range(m):
         for j in range(n):
@@ -142,9 +352,7 @@ cdef double [:,:] elementMultiply (double [:,:] A, double[:,:] B):
     cdef:
         int i, j, k, m = A.shape[0], n = A.shape[1]
         double acc
-        double [:,:] result = array ((m, n), sizeof(double), 'd')
-
-    print m, n
+        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
 
     for i in range(m):
         for j in range(n):
@@ -152,13 +360,35 @@ cdef double [:,:] elementMultiply (double [:,:] A, double[:,:] B):
 
     return result
 
+cdef double [:,:] elementAdd (double [:,:] A, double[:,:] B):
+    cdef:
+        int i, j, k, m = A.shape[0], n = A.shape[1]
+        double acc
+        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
+
+    for i in range(m):
+        for j in range(n):
+            result[i,j] = A[i,j] + B[i,j]
+
+    return result
+
+cdef double [:,:] elementSubtract (double [:,:] A, double[:,:] B):
+    cdef:
+        int i, j, k, m = A.shape[0], n = A.shape[1]
+        double acc
+        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
+
+    for i in range(m):
+        for j in range(n):
+            result[i,j] = A[i,j] - B[i,j]
+
+    return result
+
 cdef double[:,:] elementBinaryOperation (double [:,:] A, double [:,:] B, BinaryDoubleFun f):
     cdef:
         int i, j, k, m = A.shape[0], n = A.shape[1]
         double acc
-        double [:,:] result = array ((m, n), sizeof(double), 'd')
-
-    print m, n
+        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
 
     for i in range(m):
         for j in range(n):
@@ -170,9 +400,8 @@ cdef double[:,:] elementUnaryOperation (double [:,:] A, UnaryDoubleFun f):
     cdef:
         int i, j, k, m = A.shape[0], n = A.shape[1]
         double acc
-        double [:,:] result = array ((m, n), sizeof(double), 'd')
+        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
 
-    print m, n
 
     for i in range(m):
         for j in range(n):
