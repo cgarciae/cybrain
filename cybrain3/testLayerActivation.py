@@ -14,6 +14,7 @@ class TestLinearLayerFunctions(unittest.TestCase):
         self.con = cb.FullConnection (self.layerIn, self.layerOut)
 
     def test_activation (self):
+        print (self.layerIn)
         self.layerIn.setData(np.array ([[1.,2.]]))
         self.con.setW (np.array ([[1.,2.,3.],
                                   [4.,5.,6.]]))

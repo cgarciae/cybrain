@@ -38,7 +38,7 @@ cdef class Connection (object):
     cdef double[:,:] dEdY (self):
         pass
 
-    cdef void set_dEdW (self):
+    cdef void compute_dEdW (self):
         pass
 
 
@@ -76,7 +76,7 @@ cdef class FullConnection (Connection):
     cpdef set_dW (self, double [:,:] value):
         self.dW = value
 
-    cdef void set_dEdW (self):
+    cdef void compute_dEdW (self):
         ##dW : [n, m]
         ##(dZdW = Y) : [1, n]
         ##dEdZ.shape : [1, m]
@@ -84,7 +84,7 @@ cdef class FullConnection (Connection):
         self.dW = dotMultiply (self.source.Y().T, self.receiver.dEdZ())
 
     cdef double[:,:] dEdY (self):
-        self.set_dEdW()
+        self.compute_dEdW()
         ##(dZdY = W) : [n, m]
         ##dEdZ : [1, m]
         ##dEdY : [1, n]
@@ -106,11 +106,11 @@ cdef class LinearConnection (FullConnection):
     cdef double[:,:] Zc (self):
         return elementMultiply (self.source.Y(), self.W)
 
-    cdef void set_dEdW (self):
+    cdef void compute_dEdW (self):
         self.dW = elementMultiply (self.source.Y(), self.receiver.dEdZ())
 
     cdef double[:,:] dEdY (self):
-        self.set_dEdW()
+        self.compute_dEdW()
         return elementMultiply (self.receiver.dEdZ(), self.W)
 
 ####################
@@ -144,7 +144,7 @@ cdef class Layer (object):
     cdef double[:,:] dEdZ (self):
         pass
 
-    cdef double neuronCount (self):
+    cdef int neuronCount (self):
         pass
     
     cpdef setData (self, double [:,:] value):
@@ -156,13 +156,13 @@ cdef class LinearLayer (Layer):
         public double[:,:] _Y, Z, _dEdZ, _dEdY
 
 
-    def __init__(self, int neurons):
+    def __init__(self, int neuron_number):
         Layer.__init__(self)
 
-        self._Y = np.empty ((1, neurons), dtype='double')
-        self.Z = np.empty ((1, neurons), dtype='double')
-        self._dEdZ = np.empty ((1, neurons), dtype='double')
-        self._dEdY = np.empty ((1, neurons), dtype='double')
+        self._Y = np.empty ((1, neuron_number), dtype='double')
+        self.Z = np.empty ((1, neuron_number), dtype='double')
+        self._dEdZ = np.empty ((1, neuron_number), dtype='double')
+        self._dEdY = np.empty ((1, neuron_number), dtype='double')
         self.active = False
         self.back_active = False
 
@@ -226,14 +226,14 @@ cdef class LinearLayer (Layer):
     cdef double[:,:] dYdZ (self):
         return np.ones ((1, self._Y.shape[1]), dtype="double")
 
-    cdef double neuronCount (self):
+    cdef int neuronCount (self):
         return self._Y.shape[1]
 
     cpdef LinearLayer fullConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):
         FullConnection (self, layer, weightMagnitud)
         return  layer
 
-    cpdef LinearLayer   linearConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):
+    cpdef LinearLayer linearConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):
         LinearConnection (self, layer, weightMagnitud)
         return  layer
 
@@ -304,12 +304,14 @@ cdef class Network (object):
 
         for layer in self.inputLayers:
             end = start + layer.neuronCount()
-            layer.setData(X [0, start : end])
+            layer.setData(X [0:0, start : end])
 
             #TODO: check if its start = end or start = end + 1
             start = end + 1
 
 
+    cpdef activate_network (self):
+        raise 
 
 
 
