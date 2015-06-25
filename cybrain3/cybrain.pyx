@@ -7,6 +7,7 @@ import numpy as np
 cimport numpy as np
 import random as rn
 import math
+import exceptions
 
 #BUILD: python setup.py build_ext --inplace
 
@@ -62,6 +63,14 @@ cdef class FullConnection (Connection):
 
 
     cdef double[:,:] Zc (self):
+
+
+        if self.source.Y().shape[1] != self.W.shape[0]:
+            raise Exception ("Shape Error")
+
+        if self.receiver.neuronCount() != self.W.shape[1]:
+            raise Exception ("Neuron Difference Error")
+
         return dotMultiply (self.source.Y(), self.W)
 
     cpdef np.ndarray getW (self):
@@ -99,11 +108,20 @@ cdef class LinearConnection (FullConnection):
     def __init__(self, LinearLayer source, LinearLayer receiver, double weightMagnitud = 1.0):
         FullConnection.__init__(self, source, receiver, weightMagnitud)
 
+        if source.neuronCount() != receiver.neuronCount():
+            raise Exception("Number of neurons not equal")
+
         self.W = weightMagnitud * (np.random.rand (1, receiver.neuronCount()) * 2.0 - 1.0)
         self.dW = np.empty ((1, receiver.neuronCount()), dtype='double')
 
 
     cdef double[:,:] Zc (self):
+        if self.source.Y().shape[1] != self.W.shape[1]:
+            raise Exception  ("Shape Error")
+
+        if self.receiver.neuronCount() != self.W.shape[1]:
+            raise Exception ("Neuron Difference Error")
+
         return elementMultiply (self.source.Y(), self.W)
 
     cdef void compute_dEdW (self):
@@ -212,6 +230,9 @@ cdef class LinearLayer (Layer):
 
     cpdef setData (self, double [:,:] value):
         #TODO: check dimensions
+        if value.shape[1] != self.neuronCount():
+            raise Exception ("setData Error: Data shape error. Received {0}, expected {1}".format(value.shape[1], self.neuronCount()))
+
         self._Y = value
         self.active = True
 
@@ -297,25 +318,46 @@ cdef class Network (object):
         for layer in self.layers:
             layer.active = False
 
-    cpdef setData (self, double [:,:] X):
+    cpdef setData (self, double[:,:] X):
         cdef:
             int start = 0, end
-            Layer layer
+            LinearLayer layer
+
+        neuron_count = sum([layer.neuronCount() for layer in self.inputLayers])
+        if  neuron_count != X.shape[1]:
+            raise Exception("The input data has {0} entries but there are {1} neurons.".format(X.shape[1], neuron_count))
 
         for layer in self.inputLayers:
             end = start + layer.neuronCount()
-            layer.setData(X [0:0, start : end])
-
-            #TODO: check if its start = end or start = end + 1
-            start = end + 1
-
-
-    cpdef activate_network (self):
-        raise 
+            layer.setData(X [0:1, start : end])
+            start = end
 
 
 
+    cpdef activate_layers(self, double[:,:] X):
+        cdef:
+            Layer layer
 
+        self.setData(X)
+
+        for layer in self.layers:
+            layer.Y()
+
+
+    cpdef double[:,:] activate(self, double[:,:] X):
+        cdef:
+            Layer layer
+            double[:,:] result = None
+
+        self.activate_layers(X)
+
+        for layer in self.layers:
+            if result is None:
+                result = layer.getY()
+            else:
+                result = np.concatenate((result, layer.Y()), axis=1)
+
+        return result
 
 
 ####################
@@ -367,6 +409,9 @@ cdef double [:,:] elementAdd (double [:,:] A, double[:,:] B):
         int i, j, k, m = A.shape[0], n = A.shape[1]
         double acc
         double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
+
+    if A.shape[0] != B.shape[0] or A.shape[1] != B.shape[1]:
+        raise Exception ("Dimension Error")
 
     for i in range(m):
         for j in range(n):

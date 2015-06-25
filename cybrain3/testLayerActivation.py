@@ -14,7 +14,6 @@ class TestLinearLayerFunctions(unittest.TestCase):
         self.con = cb.FullConnection (self.layerIn, self.layerOut)
 
     def test_activation (self):
-        print (self.layerIn)
         self.layerIn.setData(np.array ([[1.,2.]]))
         self.con.setW (np.array ([[1.,2.,3.],
                                   [4.,5.,6.]]))
@@ -38,6 +37,7 @@ class TestLinearLayerFunctions(unittest.TestCase):
         np.testing.assert_almost_equal (dEdZ, [[-1, -2, -3]])
         np.testing.assert_almost_equal (dW, [[-1, -2, -3],
                                              [-2, -4, -6]])
+
 
 
 
@@ -81,19 +81,20 @@ class TestLogisticLayerFunctions2(unittest.TestCase):
         np.testing.assert_almost_equal (dW, [[-0.6681877721681662, 0.6899744811276126, -0.7109495026250039],
                                              [-1.3363755443363323, 1.3799489622552252, -1.4218990052500078]])
 
-class TestNetwork(unittest.TestCase):
+
+class TestLinearConnectionTests (unittest.TestCase):
 
     def setUp (self):
         self.net = cb.Network()
 
-        self.l1 = cb.LinearLayer (2)
+        self.l1 = cb.LinearLayer (3)
         self.l2 = cb.LogisticLayer (3)
 
         self.l3 = cb.LinearLayer (4)
-        self.l4 = cb.LogisticLayer (5)
+        self.l4 = cb.LogisticLayer (3)
         self.l5 = cb.LinearLayer (6)
 
-        self.l6 = cb.LogisticLayer (7)
+        self.l6 = cb.LogisticLayer (4)
         self.l7 = cb.LogisticLayer (8)
 
         self.net.inputLayers = [self.l1, self.l2]
@@ -110,6 +111,44 @@ class TestNetwork(unittest.TestCase):
         self.l3.linearConnectTo(self.l6)
         self.l5.fullConnectTo(self.l7)
 
+    def test_number_of_neurons (self):
+
+        pass
+
+
+
+class TestNetwork(unittest.TestCase):
+
+    def setUp (self):
+        self.net = cb.Network()
+
+        self.l1 = cb.LinearLayer (3)
+        self.l2 = cb.LogisticLayer (3)
+
+        self.l3 = cb.LinearLayer (4)
+        self.l4 = cb.LogisticLayer (3)
+        self.l5 = cb.LinearLayer (6)
+
+        self.l6 = cb.LogisticLayer (4)
+        self.l7 = cb.LogisticLayer (8)
+
+        self.net.inputLayers = [self.l1, self.l2]
+        self.net.outputLayers = [self.l6, self.l7]
+
+        self.l1.fullConnectTo(self.l3)
+        self.l1.linearConnectTo(self.l4)
+        self.l1.fullConnectTo(self.l5)
+
+        self.l2.fullConnectTo(self.l3)
+        self.l2.linearConnectTo(self.l4)
+        self.l2.fullConnectTo(self.l5)
+
+        self.l3.linearConnectTo(self.l6)
+        self.l5.fullConnectTo(self.l7)
+
+    def test_lenght (self):
+        pass
+
     def test_findHiddenComponents (self):
 
         self.net.findHiddenComponents()
@@ -117,19 +156,43 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual (len (self.net.layers), 7)
         self.assertEqual (len (self.net.connections), 8)
 
+    def test_activate (self):
+        self.net.activate(np.array([[1.,2.,3.,4.,5.,6.]]))
+
 
 
 
 
 if __name__ == '__main__':
+    space = "************************************************************************************************"
+
+
+    print space
     suite = unittest.TestLoader().loadTestsFromTestCase(TestLinearLayerFunctions)
     unittest.TextTestRunner(verbosity=2).run(suite)
+    print space
+    print "\n\n\n"
 
+    print space
     suite = unittest.TestLoader().loadTestsFromTestCase(TestLogisticLayerFunctions)
     unittest.TextTestRunner(verbosity=2).run(suite)
+    print space
+    print "\n\n\n"
 
+    print space
     suite = unittest.TestLoader().loadTestsFromTestCase(TestLogisticLayerFunctions2)
     unittest.TextTestRunner(verbosity=2).run(suite)
+    print space
+    print "\n\n\n"
 
+    print space
     suite = unittest.TestLoader().loadTestsFromTestCase(TestNetwork)
     unittest.TextTestRunner(verbosity=2).run(suite)
+    print space
+    print "\n\n\n"
+
+    print space
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestLinearConnectionTests)
+    unittest.TextTestRunner(verbosity=2).run(suite)
+    print space
+    print "\n\n\n"
