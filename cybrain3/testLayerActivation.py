@@ -164,35 +164,26 @@ class TestNetwork(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    space = "************************************************************************************************"
 
-
-    print space
+    print "\n\n\n"
     suite = unittest.TestLoader().loadTestsFromTestCase(TestLinearLayerFunctions)
     unittest.TextTestRunner(verbosity=2).run(suite)
-    print space
     print "\n\n\n"
 
-    print space
     suite = unittest.TestLoader().loadTestsFromTestCase(TestLogisticLayerFunctions)
     unittest.TextTestRunner(verbosity=2).run(suite)
-    print space
     print "\n\n\n"
 
-    print space
     suite = unittest.TestLoader().loadTestsFromTestCase(TestLogisticLayerFunctions2)
     unittest.TextTestRunner(verbosity=2).run(suite)
-    print space
     print "\n\n\n"
 
-    print space
+
     suite = unittest.TestLoader().loadTestsFromTestCase(TestNetwork)
     unittest.TextTestRunner(verbosity=2).run(suite)
-    print space
     print "\n\n\n"
 
-    print space
+
     suite = unittest.TestLoader().loadTestsFromTestCase(TestLinearConnectionTests)
     unittest.TextTestRunner(verbosity=2).run(suite)
-    print space
     print "\n\n\n"
