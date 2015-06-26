@@ -19,21 +19,21 @@ import numpy as np
 #                  language='c++'
 #                  )
 
-cybrain = Extension( "cybrain",
-                 sources= ["cybrain.pyx"],
-                 include_dirs= [np.get_include()],
-                 language='c++'
-                 )
-
-test = Extension( "test",
-                 sources= ["test.pyx"],
-                 include_dirs= [np.get_include()],
-                 language='c++'
-                 )
 
 
 setup\
 (
     cmdclass = {'build_ext': build_ext},
-    ext_modules = [test, cybrain]
+
+    ext_modules = [
+        Extension( "cybrain",
+        sources= ["cybrain.pyx"],
+        include_dirs= [np.get_include()],
+        language='c++'
+        ),
+        Extension( "test",
+        sources= ["test.pyx"],
+        include_dirs= [np.get_include()],
+        language='c++'
+        )]
 )

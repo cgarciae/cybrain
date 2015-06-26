@@ -164,7 +164,7 @@ cdef class Layer (object):
 
     cdef int neuronCount (self):
         pass
-    
+
     cpdef setData (self, double [:,:] value):
         pass
 
