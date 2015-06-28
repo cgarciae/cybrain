@@ -3,6 +3,8 @@ __author__ = 'Cristian Garcia'
 import cybrain as cb
 import numpy as np
 import unittest
+from time import time
+
 
 
 class TestLinearLayerFunctions(unittest.TestCase):
@@ -117,7 +119,7 @@ class TestLinearConnectionTests (unittest.TestCase):
 
 
 
-class TestNetwork(unittest.TestCase):
+class TestNetworkDimensions(unittest.TestCase):
 
     def setUp (self):
         self.net = cb.Network()
@@ -151,16 +153,105 @@ class TestNetwork(unittest.TestCase):
 
     def test_findHiddenComponents (self):
 
-        self.net.findHiddenComponents()
+        self.net.setup()
 
         self.assertEqual (len (self.net.layers), 7)
         self.assertEqual (len (self.net.connections), 8)
 
     def test_activate (self):
-        self.net.activate(np.array([[1.,2.,3.,4.,5.,6.]]))
+        x = np.array([[1.,2.,3.,4.,5.,6.]])
+        t = np.array([[1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12]])
+        y = self.net.activate(x)
+        dEdZ = self.net.back_activate(t)
+
+        in_count = sum([layer.neuronCount() for layer in self.net.inputLayers])
+        out_count = sum([layer.neuronCount() for layer in self.net.outputLayers])
+
+        self.assertEqual(y.shape[1], out_count)
+        self.assertEqual(dEdZ.shape[1], in_count)
+
+class TestNetworkValues (unittest.TestCase):
+
+    def setUp (self):
+        self.layerOut = cb.LogisticLayer (3)
+        self.layerIn = cb.LinearLayer (2)
+        self.connection = cb.FullConnection (self.layerIn, self.layerOut)
+
+        self.net = cb.Network()
+        self.net.inputLayers = [self.layerIn]
+        self.net.outputLayers = [self.layerOut]
+        self.net.setup()
+
+    def test_dEdZ (self):
+
+        self.connection.setW (np.array ([[0.1,-0.2, 0.3],
+                                         [-0.4, 0.5,-0.6]]))
+
+        Y = self.net.activate(np.array ([[1.,2.]]))
+        self.net.back_activate (np.array([[1., 0., 1.]]))
+        dW = self.connection.get_dW()
+
+        np.testing.assert_almost_equal (Y, [[0.3318122278318339, 0.6899744811276125, 0.28905049737499605]])
+        np.testing.assert_almost_equal (dW, [[-0.6681877721681662, 0.6899744811276126, -0.7109495026250039],
+                                             [-1.3363755443363323, 1.3799489622552252, -1.4218990052500078]])
 
 
+class TestFullBatchTrainer (unittest.TestCase):
 
+    def setUp(self):
+        #TRUTH TABLE (DATA)
+        X =     [[0.0,0.0]];     Y = [[0.0]]
+        X.append([1.0,0.0]); Y.append([1.0])
+        X.append([0.0,1.0]); Y.append([1.0])
+        X.append([1.0,1.0]); Y.append([0.0])
+
+        #CONVERT DATA TO NUMPY ARRAY
+        self.X, self.Y = np.array(X), np.array(Y)
+
+        #CREATE NETWORK
+        self.nnet = cb.Network()
+
+        #CREATE LAYERS
+        Lin = cb.LinearLayer(2)
+        Lhidden = cb.LogisticLayer(2)
+        Lout = cb.LogisticLayer(1)
+        bias = cb.BiasUnit()
+
+        #ADD LAYERS TO NETWORK
+        self.nnet.inputLayers = [Lin]
+        self.nnet.hiddenLayers = [Lhidden]
+        self.nnet.outputLayers = [Lout]
+        self.nnet.autoInputLayers = [bias]
+
+        #CONNECT LAYERS
+        Lin.fullConnectTo(Lhidden)
+        Lhidden.fullConnectTo(Lout)
+        bias.fullConnectTo(Lhidden)
+        bias.fullConnectTo(Lout)
+
+        #CREATE BATCH TRAINER
+        rate = 0.1
+        self.nnet.setup()
+        self.batch = cb.FullBatchTrainer(self.nnet, self.X, self.Y, rate)
+
+    def test_epochs (self):
+
+        #TRAIN
+        t1 = time()
+        for c in self.nnet.connections:
+            print c.getW()
+        print "\n\n"
+
+        self.batch.epochs(2000)
+
+        for c in self.nnet.connections:
+            print c.getW()
+        print "\n\n"
+
+        print "Time CyBrain {}".format(time()-t1)
+
+        for i in range(4):
+            print "{0} => {1}".format (self.X[i], np.array(self.nnet.activate(self.X[i:i+1,:])))
 
 
 if __name__ == '__main__':
@@ -179,11 +270,19 @@ if __name__ == '__main__':
     print "\n\n\n"
 
 
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestNetwork)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestNetworkDimensions)
     unittest.TextTestRunner(verbosity=2).run(suite)
     print "\n\n\n"
 
 
     suite = unittest.TestLoader().loadTestsFromTestCase(TestLinearConnectionTests)
+    unittest.TextTestRunner(verbosity=2).run(suite)
+    print "\n\n\n"
+
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestNetworkValues)
+    unittest.TextTestRunner(verbosity=2).run(suite)
+    print "\n\n\n"
+
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestFullBatchTrainer)
     unittest.TextTestRunner(verbosity=2).run(suite)
     print "\n\n\n"

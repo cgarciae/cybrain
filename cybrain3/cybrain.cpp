@@ -792,7 +792,9 @@ struct __pyx_obj_7cybrain_LinearConnection;
 struct __pyx_obj_7cybrain_Layer;
 struct __pyx_obj_7cybrain_LinearLayer;
 struct __pyx_obj_7cybrain_LogisticLayer;
+struct __pyx_obj_7cybrain_BiasUnit;
 struct __pyx_obj_7cybrain_Network;
+struct __pyx_obj_7cybrain_FullBatchTrainer;
 struct __pyx_array_obj;
 struct __pyx_MemviewEnum_obj;
 struct __pyx_memoryview_obj;
@@ -854,7 +856,7 @@ typedef double (*__pyx_t_7cybrain_BinaryDoubleFun)(double, double);
  */
 typedef double (*__pyx_t_7cybrain_UnaryDoubleFun)(double);
 
-/* "cybrain.pyx":253
+/* "cybrain.pyx":267
  *         return self._Y.shape[1]
  * 
  *     cpdef LinearLayer fullConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):             # <<<<<<<<<<<<<<
@@ -866,7 +868,7 @@ struct __pyx_opt_args_7cybrain_11LinearLayer_fullConnectTo {
   double weightMagnitud;
 };
 
-/* "cybrain.pyx":257
+/* "cybrain.pyx":271
  *         return  layer
  * 
  *     cpdef LinearLayer linearConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):             # <<<<<<<<<<<<<<
@@ -893,7 +895,7 @@ struct __pyx_obj_7cybrain_Connection {
 };
 
 
-/* "cybrain.pyx":46
+/* "cybrain.pyx":52
  * 
  * 
  * cdef class FullConnection (Connection):             # <<<<<<<<<<<<<<
@@ -907,7 +909,7 @@ struct __pyx_obj_7cybrain_FullConnection {
 };
 
 
-/* "cybrain.pyx":106
+/* "cybrain.pyx":110
  * 
  * 
  * cdef class LinearConnection (FullConnection):             # <<<<<<<<<<<<<<
@@ -919,7 +921,7 @@ struct __pyx_obj_7cybrain_LinearConnection {
 };
 
 
-/* "cybrain.pyx":138
+/* "cybrain.pyx":142
  * ####################
  * 
  * cdef class Layer (object):             # <<<<<<<<<<<<<<
@@ -936,8 +938,8 @@ struct __pyx_obj_7cybrain_Layer {
 };
 
 
-/* "cybrain.pyx":171
- *         pass
+/* "cybrain.pyx":181
+ *         self.back_active = False
  * 
  * cdef class LinearLayer (Layer):             # <<<<<<<<<<<<<<
  * 
@@ -952,7 +954,7 @@ struct __pyx_obj_7cybrain_LinearLayer {
 };
 
 
-/* "cybrain.pyx":261
+/* "cybrain.pyx":275
  *         return  layer
  * 
  * cdef class LogisticLayer (LinearLayer):             # <<<<<<<<<<<<<<
@@ -964,12 +966,24 @@ struct __pyx_obj_7cybrain_LogisticLayer {
 };
 
 
-/* "cybrain.pyx":277
+/* "cybrain.pyx":286
+ *         return elementUnaryOperation(self.Y(), logistic_dYdZ)
+ * 
+ * cdef class BiasUnit (LinearLayer):             # <<<<<<<<<<<<<<
+ * 
+ *     def __init__(self):
+ */
+struct __pyx_obj_7cybrain_BiasUnit {
+  struct __pyx_obj_7cybrain_LinearLayer __pyx_base;
+};
+
+
+/* "cybrain.pyx":305
  * ####################
  * 
  * cdef class Network (object):             # <<<<<<<<<<<<<<
  *     cdef:
- *         public list inputLayers, outputLayers, autoInputLayers, autoOutputLayers, layers, hiddenLayers, connections
+ *         public list inputLayers, outputLayers, autoInputLayers, autoOutputLayers, layers, hiddenLayers, connections, all_input_layers, all_output_layers
  */
 struct __pyx_obj_7cybrain_Network {
   PyObject_HEAD
@@ -981,6 +995,31 @@ struct __pyx_obj_7cybrain_Network {
   PyObject *layers;
   PyObject *hiddenLayers;
   PyObject *connections;
+  PyObject *all_input_layers;
+  PyObject *all_output_layers;
+};
+
+
+/* "cybrain.pyx":469
+ * ## TRAINERS
+ * ####################
+ * cdef class FullBatchTrainer(object):             # <<<<<<<<<<<<<<
+ * 
+ *     cdef:
+ */
+struct __pyx_obj_7cybrain_FullBatchTrainer {
+  PyObject_HEAD
+  struct __pyx_vtabstruct_7cybrain_FullBatchTrainer *__pyx_vtab;
+  std::vector<double *>  _weights;
+  std::vector<double *>  _gradient;
+  __Pyx_memviewslice total_gradient;
+  double cost;
+  struct __pyx_obj_7cybrain_Network *net;
+  __Pyx_memviewslice input_data;
+  __Pyx_memviewslice output_data;
+  double learning_rate;
+  int len_gradient;
+  int len_data;
 };
 
 
@@ -1073,11 +1112,13 @@ struct __pyx_vtabstruct_7cybrain_Connection {
   __Pyx_memviewslice (*Zc)(struct __pyx_obj_7cybrain_Connection *);
   __Pyx_memviewslice (*dEdY)(struct __pyx_obj_7cybrain_Connection *);
   void (*compute_dEdW)(struct __pyx_obj_7cybrain_Connection *);
+  std::vector<double *>  (*get_gradient_pointers)(struct __pyx_obj_7cybrain_Connection *);
+  std::vector<double *>  (*get_weight_pointers)(struct __pyx_obj_7cybrain_Connection *);
 };
 static struct __pyx_vtabstruct_7cybrain_Connection *__pyx_vtabptr_7cybrain_Connection;
 
 
-/* "cybrain.pyx":46
+/* "cybrain.pyx":52
  * 
  * 
  * cdef class FullConnection (Connection):             # <<<<<<<<<<<<<<
@@ -1095,7 +1136,7 @@ struct __pyx_vtabstruct_7cybrain_FullConnection {
 static struct __pyx_vtabstruct_7cybrain_FullConnection *__pyx_vtabptr_7cybrain_FullConnection;
 
 
-/* "cybrain.pyx":106
+/* "cybrain.pyx":110
  * 
  * 
  * cdef class LinearConnection (FullConnection):             # <<<<<<<<<<<<<<
@@ -1109,7 +1150,7 @@ struct __pyx_vtabstruct_7cybrain_LinearConnection {
 static struct __pyx_vtabstruct_7cybrain_LinearConnection *__pyx_vtabptr_7cybrain_LinearConnection;
 
 
-/* "cybrain.pyx":138
+/* "cybrain.pyx":142
  * ####################
  * 
  * cdef class Layer (object):             # <<<<<<<<<<<<<<
@@ -1125,12 +1166,13 @@ struct __pyx_vtabstruct_7cybrain_Layer {
   __Pyx_memviewslice (*dEdZ)(struct __pyx_obj_7cybrain_Layer *);
   int (*neuronCount)(struct __pyx_obj_7cybrain_Layer *);
   PyObject *(*setData)(struct __pyx_obj_7cybrain_Layer *, __Pyx_memviewslice, int __pyx_skip_dispatch);
+  PyObject *(*restart)(struct __pyx_obj_7cybrain_Layer *, int __pyx_skip_dispatch);
 };
 static struct __pyx_vtabstruct_7cybrain_Layer *__pyx_vtabptr_7cybrain_Layer;
 
 
-/* "cybrain.pyx":171
- *         pass
+/* "cybrain.pyx":181
+ *         self.back_active = False
  * 
  * cdef class LinearLayer (Layer):             # <<<<<<<<<<<<<<
  * 
@@ -1142,13 +1184,14 @@ struct __pyx_vtabstruct_7cybrain_LinearLayer {
   PyArrayObject *(*get_dEdZ)(struct __pyx_obj_7cybrain_LinearLayer *, int __pyx_skip_dispatch);
   PyArrayObject *(*getY)(struct __pyx_obj_7cybrain_LinearLayer *, int __pyx_skip_dispatch);
   PyObject *(*setTarget)(struct __pyx_obj_7cybrain_LinearLayer *, __Pyx_memviewslice, int __pyx_skip_dispatch);
+  int (*neuronCount)(struct __pyx_obj_7cybrain_LinearLayer *, int __pyx_skip_dispatch);
   struct __pyx_obj_7cybrain_LinearLayer *(*fullConnectTo)(struct __pyx_obj_7cybrain_LinearLayer *, struct __pyx_obj_7cybrain_LinearLayer *, int __pyx_skip_dispatch, struct __pyx_opt_args_7cybrain_11LinearLayer_fullConnectTo *__pyx_optional_args);
   struct __pyx_obj_7cybrain_LinearLayer *(*linearConnectTo)(struct __pyx_obj_7cybrain_LinearLayer *, struct __pyx_obj_7cybrain_LinearLayer *, int __pyx_skip_dispatch, struct __pyx_opt_args_7cybrain_11LinearLayer_linearConnectTo *__pyx_optional_args);
 };
 static struct __pyx_vtabstruct_7cybrain_LinearLayer *__pyx_vtabptr_7cybrain_LinearLayer;
 
 
-/* "cybrain.pyx":261
+/* "cybrain.pyx":275
  *         return  layer
  * 
  * cdef class LogisticLayer (LinearLayer):             # <<<<<<<<<<<<<<
@@ -1162,23 +1205,62 @@ struct __pyx_vtabstruct_7cybrain_LogisticLayer {
 static struct __pyx_vtabstruct_7cybrain_LogisticLayer *__pyx_vtabptr_7cybrain_LogisticLayer;
 
 
-/* "cybrain.pyx":277
+/* "cybrain.pyx":286
+ *         return elementUnaryOperation(self.Y(), logistic_dYdZ)
+ * 
+ * cdef class BiasUnit (LinearLayer):             # <<<<<<<<<<<<<<
+ * 
+ *     def __init__(self):
+ */
+
+struct __pyx_vtabstruct_7cybrain_BiasUnit {
+  struct __pyx_vtabstruct_7cybrain_LinearLayer __pyx_base;
+};
+static struct __pyx_vtabstruct_7cybrain_BiasUnit *__pyx_vtabptr_7cybrain_BiasUnit;
+
+
+/* "cybrain.pyx":305
  * ####################
  * 
  * cdef class Network (object):             # <<<<<<<<<<<<<<
  *     cdef:
- *         public list inputLayers, outputLayers, autoInputLayers, autoOutputLayers, layers, hiddenLayers, connections
+ *         public list inputLayers, outputLayers, autoInputLayers, autoOutputLayers, layers, hiddenLayers, connections, all_input_layers, all_output_layers
  */
 
 struct __pyx_vtabstruct_7cybrain_Network {
-  PyObject *(*findHiddenComponents)(struct __pyx_obj_7cybrain_Network *, int __pyx_skip_dispatch);
+  PyObject *(*setup)(struct __pyx_obj_7cybrain_Network *, int __pyx_skip_dispatch);
   void (*recursivelyFindLayersAndConnections)(struct __pyx_obj_7cybrain_Network *, struct __pyx_obj_7cybrain_Layer *, PyObject *, PyObject *);
+  std::vector<double *>  (*get_gradient_pointers)(struct __pyx_obj_7cybrain_Network *);
+  std::vector<double *>  (*get_weight_pointers)(struct __pyx_obj_7cybrain_Network *);
   PyObject *(*restartNetwork)(struct __pyx_obj_7cybrain_Network *, int __pyx_skip_dispatch);
   PyObject *(*setData)(struct __pyx_obj_7cybrain_Network *, __Pyx_memviewslice, int __pyx_skip_dispatch);
   PyObject *(*activate_layers)(struct __pyx_obj_7cybrain_Network *, __Pyx_memviewslice, int __pyx_skip_dispatch);
   __Pyx_memviewslice (*activate)(struct __pyx_obj_7cybrain_Network *, __Pyx_memviewslice, int __pyx_skip_dispatch);
+  PyObject *(*setTarget)(struct __pyx_obj_7cybrain_Network *, __Pyx_memviewslice, int __pyx_skip_dispatch);
+  PyObject *(*back_activate_layers)(struct __pyx_obj_7cybrain_Network *, __Pyx_memviewslice, int __pyx_skip_dispatch);
+  __Pyx_memviewslice (*back_activate)(struct __pyx_obj_7cybrain_Network *, __Pyx_memviewslice, int __pyx_skip_dispatch);
 };
 static struct __pyx_vtabstruct_7cybrain_Network *__pyx_vtabptr_7cybrain_Network;
+
+
+/* "cybrain.pyx":469
+ * ## TRAINERS
+ * ####################
+ * cdef class FullBatchTrainer(object):             # <<<<<<<<<<<<<<
+ * 
+ *     cdef:
+ */
+
+struct __pyx_vtabstruct_7cybrain_FullBatchTrainer {
+  PyObject *(*restart_gradient)(struct __pyx_obj_7cybrain_FullBatchTrainer *);
+  PyObject *(*print_gradient)(struct __pyx_obj_7cybrain_FullBatchTrainer *);
+  PyObject *(*print_actual_gradient)(struct __pyx_obj_7cybrain_FullBatchTrainer *);
+  PyObject *(*print_weights)(struct __pyx_obj_7cybrain_FullBatchTrainer *);
+  PyObject *(*add_to_total_gradient)(struct __pyx_obj_7cybrain_FullBatchTrainer *);
+  PyObject *(*epochs)(struct __pyx_obj_7cybrain_FullBatchTrainer *, int, int __pyx_skip_dispatch);
+  PyObject *(*train)(struct __pyx_obj_7cybrain_FullBatchTrainer *);
+};
+static struct __pyx_vtabstruct_7cybrain_FullBatchTrainer *__pyx_vtabptr_7cybrain_FullBatchTrainer;
 
 
 /* "View.MemoryView":302
@@ -1386,6 +1468,8 @@ static void __Pyx_WriteUnraisable(const char *name, int clineno,
                                   int lineno, const char *filename,
                                   int full_traceback, int nogil);
 
+static void __Pyx_RaiseBufferIndexError(int axis);
+
 #if CYTHON_COMPILING_IN_CPYTHON
 static CYTHON_INLINE int __Pyx_ListComp_Append(PyObject* list, PyObject* x) {
     PyListObject* L = (PyListObject*) list;
@@ -1405,8 +1489,6 @@ static CYTHON_INLINE int __Pyx_ListComp_Append(PyObject* list, PyObject* x) {
 #ifndef __PYX_FORCE_INIT_THREADS
   #define __PYX_FORCE_INIT_THREADS 0
 #endif
-
-static void __Pyx_RaiseBufferIndexError(int axis);
 
 #if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
 static PyObject *__Pyx_PyDict_GetItem(PyObject *d, PyObject* key) {
@@ -1641,6 +1723,8 @@ static CYTHON_INLINE int resize_smart(arrayobject *self, Py_ssize_t n) {
 }
 #endif
 
+#include <new>
+
 typedef struct {
   Py_ssize_t shape, strides, suboffsets;
 } __Pyx_Buf_DimInfo;
@@ -1688,6 +1772,55 @@ static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value);
 
 static PyObject *__pyx_memview_get_double(const char *itemp);
 static int __pyx_memview_set_double(const char *itemp, PyObject *obj);
+
+#ifndef __Pyx_CppExn2PyErr
+#include <new>
+#include <typeinfo>
+#include <stdexcept>
+#include <ios>
+static void __Pyx_CppExn2PyErr() {
+  try {
+    if (PyErr_Occurred())
+      ; // let the latest Python exn pass through and ignore the current one
+    else
+      throw;
+  } catch (const std::bad_alloc& exn) {
+    PyErr_SetString(PyExc_MemoryError, exn.what());
+  } catch (const std::bad_cast& exn) {
+    PyErr_SetString(PyExc_TypeError, exn.what());
+  } catch (const std::domain_error& exn) {
+    PyErr_SetString(PyExc_ValueError, exn.what());
+  } catch (const std::invalid_argument& exn) {
+    PyErr_SetString(PyExc_ValueError, exn.what());
+  } catch (const std::ios_base::failure& exn) {
+    PyErr_SetString(PyExc_IOError, exn.what());
+  } catch (const std::out_of_range& exn) {
+    PyErr_SetString(PyExc_IndexError, exn.what());
+  } catch (const std::overflow_error& exn) {
+    PyErr_SetString(PyExc_OverflowError, exn.what());
+  } catch (const std::range_error& exn) {
+    PyErr_SetString(PyExc_ArithmeticError, exn.what());
+  } catch (const std::underflow_error& exn) {
+    PyErr_SetString(PyExc_ArithmeticError, exn.what());
+  } catch (const std::exception& exn) {
+    PyErr_SetString(PyExc_RuntimeError, exn.what());
+  }
+  catch (...)
+  {
+    PyErr_SetString(PyExc_RuntimeError, "Unknown exception");
+  }
+}
+#endif
+
+static int __Pyx_Print(PyObject*, PyObject *, int);
+#if CYTHON_COMPILING_IN_PYPY || PY_MAJOR_VERSION >= 3
+static PyObject* __pyx_print = 0;
+static PyObject* __pyx_print_kwargs = 0;
+#endif
+
+static int __Pyx_PrintOne(PyObject* stream, PyObject *o);
+
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value);
 
 #if CYTHON_CCOMPLEX
   #ifdef __cplusplus
@@ -1802,11 +1935,11 @@ __pyx_memoryview_copy_new_contig(const __Pyx_memviewslice *from_mvs,
 
 static CYTHON_INLINE PyObject *__pyx_capsule_create(void *p, const char *sig);
 
-static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value);
-
 static CYTHON_INLINE char __Pyx_PyInt_As_char(PyObject *);
 
 static CYTHON_INLINE long __Pyx_PyInt_As_long(PyObject *);
+
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_double(PyObject *);
 
 static int __Pyx_check_binary_version(void);
 
@@ -1827,6 +1960,8 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 static __Pyx_memviewslice __pyx_f_7cybrain_10Connection_Zc(CYTHON_UNUSED struct __pyx_obj_7cybrain_Connection *__pyx_v_self); /* proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_10Connection_dEdY(CYTHON_UNUSED struct __pyx_obj_7cybrain_Connection *__pyx_v_self); /* proto*/
 static void __pyx_f_7cybrain_10Connection_compute_dEdW(CYTHON_UNUSED struct __pyx_obj_7cybrain_Connection *__pyx_v_self); /* proto*/
+static std::vector<double *>  __pyx_f_7cybrain_10Connection_get_gradient_pointers(CYTHON_UNUSED struct __pyx_obj_7cybrain_Connection *__pyx_v_self); /* proto*/
+static std::vector<double *>  __pyx_f_7cybrain_10Connection_get_weight_pointers(CYTHON_UNUSED struct __pyx_obj_7cybrain_Connection *__pyx_v_self); /* proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_14FullConnection_Zc(struct __pyx_obj_7cybrain_FullConnection *__pyx_v_self); /* proto*/
 static PyArrayObject *__pyx_f_7cybrain_14FullConnection_getW(struct __pyx_obj_7cybrain_FullConnection *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
 static PyObject *__pyx_f_7cybrain_14FullConnection_setW(struct __pyx_obj_7cybrain_FullConnection *__pyx_v_self, PyArrayObject *__pyx_v_value, int __pyx_skip_dispatch); /* proto*/
@@ -1834,6 +1969,8 @@ static PyArrayObject *__pyx_f_7cybrain_14FullConnection_get_dW(struct __pyx_obj_
 static PyObject *__pyx_f_7cybrain_14FullConnection_set_dW(struct __pyx_obj_7cybrain_FullConnection *__pyx_v_self, __Pyx_memviewslice __pyx_v_value, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_7cybrain_14FullConnection_compute_dEdW(struct __pyx_obj_7cybrain_FullConnection *__pyx_v_self); /* proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_14FullConnection_dEdY(struct __pyx_obj_7cybrain_FullConnection *__pyx_v_self); /* proto*/
+static std::vector<double *>  __pyx_f_7cybrain_14FullConnection_get_gradient_pointers(struct __pyx_obj_7cybrain_FullConnection *__pyx_v_self); /* proto*/
+static std::vector<double *>  __pyx_f_7cybrain_14FullConnection_get_weight_pointers(struct __pyx_obj_7cybrain_FullConnection *__pyx_v_self); /* proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_16LinearConnection_Zc(struct __pyx_obj_7cybrain_LinearConnection *__pyx_v_self); /* proto*/
 static void __pyx_f_7cybrain_16LinearConnection_compute_dEdW(struct __pyx_obj_7cybrain_LinearConnection *__pyx_v_self); /* proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_16LinearConnection_dEdY(struct __pyx_obj_7cybrain_LinearConnection *__pyx_v_self); /* proto*/
@@ -1844,6 +1981,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_5Layer_dYdZ(CYTHON_UNUSED struct __py
 static __Pyx_memviewslice __pyx_f_7cybrain_5Layer_dEdZ(CYTHON_UNUSED struct __pyx_obj_7cybrain_Layer *__pyx_v_self); /* proto*/
 static int __pyx_f_7cybrain_5Layer_neuronCount(CYTHON_UNUSED struct __pyx_obj_7cybrain_Layer *__pyx_v_self); /* proto*/
 static PyObject *__pyx_f_7cybrain_5Layer_setData(CYTHON_UNUSED struct __pyx_obj_7cybrain_Layer *__pyx_v_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_value, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_7cybrain_5Layer_restart(struct __pyx_obj_7cybrain_Layer *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_H(CYTHON_UNUSED struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, __Pyx_memviewslice __pyx_v_Z); /* proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_Y(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self); /* proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dEdZ(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self); /* proto*/
@@ -1853,18 +1991,32 @@ static PyObject *__pyx_f_7cybrain_11LinearLayer_setData(struct __pyx_obj_7cybrai
 static PyObject *__pyx_f_7cybrain_11LinearLayer_setTarget(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, __Pyx_memviewslice __pyx_v_T, int __pyx_skip_dispatch); /* proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dEdY(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, __Pyx_memviewslice __pyx_v_T); /* proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dYdZ(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self); /* proto*/
-static int __pyx_f_7cybrain_11LinearLayer_neuronCount(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self); /* proto*/
+int __pyx_f_7cybrain_11LinearLayer_neuronCount(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
+int __pyx_f_7cybrain_11LinearLayer_neuronCount__pyx_wrap_1(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self); /* proto*/
 static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_fullConnectTo(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer, int __pyx_skip_dispatch, struct __pyx_opt_args_7cybrain_11LinearLayer_fullConnectTo *__pyx_optional_args); /* proto*/
 static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_linearConnectTo(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer, int __pyx_skip_dispatch, struct __pyx_opt_args_7cybrain_11LinearLayer_linearConnectTo *__pyx_optional_args); /* proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_13LogisticLayer_H(CYTHON_UNUSED struct __pyx_obj_7cybrain_LogisticLayer *__pyx_v_self, __Pyx_memviewslice __pyx_v_Z); /* proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_13LogisticLayer_dEdY(struct __pyx_obj_7cybrain_LogisticLayer *__pyx_v_self, __Pyx_memviewslice __pyx_v_T); /* proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_13LogisticLayer_dYdZ(struct __pyx_obj_7cybrain_LogisticLayer *__pyx_v_self); /* proto*/
-static PyObject *__pyx_f_7cybrain_7Network_findHiddenComponents(struct __pyx_obj_7cybrain_Network *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
+static __Pyx_memviewslice __pyx_f_7cybrain_8BiasUnit_H(CYTHON_UNUSED struct __pyx_obj_7cybrain_BiasUnit *__pyx_v_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_Z); /* proto*/
+static PyObject *__pyx_f_7cybrain_7Network_setup(struct __pyx_obj_7cybrain_Network *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_7cybrain_7Network_recursivelyFindLayersAndConnections(struct __pyx_obj_7cybrain_Network *__pyx_v_self, struct __pyx_obj_7cybrain_Layer *__pyx_v_layer, PyObject *__pyx_v_layers, PyObject *__pyx_v_connections); /* proto*/
+static std::vector<double *>  __pyx_f_7cybrain_7Network_get_gradient_pointers(struct __pyx_obj_7cybrain_Network *__pyx_v_self); /* proto*/
+static std::vector<double *>  __pyx_f_7cybrain_7Network_get_weight_pointers(struct __pyx_obj_7cybrain_Network *__pyx_v_self); /* proto*/
 static PyObject *__pyx_f_7cybrain_7Network_restartNetwork(struct __pyx_obj_7cybrain_Network *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
 static PyObject *__pyx_f_7cybrain_7Network_setData(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, int __pyx_skip_dispatch); /* proto*/
 static PyObject *__pyx_f_7cybrain_7Network_activate_layers(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, int __pyx_skip_dispatch); /* proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_7Network_activate(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_7cybrain_7Network_setTarget(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_T, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_7cybrain_7Network_back_activate_layers(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_T, int __pyx_skip_dispatch); /* proto*/
+static __Pyx_memviewslice __pyx_f_7cybrain_7Network_back_activate(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_7cybrain_16FullBatchTrainer_restart_gradient(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self); /* proto*/
+static PyObject *__pyx_f_7cybrain_16FullBatchTrainer_print_gradient(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self); /* proto*/
+static PyObject *__pyx_f_7cybrain_16FullBatchTrainer_print_actual_gradient(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self); /* proto*/
+static PyObject *__pyx_f_7cybrain_16FullBatchTrainer_print_weights(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self); /* proto*/
+static PyObject *__pyx_f_7cybrain_16FullBatchTrainer_add_to_total_gradient(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self); /* proto*/
+static PyObject *__pyx_f_7cybrain_16FullBatchTrainer_epochs(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, int __pyx_v_epochs, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_7cybrain_16FullBatchTrainer_train(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self); /* proto*/
 static char *__pyx_memoryview_get_item_pointer(struct __pyx_memoryview_obj *__pyx_v_self, PyObject *__pyx_v_index); /* proto*/
 static PyObject *__pyx_memoryview_is_slice(struct __pyx_memoryview_obj *__pyx_v_self, PyObject *__pyx_v_obj); /* proto*/
 static PyObject *__pyx_memoryview_setitem_slice_assignment(struct __pyx_memoryview_obj *__pyx_v_self, PyObject *__pyx_v_dst, PyObject *__pyx_v_src); /* proto*/
@@ -1926,7 +2078,9 @@ static PyTypeObject *__pyx_ptype_7cybrain_LinearConnection = 0;
 static PyTypeObject *__pyx_ptype_7cybrain_Layer = 0;
 static PyTypeObject *__pyx_ptype_7cybrain_LinearLayer = 0;
 static PyTypeObject *__pyx_ptype_7cybrain_LogisticLayer = 0;
+static PyTypeObject *__pyx_ptype_7cybrain_BiasUnit = 0;
 static PyTypeObject *__pyx_ptype_7cybrain_Network = 0;
+static PyTypeObject *__pyx_ptype_7cybrain_FullBatchTrainer = 0;
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
@@ -1946,6 +2100,8 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementAdd(__Pyx_memviewslice, __Pyx_
 static __Pyx_memviewslice __pyx_f_7cybrain_elementSubtract(__Pyx_memviewslice, __Pyx_memviewslice); /*proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_elementBinaryOperation(__Pyx_memviewslice, __Pyx_memviewslice, __pyx_t_7cybrain_BinaryDoubleFun); /*proto*/
 static __Pyx_memviewslice __pyx_f_7cybrain_elementUnaryOperation(__Pyx_memviewslice, __pyx_t_7cybrain_UnaryDoubleFun); /*proto*/
+static void __pyx_f_7cybrain_copy_matrix(__Pyx_memviewslice, __Pyx_memviewslice); /*proto*/
+static std::vector<double *>  __pyx_f_7cybrain_get_pointers(__Pyx_memviewslice); /*proto*/
 static struct __pyx_array_obj *__pyx_array_new(PyObject *, Py_ssize_t, char *, char *, char *); /*proto*/
 static void *__pyx_align_pointer(void *, size_t); /*proto*/
 static PyObject *__pyx_memoryview_new(PyObject *, int, int, __Pyx_TypeInfo *); /*proto*/
@@ -2009,6 +2165,7 @@ static PyObject *__pyx_pf_7cybrain_14FullConnection_8set_dW(struct __pyx_obj_7cy
 static int __pyx_pf_7cybrain_16LinearConnection___init__(struct __pyx_obj_7cybrain_LinearConnection *__pyx_v_self, struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_source, struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_receiver, double __pyx_v_weightMagnitud); /* proto */
 static int __pyx_pf_7cybrain_5Layer___init__(struct __pyx_obj_7cybrain_Layer *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_7cybrain_5Layer_2setData(struct __pyx_obj_7cybrain_Layer *__pyx_v_self, __Pyx_memviewslice __pyx_v_value); /* proto */
+static PyObject *__pyx_pf_7cybrain_5Layer_4restart(struct __pyx_obj_7cybrain_Layer *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_7cybrain_5Layer_17sourceConnections___get__(struct __pyx_obj_7cybrain_Layer *__pyx_v_self); /* proto */
 static int __pyx_pf_7cybrain_5Layer_17sourceConnections_2__set__(struct __pyx_obj_7cybrain_Layer *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static int __pyx_pf_7cybrain_5Layer_17sourceConnections_4__del__(struct __pyx_obj_7cybrain_Layer *__pyx_v_self); /* proto */
@@ -2024,8 +2181,9 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_2get_dEdZ(struct __pyx_obj_7cyb
 static PyObject *__pyx_pf_7cybrain_11LinearLayer_4getY(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_7cybrain_11LinearLayer_6setData(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, __Pyx_memviewslice __pyx_v_value); /* proto */
 static PyObject *__pyx_pf_7cybrain_11LinearLayer_8setTarget(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, __Pyx_memviewslice __pyx_v_T); /* proto */
-static PyObject *__pyx_pf_7cybrain_11LinearLayer_10fullConnectTo(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer, double __pyx_v_weightMagnitud); /* proto */
-static PyObject *__pyx_pf_7cybrain_11LinearLayer_12linearConnectTo(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer, double __pyx_v_weightMagnitud); /* proto */
+static PyObject *__pyx_pf_7cybrain_11LinearLayer_10neuronCount(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7cybrain_11LinearLayer_12fullConnectTo(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer, double __pyx_v_weightMagnitud); /* proto */
+static PyObject *__pyx_pf_7cybrain_11LinearLayer_14linearConnectTo(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer, double __pyx_v_weightMagnitud); /* proto */
 static PyObject *__pyx_pf_7cybrain_11LinearLayer_2_Y___get__(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self); /* proto */
 static int __pyx_pf_7cybrain_11LinearLayer_2_Y_2__set__(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static PyObject *__pyx_pf_7cybrain_11LinearLayer_1Z___get__(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self); /* proto */
@@ -2034,12 +2192,16 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_5_dEdZ___get__(struct __pyx_obj
 static int __pyx_pf_7cybrain_11LinearLayer_5_dEdZ_2__set__(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static PyObject *__pyx_pf_7cybrain_11LinearLayer_5_dEdY___get__(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self); /* proto */
 static int __pyx_pf_7cybrain_11LinearLayer_5_dEdY_2__set__(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static int __pyx_pf_7cybrain_8BiasUnit___init__(struct __pyx_obj_7cybrain_BiasUnit *__pyx_v_self); /* proto */
 static int __pyx_pf_7cybrain_7Network___init__(struct __pyx_obj_7cybrain_Network *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_7cybrain_7Network_2findHiddenComponents(struct __pyx_obj_7cybrain_Network *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7cybrain_7Network_2setup(struct __pyx_obj_7cybrain_Network *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_7cybrain_7Network_4restartNetwork(struct __pyx_obj_7cybrain_Network *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_7cybrain_7Network_6setData(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_X); /* proto */
 static PyObject *__pyx_pf_7cybrain_7Network_8activate_layers(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_X); /* proto */
 static PyObject *__pyx_pf_7cybrain_7Network_10activate(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_X); /* proto */
+static PyObject *__pyx_pf_7cybrain_7Network_12setTarget(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_T); /* proto */
+static PyObject *__pyx_pf_7cybrain_7Network_14back_activate_layers(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_T); /* proto */
+static PyObject *__pyx_pf_7cybrain_7Network_16back_activate(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_X); /* proto */
 static PyObject *__pyx_pf_7cybrain_7Network_11inputLayers___get__(struct __pyx_obj_7cybrain_Network *__pyx_v_self); /* proto */
 static int __pyx_pf_7cybrain_7Network_11inputLayers_2__set__(struct __pyx_obj_7cybrain_Network *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static int __pyx_pf_7cybrain_7Network_11inputLayers_4__del__(struct __pyx_obj_7cybrain_Network *__pyx_v_self); /* proto */
@@ -2061,6 +2223,29 @@ static int __pyx_pf_7cybrain_7Network_12hiddenLayers_4__del__(struct __pyx_obj_7
 static PyObject *__pyx_pf_7cybrain_7Network_11connections___get__(struct __pyx_obj_7cybrain_Network *__pyx_v_self); /* proto */
 static int __pyx_pf_7cybrain_7Network_11connections_2__set__(struct __pyx_obj_7cybrain_Network *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static int __pyx_pf_7cybrain_7Network_11connections_4__del__(struct __pyx_obj_7cybrain_Network *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7cybrain_7Network_16all_input_layers___get__(struct __pyx_obj_7cybrain_Network *__pyx_v_self); /* proto */
+static int __pyx_pf_7cybrain_7Network_16all_input_layers_2__set__(struct __pyx_obj_7cybrain_Network *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static int __pyx_pf_7cybrain_7Network_16all_input_layers_4__del__(struct __pyx_obj_7cybrain_Network *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7cybrain_7Network_17all_output_layers___get__(struct __pyx_obj_7cybrain_Network *__pyx_v_self); /* proto */
+static int __pyx_pf_7cybrain_7Network_17all_output_layers_2__set__(struct __pyx_obj_7cybrain_Network *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static int __pyx_pf_7cybrain_7Network_17all_output_layers_4__del__(struct __pyx_obj_7cybrain_Network *__pyx_v_self); /* proto */
+static int __pyx_pf_7cybrain_16FullBatchTrainer___init__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, struct __pyx_obj_7cybrain_Network *__pyx_v_net, __Pyx_memviewslice __pyx_v_input_data, __Pyx_memviewslice __pyx_v_output_data, double __pyx_v_learning_rate); /* proto */
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_2epochs(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, int __pyx_v_epochs); /* proto */
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_4cost___get__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self); /* proto */
+static int __pyx_pf_7cybrain_16FullBatchTrainer_4cost_2__set__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_3net___get__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self); /* proto */
+static int __pyx_pf_7cybrain_16FullBatchTrainer_3net_2__set__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static int __pyx_pf_7cybrain_16FullBatchTrainer_3net_4__del__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_10input_data___get__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self); /* proto */
+static int __pyx_pf_7cybrain_16FullBatchTrainer_10input_data_2__set__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_11output_data___get__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self); /* proto */
+static int __pyx_pf_7cybrain_16FullBatchTrainer_11output_data_2__set__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_13learning_rate___get__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self); /* proto */
+static int __pyx_pf_7cybrain_16FullBatchTrainer_13learning_rate_2__set__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_12len_gradient___get__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self); /* proto */
+static int __pyx_pf_7cybrain_16FullBatchTrainer_12len_gradient_2__set__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_8len_data___get__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self); /* proto */
+static int __pyx_pf_7cybrain_16FullBatchTrainer_8len_data_2__set__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static int __pyx_pf_7cpython_5array_5array___getbuffer__(arrayobject *__pyx_v_self, Py_buffer *__pyx_v_info, CYTHON_UNUSED int __pyx_v_flags); /* proto */
 static void __pyx_pf_7cpython_5array_5array_2__releasebuffer__(CYTHON_UNUSED arrayobject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
@@ -2103,7 +2288,9 @@ static PyObject *__pyx_tp_new_7cybrain_LinearConnection(PyTypeObject *t, PyObjec
 static PyObject *__pyx_tp_new_7cybrain_Layer(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_7cybrain_LinearLayer(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_7cybrain_LogisticLayer(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_tp_new_7cybrain_BiasUnit(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_7cybrain_Network(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_tp_new_7cybrain_FullBatchTrainer(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_array(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_Enum(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_memoryview(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
@@ -2130,10 +2317,13 @@ static char __pyx_k_id[] = "id";
 static char __pyx_k_np[] = "np";
 static char __pyx_k_rn[] = "rn";
 static char __pyx_k_add[] = "add";
+static char __pyx_k_end[] = "end";
+static char __pyx_k_net[] = "net";
 static char __pyx_k_obj[] = "obj";
 static char __pyx_k_sum[] = "sum";
 static char __pyx_k_axis[] = "axis";
 static char __pyx_k_base[] = "base";
+static char __pyx_k_file[] = "file";
 static char __pyx_k_getW[] = "getW";
 static char __pyx_k_getY[] = "getY";
 static char __pyx_k_init[] = "__init__";
@@ -2157,10 +2347,13 @@ static char __pyx_k_error[] = "error";
 static char __pyx_k_flags[] = "flags";
 static char __pyx_k_layer[] = "layer";
 static char __pyx_k_numpy[] = "numpy";
+static char __pyx_k_print[] = "print";
 static char __pyx_k_range[] = "range";
+static char __pyx_k_setup[] = "setup";
 static char __pyx_k_shape[] = "shape";
 static char __pyx_k_start[] = "start";
 static char __pyx_k_double[] = "double";
+static char __pyx_k_epochs[] = "epochs";
 static char __pyx_k_format[] = "format";
 static char __pyx_k_get_dW[] = "get_dW";
 static char __pyx_k_import[] = "__import__";
@@ -2173,6 +2366,7 @@ static char __pyx_k_unpack[] = "unpack";
 static char __pyx_k_asarray[] = "asarray";
 static char __pyx_k_fortran[] = "fortran";
 static char __pyx_k_memview[] = "memview";
+static char __pyx_k_restart[] = "restart";
 static char __pyx_k_setData[] = "setData";
 static char __pyx_k_Ellipsis[] = "Ellipsis";
 static char __pyx_k_activate[] = "activate";
@@ -2186,12 +2380,17 @@ static char __pyx_k_setTarget[] = "setTarget";
 static char __pyx_k_IndexError[] = "IndexError";
 static char __pyx_k_ValueError[] = "ValueError";
 static char __pyx_k_exceptions[] = "exceptions";
+static char __pyx_k_input_data[] = "input_data";
 static char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
 static char __pyx_k_MemoryError[] = "MemoryError";
 static char __pyx_k_Shape_Error[] = "Shape Error";
 static char __pyx_k_concatenate[] = "concatenate";
+static char __pyx_k_neuronCount[] = "neuronCount";
+static char __pyx_k_output_data[] = "output_data";
 static char __pyx_k_RuntimeError[] = "RuntimeError";
+static char __pyx_k_back_activate[] = "back_activate";
 static char __pyx_k_fullConnectTo[] = "fullConnectTo";
+static char __pyx_k_learning_rate[] = "learning_rate";
 static char __pyx_k_neuron_number[] = "neuron_number";
 static char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
 static char __pyx_k_restartNetwork[] = "restartNetwork";
@@ -2202,7 +2401,7 @@ static char __pyx_k_allocate_buffer[] = "allocate_buffer";
 static char __pyx_k_dtype_is_object[] = "dtype_is_object";
 static char __pyx_k_linearConnectTo[] = "linearConnectTo";
 static char __pyx_k_strided_and_direct[] = "<strided and direct>";
-static char __pyx_k_findHiddenComponents[] = "findHiddenComponents";
+static char __pyx_k_back_activate_layers[] = "back_activate_layers";
 static char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
 static char __pyx_k_contiguous_and_direct[] = "<contiguous and direct>";
 static char __pyx_k_MemoryView_of_r_object[] = "<MemoryView of %r object>";
@@ -2225,6 +2424,7 @@ static char __pyx_k_All_dimensions_preceding_dimensi[] = "All dimensions precedi
 static char __pyx_k_Buffer_view_does_not_expose_stri[] = "Buffer view does not expose strides";
 static char __pyx_k_Can_only_create_a_buffer_that_is[] = "Can only create a buffer that is contiguous in memory.";
 static char __pyx_k_Cannot_transpose_memoryview_with[] = "Cannot transpose memoryview with indirect dimensions";
+static char __pyx_k_Copy_error_matrices_need_to_have[] = "Copy error: matrices need to have the same shape";
 static char __pyx_k_Empty_shape_tuple_for_cython_arr[] = "Empty shape tuple for cython.array";
 static char __pyx_k_Format_string_allocated_too_shor[] = "Format string allocated too short, see comment in numpy.pxd";
 static char __pyx_k_Indirect_dimensions_not_supporte[] = "Indirect dimensions not supported";
@@ -2236,11 +2436,13 @@ static char __pyx_k_Unable_to_convert_item_to_object[] = "Unable to convert item
 static char __pyx_k_got_differing_extents_in_dimensi[] = "got differing extents in dimension %d (got %d and %d)";
 static char __pyx_k_ndarray_is_not_Fortran_contiguou[] = "ndarray is not Fortran contiguous";
 static char __pyx_k_setData_Error_Data_shape_error_R[] = "setData Error: Data shape error. Received {0}, expected {1}";
+static char __pyx_k_setTarget_Error_Data_shape_error[] = "setTarget Error: Data shape error. Received {0}, expected {1}";
 static char __pyx_k_unable_to_allocate_shape_and_str[] = "unable to allocate shape and strides.";
 static char __pyx_k_Format_string_allocated_too_shor_2[] = "Format string allocated too short.";
 static PyObject *__pyx_kp_s_Buffer_view_does_not_expose_stri;
 static PyObject *__pyx_kp_s_Can_only_create_a_buffer_that_is;
 static PyObject *__pyx_kp_s_Cannot_index_with_type_s;
+static PyObject *__pyx_kp_s_Copy_error_matrices_need_to_have;
 static PyObject *__pyx_kp_s_Dimension_Error;
 static PyObject *__pyx_n_s_Ellipsis;
 static PyObject *__pyx_kp_s_Empty_shape_tuple_for_cython_arr;
@@ -2271,6 +2473,8 @@ static PyObject *__pyx_n_s_add;
 static PyObject *__pyx_n_s_allocate_buffer;
 static PyObject *__pyx_n_s_asarray;
 static PyObject *__pyx_n_s_axis;
+static PyObject *__pyx_n_s_back_activate;
+static PyObject *__pyx_n_s_back_activate_layers;
 static PyObject *__pyx_n_s_base;
 static PyObject *__pyx_n_s_c;
 static PyObject *__pyx_n_u_c;
@@ -2283,10 +2487,12 @@ static PyObject *__pyx_n_s_double;
 static PyObject *__pyx_n_s_dtype;
 static PyObject *__pyx_n_s_dtype_is_object;
 static PyObject *__pyx_n_s_empty;
+static PyObject *__pyx_n_s_end;
 static PyObject *__pyx_n_s_enumerate;
+static PyObject *__pyx_n_s_epochs;
 static PyObject *__pyx_n_s_error;
 static PyObject *__pyx_n_s_exceptions;
-static PyObject *__pyx_n_s_findHiddenComponents;
+static PyObject *__pyx_n_s_file;
 static PyObject *__pyx_n_s_flags;
 static PyObject *__pyx_n_s_format;
 static PyObject *__pyx_n_s_fortran;
@@ -2300,9 +2506,11 @@ static PyObject *__pyx_kp_s_got_differing_extents_in_dimensi;
 static PyObject *__pyx_n_s_id;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_init;
+static PyObject *__pyx_n_s_input_data;
 static PyObject *__pyx_n_s_itemsize;
 static PyObject *__pyx_kp_s_itemsize_0_for_cython_array;
 static PyObject *__pyx_n_s_layer;
+static PyObject *__pyx_n_s_learning_rate;
 static PyObject *__pyx_n_s_linearConnectTo;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_math;
@@ -2313,25 +2521,32 @@ static PyObject *__pyx_n_s_name_2;
 static PyObject *__pyx_kp_u_ndarray_is_not_C_contiguous;
 static PyObject *__pyx_kp_u_ndarray_is_not_Fortran_contiguou;
 static PyObject *__pyx_n_s_ndim;
+static PyObject *__pyx_n_s_net;
+static PyObject *__pyx_n_s_neuronCount;
 static PyObject *__pyx_n_s_neuron_number;
 static PyObject *__pyx_n_s_np;
 static PyObject *__pyx_n_s_numpy;
 static PyObject *__pyx_n_s_obj;
 static PyObject *__pyx_n_s_ones;
+static PyObject *__pyx_n_s_output_data;
 static PyObject *__pyx_n_s_pack;
+static PyObject *__pyx_n_s_print;
 static PyObject *__pyx_n_s_pyx_getbuffer;
 static PyObject *__pyx_n_s_pyx_vtable;
 static PyObject *__pyx_n_s_rand;
 static PyObject *__pyx_n_s_random;
 static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_s_receiver;
+static PyObject *__pyx_n_s_restart;
 static PyObject *__pyx_n_s_restartNetwork;
 static PyObject *__pyx_n_s_rn;
 static PyObject *__pyx_n_s_setData;
 static PyObject *__pyx_kp_s_setData_Error_Data_shape_error_R;
 static PyObject *__pyx_n_s_setTarget;
+static PyObject *__pyx_kp_s_setTarget_Error_Data_shape_error;
 static PyObject *__pyx_n_s_setW;
 static PyObject *__pyx_n_s_set_dW;
+static PyObject *__pyx_n_s_setup;
 static PyObject *__pyx_n_s_shape;
 static PyObject *__pyx_n_s_size;
 static PyObject *__pyx_n_s_source;
@@ -2363,9 +2578,9 @@ static PyObject *__pyx_tuple__6;
 static PyObject *__pyx_tuple__7;
 static PyObject *__pyx_tuple__8;
 static PyObject *__pyx_tuple__9;
-static PyObject *__pyx_slice__21;
-static PyObject *__pyx_slice__22;
 static PyObject *__pyx_slice__23;
+static PyObject *__pyx_slice__24;
+static PyObject *__pyx_slice__25;
 static PyObject *__pyx_tuple__10;
 static PyObject *__pyx_tuple__11;
 static PyObject *__pyx_tuple__12;
@@ -2377,13 +2592,15 @@ static PyObject *__pyx_tuple__17;
 static PyObject *__pyx_tuple__18;
 static PyObject *__pyx_tuple__19;
 static PyObject *__pyx_tuple__20;
-static PyObject *__pyx_tuple__24;
-static PyObject *__pyx_tuple__25;
+static PyObject *__pyx_tuple__21;
+static PyObject *__pyx_tuple__22;
 static PyObject *__pyx_tuple__26;
 static PyObject *__pyx_tuple__27;
 static PyObject *__pyx_tuple__28;
 static PyObject *__pyx_tuple__29;
 static PyObject *__pyx_tuple__30;
+static PyObject *__pyx_tuple__31;
+static PyObject *__pyx_tuple__32;
 
 /* "cybrain.pyx":33
  *         public Layer receiver
@@ -2476,6 +2693,42 @@ static void __pyx_f_7cybrain_10Connection_compute_dEdW(CYTHON_UNUSED struct __py
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
+}
+
+/* "cybrain.pyx":45
+ *         pass
+ * 
+ *     cdef vector[double*] get_gradient_pointers (self):             # <<<<<<<<<<<<<<
+ *         pass
+ * 
+ */
+
+static std::vector<double *>  __pyx_f_7cybrain_10Connection_get_gradient_pointers(CYTHON_UNUSED struct __pyx_obj_7cybrain_Connection *__pyx_v_self) {
+  std::vector<double *>  __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_gradient_pointers", 0);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":48
+ *         pass
+ * 
+ *     cdef vector[double*] get_weight_pointers (self):             # <<<<<<<<<<<<<<
+ *         pass
+ * 
+ */
+
+static std::vector<double *>  __pyx_f_7cybrain_10Connection_get_weight_pointers(CYTHON_UNUSED struct __pyx_obj_7cybrain_Connection *__pyx_v_self) {
+  std::vector<double *>  __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_weight_pointers", 0);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
 }
 
 /* "cybrain.pyx":30
@@ -2694,7 +2947,7 @@ static int __pyx_pf_7cybrain_10Connection_8receiver_4__del__(struct __pyx_obj_7c
   return __pyx_r;
 }
 
-/* "cybrain.pyx":52
+/* "cybrain.pyx":58
  *         double[:,:] dW
  * 
  *     def __init__(self, LinearLayer source, LinearLayer receiver, double weightMagnitud = 1.0):             # <<<<<<<<<<<<<<
@@ -2735,7 +2988,7 @@ static int __pyx_pw_7cybrain_14FullConnection_1__init__(PyObject *__pyx_v_self, 
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_receiver)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 52; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 58; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (kw_args > 0) {
@@ -2744,7 +2997,7 @@ static int __pyx_pw_7cybrain_14FullConnection_1__init__(PyObject *__pyx_v_self, 
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 52; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 58; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -2758,21 +3011,21 @@ static int __pyx_pw_7cybrain_14FullConnection_1__init__(PyObject *__pyx_v_self, 
     __pyx_v_source = ((struct __pyx_obj_7cybrain_LinearLayer *)values[0]);
     __pyx_v_receiver = ((struct __pyx_obj_7cybrain_LinearLayer *)values[1]);
     if (values[2]) {
-      __pyx_v_weightMagnitud = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_weightMagnitud == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 52; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_weightMagnitud = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_weightMagnitud == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 58; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_weightMagnitud = ((double)1.0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 52; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 58; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("cybrain.FullConnection.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_source), __pyx_ptype_7cybrain_LinearLayer, 1, "source", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 52; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_receiver), __pyx_ptype_7cybrain_LinearLayer, 1, "receiver", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 52; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_source), __pyx_ptype_7cybrain_LinearLayer, 1, "source", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 58; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_receiver), __pyx_ptype_7cybrain_LinearLayer, 1, "receiver", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 58; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7cybrain_14FullConnection___init__(((struct __pyx_obj_7cybrain_FullConnection *)__pyx_v_self), __pyx_v_source, __pyx_v_receiver, __pyx_v_weightMagnitud);
 
   /* function exit code */
@@ -2802,14 +3055,14 @@ static int __pyx_pf_7cybrain_14FullConnection___init__(struct __pyx_obj_7cybrain
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "cybrain.pyx":53
+  /* "cybrain.pyx":59
  * 
  *     def __init__(self, LinearLayer source, LinearLayer receiver, double weightMagnitud = 1.0):
  *         Connection.__init__(self)             # <<<<<<<<<<<<<<
  * 
  *         self.W = weightMagnitud * (np.random.rand (source.neuronCount(), receiver.neuronCount()) * 2.0 - 1.0)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)((PyObject*)__pyx_ptype_7cybrain_Connection)), __pyx_n_s_init); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)((PyObject*)__pyx_ptype_7cybrain_Connection)), __pyx_n_s_init); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 59; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -2822,42 +3075,42 @@ static int __pyx_pf_7cybrain_14FullConnection___init__(struct __pyx_obj_7cybrain
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_self)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_self)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 59; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 59; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(((PyObject *)__pyx_v_self));
     __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, ((PyObject *)__pyx_v_self));
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 59; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":55
+  /* "cybrain.pyx":61
  *         Connection.__init__(self)
  * 
  *         self.W = weightMagnitud * (np.random.rand (source.neuronCount(), receiver.neuronCount()) * 2.0 - 1.0)             # <<<<<<<<<<<<<<
  *         self.dW = np.empty ((source.neuronCount(), receiver.neuronCount()), dtype='double')
  * 
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_weightMagnitud); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_weightMagnitud); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_random); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_random); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_rand); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_rand); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_source->__pyx_base.__pyx_vtab)->__pyx_base.neuronCount(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_source))); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_source->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_source, 0)); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_receiver->__pyx_base.__pyx_vtab)->__pyx_base.neuronCount(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_receiver))); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_receiver->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_receiver, 0)); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = NULL;
   __pyx_t_7 = 0;
@@ -2871,7 +3124,7 @@ static int __pyx_pf_7cybrain_14FullConnection___init__(struct __pyx_obj_7cybrain
       __pyx_t_7 = 1;
     }
   }
-  __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
   if (__pyx_t_6) {
     __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -2882,45 +3135,45 @@ static int __pyx_pf_7cybrain_14FullConnection___init__(struct __pyx_obj_7cybrain
   PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_7, __pyx_t_5);
   __pyx_t_3 = 0;
   __pyx_t_5 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyNumber_Multiply(__pyx_t_2, __pyx_float_2_0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyNumber_Multiply(__pyx_t_2, __pyx_float_2_0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyNumber_Subtract(__pyx_t_4, __pyx_float_1_0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyNumber_Subtract(__pyx_t_4, __pyx_float_1_0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyNumber_Multiply(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyNumber_Multiply(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_9 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_4);
-  if (unlikely(!__pyx_t_9.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_9.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->W, 0);
   __pyx_v_self->W = __pyx_t_9;
   __pyx_t_9.memview = NULL;
   __pyx_t_9.data = NULL;
 
-  /* "cybrain.pyx":56
+  /* "cybrain.pyx":62
  * 
  *         self.W = weightMagnitud * (np.random.rand (source.neuronCount(), receiver.neuronCount()) * 2.0 - 1.0)
  *         self.dW = np.empty ((source.neuronCount(), receiver.neuronCount()), dtype='double')             # <<<<<<<<<<<<<<
  * 
  *         source.receiverConnections.append (self)
  */
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 56; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_empty); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 56; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_empty); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_source->__pyx_base.__pyx_vtab)->__pyx_base.neuronCount(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_source))); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 56; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_source->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_source, 0)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_receiver->__pyx_base.__pyx_vtab)->__pyx_base.neuronCount(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_receiver))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 56; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_receiver->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_receiver, 0)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_8 = PyTuple_New(2); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 56; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = PyTuple_New(2); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_4);
@@ -2928,28 +3181,28 @@ static int __pyx_pf_7cybrain_14FullConnection___init__(struct __pyx_obj_7cybrain
   PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_t_1);
   __pyx_t_4 = 0;
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 56; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_8);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_8);
   __pyx_t_8 = 0;
-  __pyx_t_8 = PyDict_New(); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 56; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = PyDict_New(); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
-  if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_dtype, __pyx_n_s_double) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 56; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_8); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 56; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_dtype, __pyx_n_s_double) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_8); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __pyx_t_9 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_4);
-  if (unlikely(!__pyx_t_9.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 56; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_9.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->dW, 0);
   __pyx_v_self->dW = __pyx_t_9;
   __pyx_t_9.memview = NULL;
   __pyx_t_9.data = NULL;
 
-  /* "cybrain.pyx":58
+  /* "cybrain.pyx":64
  *         self.dW = np.empty ((source.neuronCount(), receiver.neuronCount()), dtype='double')
  * 
  *         source.receiverConnections.append (self)             # <<<<<<<<<<<<<<
@@ -2958,11 +3211,11 @@ static int __pyx_pf_7cybrain_14FullConnection___init__(struct __pyx_obj_7cybrain
  */
   if (unlikely(__pyx_v_source->__pyx_base.receiverConnections == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%s'", "append");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 58; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 64; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_source->__pyx_base.receiverConnections, ((PyObject *)__pyx_v_self)); if (unlikely(__pyx_t_10 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 58; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_source->__pyx_base.receiverConnections, ((PyObject *)__pyx_v_self)); if (unlikely(__pyx_t_10 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 64; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "cybrain.pyx":59
+  /* "cybrain.pyx":65
  * 
  *         source.receiverConnections.append (self)
  *         receiver.sourceConnections.append (self)             # <<<<<<<<<<<<<<
@@ -2971,11 +3224,11 @@ static int __pyx_pf_7cybrain_14FullConnection___init__(struct __pyx_obj_7cybrain
  */
   if (unlikely(__pyx_v_receiver->__pyx_base.sourceConnections == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%s'", "append");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 59; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 65; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_receiver->__pyx_base.sourceConnections, ((PyObject *)__pyx_v_self)); if (unlikely(__pyx_t_10 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 59; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_receiver->__pyx_base.sourceConnections, ((PyObject *)__pyx_v_self)); if (unlikely(__pyx_t_10 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 65; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "cybrain.pyx":61
+  /* "cybrain.pyx":67
  *         receiver.sourceConnections.append (self)
  * 
  *         self.source = source             # <<<<<<<<<<<<<<
@@ -2988,7 +3241,7 @@ static int __pyx_pf_7cybrain_14FullConnection___init__(struct __pyx_obj_7cybrain
   __Pyx_DECREF(((PyObject *)__pyx_v_self->__pyx_base.source));
   __pyx_v_self->__pyx_base.source = ((struct __pyx_obj_7cybrain_Layer *)__pyx_v_source);
 
-  /* "cybrain.pyx":62
+  /* "cybrain.pyx":68
  * 
  *         self.source = source
  *         self.receiver = receiver             # <<<<<<<<<<<<<<
@@ -3001,7 +3254,7 @@ static int __pyx_pf_7cybrain_14FullConnection___init__(struct __pyx_obj_7cybrain
   __Pyx_DECREF(((PyObject *)__pyx_v_self->__pyx_base.receiver));
   __pyx_v_self->__pyx_base.receiver = ((struct __pyx_obj_7cybrain_Layer *)__pyx_v_receiver);
 
-  /* "cybrain.pyx":52
+  /* "cybrain.pyx":58
  *         double[:,:] dW
  * 
  *     def __init__(self, LinearLayer source, LinearLayer receiver, double weightMagnitud = 1.0):             # <<<<<<<<<<<<<<
@@ -3028,7 +3281,7 @@ static int __pyx_pf_7cybrain_14FullConnection___init__(struct __pyx_obj_7cybrain
   return __pyx_r;
 }
 
-/* "cybrain.pyx":65
+/* "cybrain.pyx":71
  * 
  * 
  *     cdef double[:,:] Zc (self):             # <<<<<<<<<<<<<<
@@ -3048,75 +3301,75 @@ static __Pyx_memviewslice __pyx_f_7cybrain_14FullConnection_Zc(struct __pyx_obj_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("Zc", 0);
 
-  /* "cybrain.pyx":68
+  /* "cybrain.pyx":74
  * 
  * 
  *         if self.source.Y().shape[1] != self.W.shape[0]:             # <<<<<<<<<<<<<<
  *             raise Exception ("Shape Error")
  * 
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.source->__pyx_vtab)->Y(__pyx_v_self->__pyx_base.source); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 68; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__pyx_v_self->W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 68; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.source->__pyx_vtab)->Y(__pyx_v_self->__pyx_base.source); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 74; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 74; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
   __pyx_t_2 = (((__pyx_t_1.shape[1]) != (__pyx_v_self->W.shape[0])) != 0);
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
   if (__pyx_t_2) {
 
-    /* "cybrain.pyx":69
+    /* "cybrain.pyx":75
  * 
  *         if self.source.Y().shape[1] != self.W.shape[0]:
  *             raise Exception ("Shape Error")             # <<<<<<<<<<<<<<
  * 
  *         if self.receiver.neuronCount() != self.W.shape[1]:
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 69; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 69; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "cybrain.pyx":71
+  /* "cybrain.pyx":77
  *             raise Exception ("Shape Error")
  * 
  *         if self.receiver.neuronCount() != self.W.shape[1]:             # <<<<<<<<<<<<<<
  *             raise Exception ("Neuron Difference Error")
  * 
  */
-  if (unlikely(!__pyx_v_self->W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  if (unlikely(!__pyx_v_self->W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
   __pyx_t_2 = ((((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.receiver->__pyx_vtab)->neuronCount(__pyx_v_self->__pyx_base.receiver) != (__pyx_v_self->W.shape[1])) != 0);
   if (__pyx_t_2) {
 
-    /* "cybrain.pyx":72
+    /* "cybrain.pyx":78
  * 
  *         if self.receiver.neuronCount() != self.W.shape[1]:
  *             raise Exception ("Neuron Difference Error")             # <<<<<<<<<<<<<<
  * 
- *         return dotMultiply (self.source.Y(), self.W)
+ *         ##print np.asarray (self.W)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "cybrain.pyx":74
- *             raise Exception ("Neuron Difference Error")
+  /* "cybrain.pyx":81
  * 
+ *         ##print np.asarray (self.W)
  *         return dotMultiply (self.source.Y(), self.W)             # <<<<<<<<<<<<<<
  * 
  *     cpdef np.ndarray getW (self):
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.source->__pyx_vtab)->Y(__pyx_v_self->__pyx_base.source); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 74; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__pyx_v_self->W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 74; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
-  __pyx_t_4 = __pyx_f_7cybrain_dotMultiply(__pyx_t_1, __pyx_v_self->W); if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 74; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.source->__pyx_vtab)->Y(__pyx_v_self->__pyx_base.source); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 81; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 81; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_4 = __pyx_f_7cybrain_dotMultiply(__pyx_t_1, __pyx_v_self->W); if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 81; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
   __pyx_r = __pyx_t_4;
   __pyx_t_4.memview = NULL;
   __pyx_t_4.data = NULL;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":65
+  /* "cybrain.pyx":71
  * 
  * 
  *     cdef double[:,:] Zc (self):             # <<<<<<<<<<<<<<
@@ -3143,7 +3396,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_14FullConnection_Zc(struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "cybrain.pyx":76
+/* "cybrain.pyx":83
  *         return dotMultiply (self.source.Y(), self.W)
  * 
  *     cpdef np.ndarray getW (self):             # <<<<<<<<<<<<<<
@@ -3168,7 +3421,7 @@ static PyArrayObject *__pyx_f_7cybrain_14FullConnection_getW(struct __pyx_obj_7c
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_getW); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 76; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_getW); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 83; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_14FullConnection_3getW)) {
       __Pyx_XDECREF(((PyObject *)__pyx_r));
@@ -3184,14 +3437,14 @@ static PyArrayObject *__pyx_f_7cybrain_14FullConnection_getW(struct __pyx_obj_7c
         }
       }
       if (__pyx_t_4) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 76; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 83; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       } else {
-        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 76; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 83; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 76; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 83; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_r = ((PyArrayObject *)__pyx_t_2);
       __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3200,7 +3453,7 @@ static PyArrayObject *__pyx_f_7cybrain_14FullConnection_getW(struct __pyx_obj_7c
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":77
+  /* "cybrain.pyx":84
  * 
  *     cpdef np.ndarray getW (self):
  *         return np.asarray (self.W)             # <<<<<<<<<<<<<<
@@ -3208,13 +3461,13 @@ static PyArrayObject *__pyx_f_7cybrain_14FullConnection_getW(struct __pyx_obj_7c
  *     cpdef setW (self, np.ndarray value):
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_asarray); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_asarray); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_v_self->W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
-  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_self->W, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_self->W, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -3227,27 +3480,27 @@ static PyArrayObject *__pyx_f_7cybrain_14FullConnection_getW(struct __pyx_obj_7c
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_2);
     __pyx_t_2 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":76
+  /* "cybrain.pyx":83
  *         return dotMultiply (self.source.Y(), self.W)
  * 
  *     cpdef np.ndarray getW (self):             # <<<<<<<<<<<<<<
@@ -3292,7 +3545,7 @@ static PyObject *__pyx_pf_7cybrain_14FullConnection_2getW(struct __pyx_obj_7cybr
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("getW", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_7cybrain_14FullConnection_getW(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 76; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((PyObject *)__pyx_f_7cybrain_14FullConnection_getW(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 83; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3309,11 +3562,11 @@ static PyObject *__pyx_pf_7cybrain_14FullConnection_2getW(struct __pyx_obj_7cybr
   return __pyx_r;
 }
 
-/* "cybrain.pyx":79
+/* "cybrain.pyx":86
  *         return np.asarray (self.W)
  * 
  *     cpdef setW (self, np.ndarray value):             # <<<<<<<<<<<<<<
- *         self.W = value
+ *         copy_matrix(self.W, value)
  * 
  */
 
@@ -3335,7 +3588,7 @@ static PyObject *__pyx_f_7cybrain_14FullConnection_setW(struct __pyx_obj_7cybrai
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_setW); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_setW); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_14FullConnection_5setW)) {
       __Pyx_XDECREF(__pyx_r);
@@ -3351,16 +3604,16 @@ static PyObject *__pyx_f_7cybrain_14FullConnection_setW(struct __pyx_obj_7cybrai
         }
       }
       if (!__pyx_t_4) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, ((PyObject *)__pyx_v_value)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, ((PyObject *)__pyx_v_value)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_2);
       } else {
-        __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
         __Pyx_INCREF(((PyObject *)__pyx_v_value));
         __Pyx_GIVEREF(((PyObject *)__pyx_v_value));
         PyTuple_SET_ITEM(__pyx_t_5, 0+1, ((PyObject *)__pyx_v_value));
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       }
@@ -3373,25 +3626,24 @@ static PyObject *__pyx_f_7cybrain_14FullConnection_setW(struct __pyx_obj_7cybrai
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":80
+  /* "cybrain.pyx":87
  * 
  *     cpdef setW (self, np.ndarray value):
- *         self.W = value             # <<<<<<<<<<<<<<
+ *         copy_matrix(self.W, value)             # <<<<<<<<<<<<<<
  * 
  *     cpdef np.ndarray get_dW (self):
  */
+  if (unlikely(!__pyx_v_self->W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
   __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(((PyObject *)__pyx_v_value));
-  if (unlikely(!__pyx_t_6.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __PYX_XDEC_MEMVIEW(&__pyx_v_self->W, 0);
-  __pyx_v_self->W = __pyx_t_6;
-  __pyx_t_6.memview = NULL;
-  __pyx_t_6.data = NULL;
+  if (unlikely(!__pyx_t_6.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_f_7cybrain_copy_matrix(__pyx_v_self->W, __pyx_t_6);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_6, 1);
 
-  /* "cybrain.pyx":79
+  /* "cybrain.pyx":86
  *         return np.asarray (self.W)
  * 
  *     cpdef setW (self, np.ndarray value):             # <<<<<<<<<<<<<<
- *         self.W = value
+ *         copy_matrix(self.W, value)
  * 
  */
 
@@ -3422,7 +3674,7 @@ static PyObject *__pyx_pw_7cybrain_14FullConnection_5setW(PyObject *__pyx_v_self
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("setW (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_value), __pyx_ptype_5numpy_ndarray, 1, "value", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_value), __pyx_ptype_5numpy_ndarray, 1, "value", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7cybrain_14FullConnection_4setW(((struct __pyx_obj_7cybrain_FullConnection *)__pyx_v_self), ((PyArrayObject *)__pyx_v_value));
 
   /* function exit code */
@@ -3443,7 +3695,7 @@ static PyObject *__pyx_pf_7cybrain_14FullConnection_4setW(struct __pyx_obj_7cybr
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("setW", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_7cybrain_14FullConnection_setW(__pyx_v_self, __pyx_v_value, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_f_7cybrain_14FullConnection_setW(__pyx_v_self, __pyx_v_value, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3460,8 +3712,8 @@ static PyObject *__pyx_pf_7cybrain_14FullConnection_4setW(struct __pyx_obj_7cybr
   return __pyx_r;
 }
 
-/* "cybrain.pyx":82
- *         self.W = value
+/* "cybrain.pyx":89
+ *         copy_matrix(self.W, value)
  * 
  *     cpdef np.ndarray get_dW (self):             # <<<<<<<<<<<<<<
  *         return np.asarray (self.dW)
@@ -3485,7 +3737,7 @@ static PyArrayObject *__pyx_f_7cybrain_14FullConnection_get_dW(struct __pyx_obj_
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_dW); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 82; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_dW); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 89; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_14FullConnection_7get_dW)) {
       __Pyx_XDECREF(((PyObject *)__pyx_r));
@@ -3501,14 +3753,14 @@ static PyArrayObject *__pyx_f_7cybrain_14FullConnection_get_dW(struct __pyx_obj_
         }
       }
       if (__pyx_t_4) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 82; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 89; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       } else {
-        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 82; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 89; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 82; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 89; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_r = ((PyArrayObject *)__pyx_t_2);
       __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3517,7 +3769,7 @@ static PyArrayObject *__pyx_f_7cybrain_14FullConnection_get_dW(struct __pyx_obj_
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":83
+  /* "cybrain.pyx":90
  * 
  *     cpdef np.ndarray get_dW (self):
  *         return np.asarray (self.dW)             # <<<<<<<<<<<<<<
@@ -3525,13 +3777,13 @@ static PyArrayObject *__pyx_f_7cybrain_14FullConnection_get_dW(struct __pyx_obj_
  *     cpdef set_dW (self, double [:,:] value):
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 83; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_asarray); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 83; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_asarray); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_v_self->dW.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 83; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
-  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_self->dW, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 83; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->dW.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_self->dW, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -3544,28 +3796,28 @@ static PyArrayObject *__pyx_f_7cybrain_14FullConnection_get_dW(struct __pyx_obj_
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 83; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 83; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_2);
     __pyx_t_2 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 83; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 83; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":82
- *         self.W = value
+  /* "cybrain.pyx":89
+ *         copy_matrix(self.W, value)
  * 
  *     cpdef np.ndarray get_dW (self):             # <<<<<<<<<<<<<<
  *         return np.asarray (self.dW)
@@ -3609,7 +3861,7 @@ static PyObject *__pyx_pf_7cybrain_14FullConnection_6get_dW(struct __pyx_obj_7cy
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_dW", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_7cybrain_14FullConnection_get_dW(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 82; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((PyObject *)__pyx_f_7cybrain_14FullConnection_get_dW(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 89; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3626,11 +3878,11 @@ static PyObject *__pyx_pf_7cybrain_14FullConnection_6get_dW(struct __pyx_obj_7cy
   return __pyx_r;
 }
 
-/* "cybrain.pyx":85
+/* "cybrain.pyx":92
  *         return np.asarray (self.dW)
  * 
  *     cpdef set_dW (self, double [:,:] value):             # <<<<<<<<<<<<<<
- *         self.dW = value
+ *         copy_matrix(self.dW, value)
  * 
  */
 
@@ -3652,12 +3904,12 @@ static PyObject *__pyx_f_7cybrain_14FullConnection_set_dW(struct __pyx_obj_7cybr
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_set_dW); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_set_dW); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_14FullConnection_9set_dW)) {
       __Pyx_XDECREF(__pyx_r);
-      if (unlikely(!__pyx_v_value.memview)) { __Pyx_RaiseUnboundLocalError("value"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_value, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (unlikely(!__pyx_v_value.memview)) { __Pyx_RaiseUnboundLocalError("value"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_value, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_1);
       __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -3671,17 +3923,17 @@ static PyObject *__pyx_f_7cybrain_14FullConnection_set_dW(struct __pyx_obj_7cybr
         }
       }
       if (!__pyx_t_5) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else {
-        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
         __Pyx_GIVEREF(__pyx_t_3);
         PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
         __pyx_t_3 = 0;
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
@@ -3694,22 +3946,21 @@ static PyObject *__pyx_f_7cybrain_14FullConnection_set_dW(struct __pyx_obj_7cybr
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":86
+  /* "cybrain.pyx":93
  * 
  *     cpdef set_dW (self, double [:,:] value):
- *         self.dW = value             # <<<<<<<<<<<<<<
+ *         copy_matrix(self.dW, value)             # <<<<<<<<<<<<<<
  * 
  *     cdef void compute_dEdW (self):
  */
-  __PYX_XDEC_MEMVIEW(&__pyx_v_self->dW, 0);
-  __PYX_INC_MEMVIEW(&__pyx_v_value, 0);
-  __pyx_v_self->dW = __pyx_v_value;
+  if (unlikely(!__pyx_v_self->dW.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 93; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_f_7cybrain_copy_matrix(__pyx_v_self->dW, __pyx_v_value);
 
-  /* "cybrain.pyx":85
+  /* "cybrain.pyx":92
  *         return np.asarray (self.dW)
  * 
  *     cpdef set_dW (self, double [:,:] value):             # <<<<<<<<<<<<<<
- *         self.dW = value
+ *         copy_matrix(self.dW, value)
  * 
  */
 
@@ -3742,7 +3993,7 @@ static PyObject *__pyx_pw_7cybrain_14FullConnection_9set_dW(PyObject *__pyx_v_se
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("set_dW (wrapper)", 0);
   assert(__pyx_arg_value); {
-    __pyx_v_value = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_value); if (unlikely(!__pyx_v_value.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_value = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_value); if (unlikely(!__pyx_v_value.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -3766,8 +4017,8 @@ static PyObject *__pyx_pf_7cybrain_14FullConnection_8set_dW(struct __pyx_obj_7cy
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("set_dW", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_value.memview)) { __Pyx_RaiseUnboundLocalError("value"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-  __pyx_t_1 = __pyx_f_7cybrain_14FullConnection_set_dW(__pyx_v_self, __pyx_v_value, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_value.memview)) { __Pyx_RaiseUnboundLocalError("value"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+  __pyx_t_1 = __pyx_f_7cybrain_14FullConnection_set_dW(__pyx_v_self, __pyx_v_value, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3785,12 +4036,12 @@ static PyObject *__pyx_pf_7cybrain_14FullConnection_8set_dW(struct __pyx_obj_7cy
   return __pyx_r;
 }
 
-/* "cybrain.pyx":88
- *         self.dW = value
+/* "cybrain.pyx":95
+ *         copy_matrix(self.dW, value)
  * 
  *     cdef void compute_dEdW (self):             # <<<<<<<<<<<<<<
- *         ##dW : [n, m]
- *         ##(dZdW = Y) : [1, n]
+ *         copy_matrix(self.dW, dotMultiply (self.source.Y().T, self.receiver.dEdZ()))
+ * 
  */
 
 static void __pyx_f_7cybrain_14FullConnection_compute_dEdW(struct __pyx_obj_7cybrain_FullConnection *__pyx_v_self) {
@@ -3803,31 +4054,30 @@ static void __pyx_f_7cybrain_14FullConnection_compute_dEdW(struct __pyx_obj_7cyb
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("compute_dEdW", 0);
 
-  /* "cybrain.pyx":93
- *         ##dEdZ.shape : [1, m]
- *         ##(Y.T * dEdZ) : [n, 1] * [1, m]  =  [n, m]
- *         self.dW = dotMultiply (self.source.Y().T, self.receiver.dEdZ())             # <<<<<<<<<<<<<<
+  /* "cybrain.pyx":96
+ * 
+ *     cdef void compute_dEdW (self):
+ *         copy_matrix(self.dW, dotMultiply (self.source.Y().T, self.receiver.dEdZ()))             # <<<<<<<<<<<<<<
  * 
  *     cdef double[:,:] dEdY (self):
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.source->__pyx_vtab)->Y(__pyx_v_self->__pyx_base.source); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 93; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->dW.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.source->__pyx_vtab)->Y(__pyx_v_self->__pyx_base.source); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_2 = __pyx_t_1;
-  if (unlikely(__pyx_memslice_transpose(&__pyx_t_2) == 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 93; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(__pyx_memslice_transpose(&__pyx_t_2) == 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.receiver->__pyx_vtab)->dEdZ(__pyx_v_self->__pyx_base.receiver); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 93; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_3 = __pyx_f_7cybrain_dotMultiply(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 93; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.receiver->__pyx_vtab)->dEdZ(__pyx_v_self->__pyx_base.receiver); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_f_7cybrain_dotMultiply(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_self->dW, 0);
-  __pyx_v_self->dW = __pyx_t_3;
-  __pyx_t_3.memview = NULL;
-  __pyx_t_3.data = NULL;
+  __pyx_f_7cybrain_copy_matrix(__pyx_v_self->dW, __pyx_t_3);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_3, 1);
 
-  /* "cybrain.pyx":88
- *         self.dW = value
+  /* "cybrain.pyx":95
+ *         copy_matrix(self.dW, value)
  * 
  *     cdef void compute_dEdW (self):             # <<<<<<<<<<<<<<
- *         ##dW : [n, m]
- *         ##(dZdW = Y) : [1, n]
+ *         copy_matrix(self.dW, dotMultiply (self.source.Y().T, self.receiver.dEdZ()))
+ * 
  */
 
   /* function exit code */
@@ -3841,12 +4091,12 @@ static void __pyx_f_7cybrain_14FullConnection_compute_dEdW(struct __pyx_obj_7cyb
   __Pyx_RefNannyFinishContext();
 }
 
-/* "cybrain.pyx":95
- *         self.dW = dotMultiply (self.source.Y().T, self.receiver.dEdZ())
+/* "cybrain.pyx":98
+ *         copy_matrix(self.dW, dotMultiply (self.source.Y().T, self.receiver.dEdZ()))
  * 
  *     cdef double[:,:] dEdY (self):             # <<<<<<<<<<<<<<
  *         self.compute_dEdW()
- *         ##(dZdY = W) : [n, m]
+ *         return dotMultiply (self.receiver.dEdZ(), self.W.T)
  */
 
 static __Pyx_memviewslice __pyx_f_7cybrain_14FullConnection_dEdY(struct __pyx_obj_7cybrain_FullConnection *__pyx_v_self) {
@@ -3860,39 +4110,39 @@ static __Pyx_memviewslice __pyx_f_7cybrain_14FullConnection_dEdY(struct __pyx_ob
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("dEdY", 0);
 
-  /* "cybrain.pyx":96
+  /* "cybrain.pyx":99
  * 
  *     cdef double[:,:] dEdY (self):
  *         self.compute_dEdW()             # <<<<<<<<<<<<<<
- *         ##(dZdY = W) : [n, m]
- *         ##dEdZ : [1, m]
+ *         return dotMultiply (self.receiver.dEdZ(), self.W.T)
+ * 
  */
   ((struct __pyx_vtabstruct_7cybrain_FullConnection *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.compute_dEdW(((struct __pyx_obj_7cybrain_Connection *)__pyx_v_self));
 
-  /* "cybrain.pyx":102
- *         ##(W * dEdZ.T).T :  ([n, m] * [m, 1] = [n, 1]).T = [1, n]
- *         ##(W * dEdZ.T).T = dEdZ * W.T : [1, m] * [m, n] = [1, n]
+  /* "cybrain.pyx":100
+ *     cdef double[:,:] dEdY (self):
+ *         self.compute_dEdW()
  *         return dotMultiply (self.receiver.dEdZ(), self.W.T)             # <<<<<<<<<<<<<<
  * 
- * 
+ *     cdef vector[double*] get_gradient_pointers (self):
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.receiver->__pyx_vtab)->dEdZ(__pyx_v_self->__pyx_base.receiver); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 102; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__pyx_v_self->W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 102; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.receiver->__pyx_vtab)->dEdZ(__pyx_v_self->__pyx_base.receiver); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
   __pyx_t_2 = __pyx_v_self->W;
-  if (unlikely(__pyx_memslice_transpose(&__pyx_t_2) == 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 102; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_3 = __pyx_f_7cybrain_dotMultiply(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 102; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(__pyx_memslice_transpose(&__pyx_t_2) == 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_f_7cybrain_dotMultiply(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
   __pyx_r = __pyx_t_3;
   __pyx_t_3.memview = NULL;
   __pyx_t_3.data = NULL;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":95
- *         self.dW = dotMultiply (self.source.Y().T, self.receiver.dEdZ())
+  /* "cybrain.pyx":98
+ *         copy_matrix(self.dW, dotMultiply (self.source.Y().T, self.receiver.dEdZ()))
  * 
  *     cdef double[:,:] dEdY (self):             # <<<<<<<<<<<<<<
  *         self.compute_dEdW()
- *         ##(dZdY = W) : [n, m]
+ *         return dotMultiply (self.receiver.dEdZ(), self.W.T)
  */
 
   /* function exit code */
@@ -3914,7 +4164,93 @@ static __Pyx_memviewslice __pyx_f_7cybrain_14FullConnection_dEdY(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "cybrain.pyx":108
+/* "cybrain.pyx":102
+ *         return dotMultiply (self.receiver.dEdZ(), self.W.T)
+ * 
+ *     cdef vector[double*] get_gradient_pointers (self):             # <<<<<<<<<<<<<<
+ *         return get_pointers(self.dW)
+ * 
+ */
+
+static std::vector<double *>  __pyx_f_7cybrain_14FullConnection_get_gradient_pointers(struct __pyx_obj_7cybrain_FullConnection *__pyx_v_self) {
+  std::vector<double *>  __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_gradient_pointers", 0);
+
+  /* "cybrain.pyx":103
+ * 
+ *     cdef vector[double*] get_gradient_pointers (self):
+ *         return get_pointers(self.dW)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef vector[double*] get_weight_pointers (self):
+ */
+  if (unlikely(!__pyx_v_self->dW.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 103; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_r = __pyx_f_7cybrain_get_pointers(__pyx_v_self->dW);
+  goto __pyx_L0;
+
+  /* "cybrain.pyx":102
+ *         return dotMultiply (self.receiver.dEdZ(), self.W.T)
+ * 
+ *     cdef vector[double*] get_gradient_pointers (self):             # <<<<<<<<<<<<<<
+ *         return get_pointers(self.dW)
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_WriteUnraisable("cybrain.FullConnection.get_gradient_pointers", __pyx_clineno, __pyx_lineno, __pyx_filename, 0, 0);
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":105
+ *         return get_pointers(self.dW)
+ * 
+ *     cdef vector[double*] get_weight_pointers (self):             # <<<<<<<<<<<<<<
+ *         return get_pointers(self.W)
+ * 
+ */
+
+static std::vector<double *>  __pyx_f_7cybrain_14FullConnection_get_weight_pointers(struct __pyx_obj_7cybrain_FullConnection *__pyx_v_self) {
+  std::vector<double *>  __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_weight_pointers", 0);
+
+  /* "cybrain.pyx":106
+ * 
+ *     cdef vector[double*] get_weight_pointers (self):
+ *         return get_pointers(self.W)             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  if (unlikely(!__pyx_v_self->W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 106; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_r = __pyx_f_7cybrain_get_pointers(__pyx_v_self->W);
+  goto __pyx_L0;
+
+  /* "cybrain.pyx":105
+ *         return get_pointers(self.dW)
+ * 
+ *     cdef vector[double*] get_weight_pointers (self):             # <<<<<<<<<<<<<<
+ *         return get_pointers(self.W)
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_WriteUnraisable("cybrain.FullConnection.get_weight_pointers", __pyx_clineno, __pyx_lineno, __pyx_filename, 0, 0);
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":112
  * cdef class LinearConnection (FullConnection):
  * 
  *     def __init__(self, LinearLayer source, LinearLayer receiver, double weightMagnitud = 1.0):             # <<<<<<<<<<<<<<
@@ -3955,7 +4291,7 @@ static int __pyx_pw_7cybrain_16LinearConnection_1__init__(PyObject *__pyx_v_self
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_receiver)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (kw_args > 0) {
@@ -3964,7 +4300,7 @@ static int __pyx_pw_7cybrain_16LinearConnection_1__init__(PyObject *__pyx_v_self
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -3978,21 +4314,21 @@ static int __pyx_pw_7cybrain_16LinearConnection_1__init__(PyObject *__pyx_v_self
     __pyx_v_source = ((struct __pyx_obj_7cybrain_LinearLayer *)values[0]);
     __pyx_v_receiver = ((struct __pyx_obj_7cybrain_LinearLayer *)values[1]);
     if (values[2]) {
-      __pyx_v_weightMagnitud = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_weightMagnitud == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_weightMagnitud = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_weightMagnitud == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_weightMagnitud = ((double)1.0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("cybrain.LinearConnection.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_source), __pyx_ptype_7cybrain_LinearLayer, 1, "source", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_receiver), __pyx_ptype_7cybrain_LinearLayer, 1, "receiver", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_source), __pyx_ptype_7cybrain_LinearLayer, 1, "source", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_receiver), __pyx_ptype_7cybrain_LinearLayer, 1, "receiver", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7cybrain_16LinearConnection___init__(((struct __pyx_obj_7cybrain_LinearConnection *)__pyx_v_self), __pyx_v_source, __pyx_v_receiver, __pyx_v_weightMagnitud);
 
   /* function exit code */
@@ -4021,16 +4357,16 @@ static int __pyx_pf_7cybrain_16LinearConnection___init__(struct __pyx_obj_7cybra
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "cybrain.pyx":109
+  /* "cybrain.pyx":113
  * 
  *     def __init__(self, LinearLayer source, LinearLayer receiver, double weightMagnitud = 1.0):
  *         FullConnection.__init__(self, source, receiver, weightMagnitud)             # <<<<<<<<<<<<<<
  * 
  *         if source.neuronCount() != receiver.neuronCount():
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)((PyObject*)__pyx_ptype_7cybrain_FullConnection)), __pyx_n_s_init); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 109; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)((PyObject*)__pyx_ptype_7cybrain_FullConnection)), __pyx_n_s_init); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 113; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_weightMagnitud); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 109; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_weightMagnitud); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 113; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   __pyx_t_5 = 0;
@@ -4044,7 +4380,7 @@ static int __pyx_pf_7cybrain_16LinearConnection___init__(struct __pyx_obj_7cybra
       __pyx_t_5 = 1;
     }
   }
-  __pyx_t_6 = PyTuple_New(4+__pyx_t_5); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 109; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = PyTuple_New(4+__pyx_t_5); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 113; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
   if (__pyx_t_4) {
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -4061,54 +4397,54 @@ static int __pyx_pf_7cybrain_16LinearConnection___init__(struct __pyx_obj_7cybra
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_6, 3+__pyx_t_5, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 109; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 113; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":111
+  /* "cybrain.pyx":115
  *         FullConnection.__init__(self, source, receiver, weightMagnitud)
  * 
  *         if source.neuronCount() != receiver.neuronCount():             # <<<<<<<<<<<<<<
  *             raise Exception("Number of neurons not equal")
  * 
  */
-  __pyx_t_7 = ((((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_source->__pyx_base.__pyx_vtab)->__pyx_base.neuronCount(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_source)) != ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_receiver->__pyx_base.__pyx_vtab)->__pyx_base.neuronCount(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_receiver))) != 0);
+  __pyx_t_7 = ((((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_source->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_source, 0) != ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_receiver->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_receiver, 0)) != 0);
   if (__pyx_t_7) {
 
-    /* "cybrain.pyx":112
+    /* "cybrain.pyx":116
  * 
  *         if source.neuronCount() != receiver.neuronCount():
  *             raise Exception("Number of neurons not equal")             # <<<<<<<<<<<<<<
  * 
  *         self.W = weightMagnitud * (np.random.rand (1, receiver.neuronCount()) * 2.0 - 1.0)
  */
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 116; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 116; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "cybrain.pyx":114
+  /* "cybrain.pyx":118
  *             raise Exception("Number of neurons not equal")
  * 
  *         self.W = weightMagnitud * (np.random.rand (1, receiver.neuronCount()) * 2.0 - 1.0)             # <<<<<<<<<<<<<<
  *         self.dW = np.empty ((1, receiver.neuronCount()), dtype='double')
  * 
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_weightMagnitud); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_weightMagnitud); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_random); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_random); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_rand); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_rand); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_receiver->__pyx_base.__pyx_vtab)->__pyx_base.neuronCount(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_receiver))); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_receiver->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_receiver, 0)); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   __pyx_t_5 = 0;
@@ -4122,7 +4458,7 @@ static int __pyx_pf_7cybrain_16LinearConnection___init__(struct __pyx_obj_7cybra
       __pyx_t_5 = 1;
     }
   }
-  __pyx_t_8 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
   if (__pyx_t_4) {
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -4133,43 +4469,43 @@ static int __pyx_pf_7cybrain_16LinearConnection___init__(struct __pyx_obj_7cybra
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_5, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyNumber_Multiply(__pyx_t_2, __pyx_float_2_0); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = PyNumber_Multiply(__pyx_t_2, __pyx_float_2_0); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyNumber_Subtract(__pyx_t_6, __pyx_float_1_0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyNumber_Subtract(__pyx_t_6, __pyx_float_1_0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyNumber_Multiply(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = PyNumber_Multiply(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_9 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_6);
-  if (unlikely(!__pyx_t_9.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_9.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->__pyx_base.W, 0);
   __pyx_v_self->__pyx_base.W = __pyx_t_9;
   __pyx_t_9.memview = NULL;
   __pyx_t_9.data = NULL;
 
-  /* "cybrain.pyx":115
+  /* "cybrain.pyx":119
  * 
  *         self.W = weightMagnitud * (np.random.rand (1, receiver.neuronCount()) * 2.0 - 1.0)
  *         self.dW = np.empty ((1, receiver.neuronCount()), dtype='double')             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_empty); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_empty); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_receiver->__pyx_base.__pyx_vtab)->__pyx_base.neuronCount(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_receiver))); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_receiver->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_receiver, 0)); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
@@ -4177,28 +4513,28 @@ static int __pyx_pf_7cybrain_16LinearConnection___init__(struct __pyx_obj_7cybra
   __Pyx_GIVEREF(__pyx_t_6);
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_6);
   __pyx_t_6 = 0;
-  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_n_s_double) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, __pyx_t_1); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_n_s_double) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, __pyx_t_1); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_9 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_8);
-  if (unlikely(!__pyx_t_9.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_9.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->__pyx_base.dW, 0);
   __pyx_v_self->__pyx_base.dW = __pyx_t_9;
   __pyx_t_9.memview = NULL;
   __pyx_t_9.data = NULL;
 
-  /* "cybrain.pyx":108
+  /* "cybrain.pyx":112
  * cdef class LinearConnection (FullConnection):
  * 
  *     def __init__(self, LinearLayer source, LinearLayer receiver, double weightMagnitud = 1.0):             # <<<<<<<<<<<<<<
@@ -4224,7 +4560,7 @@ static int __pyx_pf_7cybrain_16LinearConnection___init__(struct __pyx_obj_7cybra
   return __pyx_r;
 }
 
-/* "cybrain.pyx":118
+/* "cybrain.pyx":122
  * 
  * 
  *     cdef double[:,:] Zc (self):             # <<<<<<<<<<<<<<
@@ -4244,75 +4580,75 @@ static __Pyx_memviewslice __pyx_f_7cybrain_16LinearConnection_Zc(struct __pyx_ob
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("Zc", 0);
 
-  /* "cybrain.pyx":119
+  /* "cybrain.pyx":123
  * 
  *     cdef double[:,:] Zc (self):
  *         if self.source.Y().shape[1] != self.W.shape[1]:             # <<<<<<<<<<<<<<
  *             raise Exception  ("Shape Error")
  * 
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.__pyx_base.source->__pyx_vtab)->Y(__pyx_v_self->__pyx_base.__pyx_base.source); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__pyx_v_self->__pyx_base.W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.__pyx_base.source->__pyx_vtab)->Y(__pyx_v_self->__pyx_base.__pyx_base.source); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->__pyx_base.W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
   __pyx_t_2 = (((__pyx_t_1.shape[1]) != (__pyx_v_self->__pyx_base.W.shape[1])) != 0);
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
   if (__pyx_t_2) {
 
-    /* "cybrain.pyx":120
+    /* "cybrain.pyx":124
  *     cdef double[:,:] Zc (self):
  *         if self.source.Y().shape[1] != self.W.shape[1]:
  *             raise Exception  ("Shape Error")             # <<<<<<<<<<<<<<
  * 
  *         if self.receiver.neuronCount() != self.W.shape[1]:
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 120; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 120; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "cybrain.pyx":122
+  /* "cybrain.pyx":126
  *             raise Exception  ("Shape Error")
  * 
  *         if self.receiver.neuronCount() != self.W.shape[1]:             # <<<<<<<<<<<<<<
  *             raise Exception ("Neuron Difference Error")
  * 
  */
-  if (unlikely(!__pyx_v_self->__pyx_base.W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 122; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  if (unlikely(!__pyx_v_self->__pyx_base.W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 126; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
   __pyx_t_2 = ((((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.__pyx_base.receiver->__pyx_vtab)->neuronCount(__pyx_v_self->__pyx_base.__pyx_base.receiver) != (__pyx_v_self->__pyx_base.W.shape[1])) != 0);
   if (__pyx_t_2) {
 
-    /* "cybrain.pyx":123
+    /* "cybrain.pyx":127
  * 
  *         if self.receiver.neuronCount() != self.W.shape[1]:
  *             raise Exception ("Neuron Difference Error")             # <<<<<<<<<<<<<<
  * 
  *         return elementMultiply (self.source.Y(), self.W)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "cybrain.pyx":125
+  /* "cybrain.pyx":129
  *             raise Exception ("Neuron Difference Error")
  * 
  *         return elementMultiply (self.source.Y(), self.W)             # <<<<<<<<<<<<<<
  * 
  *     cdef void compute_dEdW (self):
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.__pyx_base.source->__pyx_vtab)->Y(__pyx_v_self->__pyx_base.__pyx_base.source); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__pyx_v_self->__pyx_base.W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
-  __pyx_t_4 = __pyx_f_7cybrain_elementMultiply(__pyx_t_1, __pyx_v_self->__pyx_base.W); if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.__pyx_base.source->__pyx_vtab)->Y(__pyx_v_self->__pyx_base.__pyx_base.source); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 129; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->__pyx_base.W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 129; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_4 = __pyx_f_7cybrain_elementMultiply(__pyx_t_1, __pyx_v_self->__pyx_base.W); if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 129; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
   __pyx_r = __pyx_t_4;
   __pyx_t_4.memview = NULL;
   __pyx_t_4.data = NULL;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":118
+  /* "cybrain.pyx":122
  * 
  * 
  *     cdef double[:,:] Zc (self):             # <<<<<<<<<<<<<<
@@ -4339,11 +4675,11 @@ static __Pyx_memviewslice __pyx_f_7cybrain_16LinearConnection_Zc(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "cybrain.pyx":127
+/* "cybrain.pyx":131
  *         return elementMultiply (self.source.Y(), self.W)
  * 
  *     cdef void compute_dEdW (self):             # <<<<<<<<<<<<<<
- *         self.dW = elementMultiply (self.source.Y(), self.receiver.dEdZ())
+ *         copy_matrix(self.dW, elementMultiply (self.source.Y(), self.receiver.dEdZ()))
  * 
  */
 
@@ -4357,28 +4693,27 @@ static void __pyx_f_7cybrain_16LinearConnection_compute_dEdW(struct __pyx_obj_7c
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("compute_dEdW", 0);
 
-  /* "cybrain.pyx":128
+  /* "cybrain.pyx":132
  * 
  *     cdef void compute_dEdW (self):
- *         self.dW = elementMultiply (self.source.Y(), self.receiver.dEdZ())             # <<<<<<<<<<<<<<
+ *         copy_matrix(self.dW, elementMultiply (self.source.Y(), self.receiver.dEdZ()))             # <<<<<<<<<<<<<<
  * 
  *     cdef double[:,:] dEdY (self):
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.__pyx_base.source->__pyx_vtab)->Y(__pyx_v_self->__pyx_base.__pyx_base.source); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 128; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.__pyx_base.receiver->__pyx_vtab)->dEdZ(__pyx_v_self->__pyx_base.__pyx_base.receiver); if (unlikely(!__pyx_t_2.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 128; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_3 = __pyx_f_7cybrain_elementMultiply(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 128; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->__pyx_base.dW.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 132; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.__pyx_base.source->__pyx_vtab)->Y(__pyx_v_self->__pyx_base.__pyx_base.source); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 132; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.__pyx_base.receiver->__pyx_vtab)->dEdZ(__pyx_v_self->__pyx_base.__pyx_base.receiver); if (unlikely(!__pyx_t_2.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 132; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_f_7cybrain_elementMultiply(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 132; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_2, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_self->__pyx_base.dW, 0);
-  __pyx_v_self->__pyx_base.dW = __pyx_t_3;
-  __pyx_t_3.memview = NULL;
-  __pyx_t_3.data = NULL;
+  __pyx_f_7cybrain_copy_matrix(__pyx_v_self->__pyx_base.dW, __pyx_t_3);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_3, 1);
 
-  /* "cybrain.pyx":127
+  /* "cybrain.pyx":131
  *         return elementMultiply (self.source.Y(), self.W)
  * 
  *     cdef void compute_dEdW (self):             # <<<<<<<<<<<<<<
- *         self.dW = elementMultiply (self.source.Y(), self.receiver.dEdZ())
+ *         copy_matrix(self.dW, elementMultiply (self.source.Y(), self.receiver.dEdZ()))
  * 
  */
 
@@ -4393,8 +4728,8 @@ static void __pyx_f_7cybrain_16LinearConnection_compute_dEdW(struct __pyx_obj_7c
   __Pyx_RefNannyFinishContext();
 }
 
-/* "cybrain.pyx":130
- *         self.dW = elementMultiply (self.source.Y(), self.receiver.dEdZ())
+/* "cybrain.pyx":134
+ *         copy_matrix(self.dW, elementMultiply (self.source.Y(), self.receiver.dEdZ()))
  * 
  *     cdef double[:,:] dEdY (self):             # <<<<<<<<<<<<<<
  *         self.compute_dEdW()
@@ -4411,7 +4746,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_16LinearConnection_dEdY(struct __pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("dEdY", 0);
 
-  /* "cybrain.pyx":131
+  /* "cybrain.pyx":135
  * 
  *     cdef double[:,:] dEdY (self):
  *         self.compute_dEdW()             # <<<<<<<<<<<<<<
@@ -4420,24 +4755,24 @@ static __Pyx_memviewslice __pyx_f_7cybrain_16LinearConnection_dEdY(struct __pyx_
  */
   ((struct __pyx_vtabstruct_7cybrain_LinearConnection *)__pyx_v_self->__pyx_base.__pyx_base.__pyx_vtab)->__pyx_base.__pyx_base.compute_dEdW(((struct __pyx_obj_7cybrain_Connection *)__pyx_v_self));
 
-  /* "cybrain.pyx":132
+  /* "cybrain.pyx":136
  *     cdef double[:,:] dEdY (self):
  *         self.compute_dEdW()
  *         return elementMultiply (self.receiver.dEdZ(), self.W)             # <<<<<<<<<<<<<<
  * 
  * ####################
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.__pyx_base.receiver->__pyx_vtab)->dEdZ(__pyx_v_self->__pyx_base.__pyx_base.receiver); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 132; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__pyx_v_self->__pyx_base.W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 132; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
-  __pyx_t_2 = __pyx_f_7cybrain_elementMultiply(__pyx_t_1, __pyx_v_self->__pyx_base.W); if (unlikely(!__pyx_t_2.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 132; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_self->__pyx_base.__pyx_base.receiver->__pyx_vtab)->dEdZ(__pyx_v_self->__pyx_base.__pyx_base.receiver); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 136; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->__pyx_base.W.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 136; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_2 = __pyx_f_7cybrain_elementMultiply(__pyx_t_1, __pyx_v_self->__pyx_base.W); if (unlikely(!__pyx_t_2.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 136; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
   __pyx_r = __pyx_t_2;
   __pyx_t_2.memview = NULL;
   __pyx_t_2.data = NULL;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":130
- *         self.dW = elementMultiply (self.source.Y(), self.receiver.dEdZ())
+  /* "cybrain.pyx":134
+ *         copy_matrix(self.dW, elementMultiply (self.source.Y(), self.receiver.dEdZ()))
  * 
  *     cdef double[:,:] dEdY (self):             # <<<<<<<<<<<<<<
  *         self.compute_dEdW()
@@ -4462,7 +4797,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_16LinearConnection_dEdY(struct __pyx_
   return __pyx_r;
 }
 
-/* "cybrain.pyx":146
+/* "cybrain.pyx":150
  *         public bint back_active
  * 
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -4495,14 +4830,14 @@ static int __pyx_pf_7cybrain_5Layer___init__(struct __pyx_obj_7cybrain_Layer *__
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "cybrain.pyx":147
+  /* "cybrain.pyx":151
  * 
  *     def __init__(self):
  *         self.sourceConnections = []             # <<<<<<<<<<<<<<
  *         self.receiverConnections = []
- * 
+ *         self.active = False
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 147; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->sourceConnections);
@@ -4510,14 +4845,14 @@ static int __pyx_pf_7cybrain_5Layer___init__(struct __pyx_obj_7cybrain_Layer *__
   __pyx_v_self->sourceConnections = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":148
+  /* "cybrain.pyx":152
  *     def __init__(self):
  *         self.sourceConnections = []
  *         self.receiverConnections = []             # <<<<<<<<<<<<<<
- * 
- *     cdef double[:,:] H (self, double[:,:] Z):
+ *         self.active = False
+ *         self.back_active = False
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 148; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 152; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->receiverConnections);
@@ -4525,7 +4860,25 @@ static int __pyx_pf_7cybrain_5Layer___init__(struct __pyx_obj_7cybrain_Layer *__
   __pyx_v_self->receiverConnections = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":146
+  /* "cybrain.pyx":153
+ *         self.sourceConnections = []
+ *         self.receiverConnections = []
+ *         self.active = False             # <<<<<<<<<<<<<<
+ *         self.back_active = False
+ * 
+ */
+  __pyx_v_self->active = 0;
+
+  /* "cybrain.pyx":154
+ *         self.receiverConnections = []
+ *         self.active = False
+ *         self.back_active = False             # <<<<<<<<<<<<<<
+ * 
+ *     cdef double[:,:] H (self, double[:,:] Z):
+ */
+  __pyx_v_self->back_active = 0;
+
+  /* "cybrain.pyx":150
  *         public bint back_active
  * 
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -4545,8 +4898,8 @@ static int __pyx_pf_7cybrain_5Layer___init__(struct __pyx_obj_7cybrain_Layer *__
   return __pyx_r;
 }
 
-/* "cybrain.pyx":150
- *         self.receiverConnections = []
+/* "cybrain.pyx":156
+ *         self.back_active = False
  * 
  *     cdef double[:,:] H (self, double[:,:] Z):             # <<<<<<<<<<<<<<
  *         pass
@@ -4566,7 +4919,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_5Layer_H(CYTHON_UNUSED struct __pyx_o
   return __pyx_r;
 }
 
-/* "cybrain.pyx":153
+/* "cybrain.pyx":159
  *         pass
  * 
  *     cdef double[:,:] Y (self):             # <<<<<<<<<<<<<<
@@ -4587,7 +4940,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_5Layer_Y(CYTHON_UNUSED struct __pyx_o
   return __pyx_r;
 }
 
-/* "cybrain.pyx":156
+/* "cybrain.pyx":162
  *         pass
  * 
  *     cdef double[:,:] dEdY (self, double[:,:] T):             # <<<<<<<<<<<<<<
@@ -4608,7 +4961,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_5Layer_dEdY(CYTHON_UNUSED struct __py
   return __pyx_r;
 }
 
-/* "cybrain.pyx":159
+/* "cybrain.pyx":165
  *         pass
  * 
  *     cdef double[:,:] dYdZ (self):             # <<<<<<<<<<<<<<
@@ -4629,7 +4982,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_5Layer_dYdZ(CYTHON_UNUSED struct __py
   return __pyx_r;
 }
 
-/* "cybrain.pyx":162
+/* "cybrain.pyx":168
  *         pass
  * 
  *     cdef double[:,:] dEdZ (self):             # <<<<<<<<<<<<<<
@@ -4650,7 +5003,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_5Layer_dEdZ(CYTHON_UNUSED struct __py
   return __pyx_r;
 }
 
-/* "cybrain.pyx":165
+/* "cybrain.pyx":171
  *         pass
  * 
  *     cdef int neuronCount (self):             # <<<<<<<<<<<<<<
@@ -4669,7 +5022,7 @@ static int __pyx_f_7cybrain_5Layer_neuronCount(CYTHON_UNUSED struct __pyx_obj_7c
   return __pyx_r;
 }
 
-/* "cybrain.pyx":168
+/* "cybrain.pyx":174
  *         pass
  * 
  *     cpdef setData (self, double [:,:] value):             # <<<<<<<<<<<<<<
@@ -4695,12 +5048,12 @@ static PyObject *__pyx_f_7cybrain_5Layer_setData(CYTHON_UNUSED struct __pyx_obj_
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_setData); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 168; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_setData); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_5Layer_3setData)) {
       __Pyx_XDECREF(__pyx_r);
-      if (unlikely(!__pyx_v_value.memview)) { __Pyx_RaiseUnboundLocalError("value"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 168; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_value, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 168; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (unlikely(!__pyx_v_value.memview)) { __Pyx_RaiseUnboundLocalError("value"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_value, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_1);
       __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -4714,17 +5067,17 @@ static PyObject *__pyx_f_7cybrain_5Layer_setData(CYTHON_UNUSED struct __pyx_obj_
         }
       }
       if (!__pyx_t_5) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 168; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else {
-        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 168; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
         __Pyx_GIVEREF(__pyx_t_3);
         PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
         __pyx_t_3 = 0;
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 168; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
@@ -4737,12 +5090,12 @@ static PyObject *__pyx_f_7cybrain_5Layer_setData(CYTHON_UNUSED struct __pyx_obj_
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":169
+  /* "cybrain.pyx":175
  * 
  *     cpdef setData (self, double [:,:] value):
  *         pass             # <<<<<<<<<<<<<<
  * 
- * cdef class LinearLayer (Layer):
+ *     cpdef restart (self):
  */
 
   /* function exit code */
@@ -4763,7 +5116,7 @@ static PyObject *__pyx_f_7cybrain_5Layer_setData(CYTHON_UNUSED struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "cybrain.pyx":168
+/* "cybrain.pyx":174
  *         pass
  * 
  *     cpdef setData (self, double [:,:] value):             # <<<<<<<<<<<<<<
@@ -4782,7 +5135,7 @@ static PyObject *__pyx_pw_7cybrain_5Layer_3setData(PyObject *__pyx_v_self, PyObj
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("setData (wrapper)", 0);
   assert(__pyx_arg_value); {
-    __pyx_v_value = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_value); if (unlikely(!__pyx_v_value.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 168; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_value = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_value); if (unlikely(!__pyx_v_value.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -4806,8 +5159,8 @@ static PyObject *__pyx_pf_7cybrain_5Layer_2setData(struct __pyx_obj_7cybrain_Lay
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("setData", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_value.memview)) { __Pyx_RaiseUnboundLocalError("value"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 168; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-  __pyx_t_1 = __pyx_f_7cybrain_5Layer_setData(__pyx_v_self, __pyx_v_value, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 168; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_value.memview)) { __Pyx_RaiseUnboundLocalError("value"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+  __pyx_t_1 = __pyx_f_7cybrain_5Layer_setData(__pyx_v_self, __pyx_v_value, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4825,7 +5178,143 @@ static PyObject *__pyx_pf_7cybrain_5Layer_2setData(struct __pyx_obj_7cybrain_Lay
   return __pyx_r;
 }
 
-/* "cybrain.pyx":141
+/* "cybrain.pyx":177
+ *         pass
+ * 
+ *     cpdef restart (self):             # <<<<<<<<<<<<<<
+ *         self.active = False
+ *         self.back_active = False
+ */
+
+static PyObject *__pyx_pw_7cybrain_5Layer_5restart(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_f_7cybrain_5Layer_restart(struct __pyx_obj_7cybrain_Layer *__pyx_v_self, int __pyx_skip_dispatch) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("restart", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_restart); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_5Layer_5restart)) {
+      __Pyx_XDECREF(__pyx_r);
+      __Pyx_INCREF(__pyx_t_1);
+      __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
+      if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
+        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+        if (likely(__pyx_t_4)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+          __Pyx_INCREF(__pyx_t_4);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_3, function);
+        }
+      }
+      if (__pyx_t_4) {
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      } else {
+        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      }
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_r = __pyx_t_2;
+      __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      goto __pyx_L0;
+    }
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  }
+
+  /* "cybrain.pyx":178
+ * 
+ *     cpdef restart (self):
+ *         self.active = False             # <<<<<<<<<<<<<<
+ *         self.back_active = False
+ * 
+ */
+  __pyx_v_self->active = 0;
+
+  /* "cybrain.pyx":179
+ *     cpdef restart (self):
+ *         self.active = False
+ *         self.back_active = False             # <<<<<<<<<<<<<<
+ * 
+ * cdef class LinearLayer (Layer):
+ */
+  __pyx_v_self->back_active = 0;
+
+  /* "cybrain.pyx":177
+ *         pass
+ * 
+ *     cpdef restart (self):             # <<<<<<<<<<<<<<
+ *         self.active = False
+ *         self.back_active = False
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_AddTraceback("cybrain.Layer.restart", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_5Layer_5restart(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_7cybrain_5Layer_5restart(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("restart (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_5Layer_4restart(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_5Layer_4restart(struct __pyx_obj_7cybrain_Layer *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("restart", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_f_7cybrain_5Layer_restart(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("cybrain.Layer.restart", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":145
  * 
  *     cdef:
  *         public list sourceConnections             # <<<<<<<<<<<<<<
@@ -4883,7 +5372,7 @@ static int __pyx_pf_7cybrain_5Layer_17sourceConnections_2__set__(struct __pyx_ob
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
-  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 141; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 145; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_1 = __pyx_v_value;
   __Pyx_INCREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
@@ -4933,7 +5422,7 @@ static int __pyx_pf_7cybrain_5Layer_17sourceConnections_4__del__(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "cybrain.pyx":142
+/* "cybrain.pyx":146
  *     cdef:
  *         public list sourceConnections
  *         public list receiverConnections             # <<<<<<<<<<<<<<
@@ -4991,7 +5480,7 @@ static int __pyx_pf_7cybrain_5Layer_19receiverConnections_2__set__(struct __pyx_
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
-  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 142; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 146; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_1 = __pyx_v_value;
   __Pyx_INCREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
@@ -5041,7 +5530,7 @@ static int __pyx_pf_7cybrain_5Layer_19receiverConnections_4__del__(struct __pyx_
   return __pyx_r;
 }
 
-/* "cybrain.pyx":143
+/* "cybrain.pyx":147
  *         public list sourceConnections
  *         public list receiverConnections
  *         public bint active             # <<<<<<<<<<<<<<
@@ -5071,7 +5560,7 @@ static PyObject *__pyx_pf_7cybrain_5Layer_6active___get__(struct __pyx_obj_7cybr
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_self->active); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 143; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_self->active); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 147; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5109,7 +5598,7 @@ static int __pyx_pf_7cybrain_5Layer_6active_2__set__(struct __pyx_obj_7cybrain_L
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 143; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 147; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->active = __pyx_t_1;
 
   /* function exit code */
@@ -5123,7 +5612,7 @@ static int __pyx_pf_7cybrain_5Layer_6active_2__set__(struct __pyx_obj_7cybrain_L
   return __pyx_r;
 }
 
-/* "cybrain.pyx":144
+/* "cybrain.pyx":148
  *         public list receiverConnections
  *         public bint active
  *         public bint back_active             # <<<<<<<<<<<<<<
@@ -5153,7 +5642,7 @@ static PyObject *__pyx_pf_7cybrain_5Layer_11back_active___get__(struct __pyx_obj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_self->back_active); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 144; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_self->back_active); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 148; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5191,7 +5680,7 @@ static int __pyx_pf_7cybrain_5Layer_11back_active_2__set__(struct __pyx_obj_7cyb
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 144; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 148; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->back_active = __pyx_t_1;
 
   /* function exit code */
@@ -5205,7 +5694,7 @@ static int __pyx_pf_7cybrain_5Layer_11back_active_2__set__(struct __pyx_obj_7cyb
   return __pyx_r;
 }
 
-/* "cybrain.pyx":177
+/* "cybrain.pyx":187
  * 
  * 
  *     def __init__(self, int neuron_number):             # <<<<<<<<<<<<<<
@@ -5241,18 +5730,18 @@ static int __pyx_pw_7cybrain_11LinearLayer_1__init__(PyObject *__pyx_v_self, PyO
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
     }
-    __pyx_v_neuron_number = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_neuron_number == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_neuron_number = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_neuron_number == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("cybrain.LinearLayer.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5278,14 +5767,14 @@ static int __pyx_pf_7cybrain_11LinearLayer___init__(struct __pyx_obj_7cybrain_Li
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "cybrain.pyx":178
+  /* "cybrain.pyx":188
  * 
  *     def __init__(self, int neuron_number):
  *         Layer.__init__(self)             # <<<<<<<<<<<<<<
  * 
  *         self._Y = np.empty ((1, neuron_number), dtype='double')
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)((PyObject*)__pyx_ptype_7cybrain_Layer)), __pyx_n_s_init); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)((PyObject*)__pyx_ptype_7cybrain_Layer)), __pyx_n_s_init); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 188; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5298,37 +5787,37 @@ static int __pyx_pf_7cybrain_11LinearLayer___init__(struct __pyx_obj_7cybrain_Li
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_self)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_self)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 188; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 188; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(((PyObject *)__pyx_v_self));
     __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, ((PyObject *)__pyx_v_self));
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 188; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":180
+  /* "cybrain.pyx":190
  *         Layer.__init__(self)
  * 
  *         self._Y = np.empty ((1, neuron_number), dtype='double')             # <<<<<<<<<<<<<<
  *         self.Z = np.empty ((1, neuron_number), dtype='double')
  *         self._dEdZ = np.empty ((1, neuron_number), dtype='double')
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 180; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_empty); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 180; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_empty); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_neuron_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 180; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_neuron_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 180; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
@@ -5336,42 +5825,42 @@ static int __pyx_pf_7cybrain_11LinearLayer___init__(struct __pyx_obj_7cybrain_Li
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 180; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = PyDict_New(); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 180; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyDict_New(); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_n_s_double) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 180; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 180; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_n_s_double) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_3);
-  if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 180; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->_Y, 0);
   __pyx_v_self->_Y = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "cybrain.pyx":181
+  /* "cybrain.pyx":191
  * 
  *         self._Y = np.empty ((1, neuron_number), dtype='double')
  *         self.Z = np.empty ((1, neuron_number), dtype='double')             # <<<<<<<<<<<<<<
  *         self._dEdZ = np.empty ((1, neuron_number), dtype='double')
  *         self._dEdY = np.empty ((1, neuron_number), dtype='double')
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_empty); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_empty); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_neuron_number); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_neuron_number); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
@@ -5379,42 +5868,42 @@ static int __pyx_pf_7cybrain_11LinearLayer___init__(struct __pyx_obj_7cybrain_Li
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_n_s_double) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_n_s_double) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_2);
-  if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->Z, 0);
   __pyx_v_self->Z = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "cybrain.pyx":182
+  /* "cybrain.pyx":192
  *         self._Y = np.empty ((1, neuron_number), dtype='double')
  *         self.Z = np.empty ((1, neuron_number), dtype='double')
  *         self._dEdZ = np.empty ((1, neuron_number), dtype='double')             # <<<<<<<<<<<<<<
  *         self._dEdY = np.empty ((1, neuron_number), dtype='double')
  *         self.active = False
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 192; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 192; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_neuron_number); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_neuron_number); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 192; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 192; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
@@ -5422,42 +5911,42 @@ static int __pyx_pf_7cybrain_11LinearLayer___init__(struct __pyx_obj_7cybrain_Li
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 192; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 192; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_n_s_double) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_n_s_double) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 192; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 192; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_4);
-  if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 192; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->_dEdZ, 0);
   __pyx_v_self->_dEdZ = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "cybrain.pyx":183
+  /* "cybrain.pyx":193
  *         self.Z = np.empty ((1, neuron_number), dtype='double')
  *         self._dEdZ = np.empty ((1, neuron_number), dtype='double')
  *         self._dEdY = np.empty ((1, neuron_number), dtype='double')             # <<<<<<<<<<<<<<
  *         self.active = False
  *         self.back_active = False
  */
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 183; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_empty); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 183; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_empty); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_neuron_number); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 183; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_neuron_number); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 183; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
@@ -5465,28 +5954,28 @@ static int __pyx_pf_7cybrain_11LinearLayer___init__(struct __pyx_obj_7cybrain_Li
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 183; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 183; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_n_s_double) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 183; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 183; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_n_s_double) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_1);
-  if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 183; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->_dEdY, 0);
   __pyx_v_self->_dEdY = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "cybrain.pyx":184
+  /* "cybrain.pyx":194
  *         self._dEdZ = np.empty ((1, neuron_number), dtype='double')
  *         self._dEdY = np.empty ((1, neuron_number), dtype='double')
  *         self.active = False             # <<<<<<<<<<<<<<
@@ -5495,7 +5984,7 @@ static int __pyx_pf_7cybrain_11LinearLayer___init__(struct __pyx_obj_7cybrain_Li
  */
   __pyx_v_self->__pyx_base.active = 0;
 
-  /* "cybrain.pyx":185
+  /* "cybrain.pyx":195
  *         self._dEdY = np.empty ((1, neuron_number), dtype='double')
  *         self.active = False
  *         self.back_active = False             # <<<<<<<<<<<<<<
@@ -5504,7 +5993,7 @@ static int __pyx_pf_7cybrain_11LinearLayer___init__(struct __pyx_obj_7cybrain_Li
  */
   __pyx_v_self->__pyx_base.back_active = 0;
 
-  /* "cybrain.pyx":177
+  /* "cybrain.pyx":187
  * 
  * 
  *     def __init__(self, int neuron_number):             # <<<<<<<<<<<<<<
@@ -5528,7 +6017,7 @@ static int __pyx_pf_7cybrain_11LinearLayer___init__(struct __pyx_obj_7cybrain_Li
   return __pyx_r;
 }
 
-/* "cybrain.pyx":188
+/* "cybrain.pyx":198
  * 
  * 
  *     cdef double[:,:] H (self, double[:,:] Z):             # <<<<<<<<<<<<<<
@@ -5541,7 +6030,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_H(CYTHON_UNUSED struct 
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("H", 0);
 
-  /* "cybrain.pyx":189
+  /* "cybrain.pyx":199
  * 
  *     cdef double[:,:] H (self, double[:,:] Z):
  *         return Z             # <<<<<<<<<<<<<<
@@ -5552,7 +6041,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_H(CYTHON_UNUSED struct 
   __pyx_r = __pyx_v_Z;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":188
+  /* "cybrain.pyx":198
  * 
  * 
  *     cdef double[:,:] H (self, double[:,:] Z):             # <<<<<<<<<<<<<<
@@ -5569,7 +6058,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_H(CYTHON_UNUSED struct 
   return __pyx_r;
 }
 
-/* "cybrain.pyx":191
+/* "cybrain.pyx":201
  *         return Z
  * 
  *     cdef double[:,:] Y (self):             # <<<<<<<<<<<<<<
@@ -5592,8 +6081,8 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_Y(struct __pyx_obj_7cyb
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("Y", 0);
 
-  /* "cybrain.pyx":197
- * 
+  /* "cybrain.pyx":206
+ *             int i
  * 
  *         if not self.active:             # <<<<<<<<<<<<<<
  *             self.active = True
@@ -5602,7 +6091,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_Y(struct __pyx_obj_7cyb
   __pyx_t_1 = ((!(__pyx_v_self->__pyx_base.active != 0)) != 0);
   if (__pyx_t_1) {
 
-    /* "cybrain.pyx":198
+    /* "cybrain.pyx":207
  * 
  *         if not self.active:
  *             self.active = True             # <<<<<<<<<<<<<<
@@ -5611,14 +6100,14 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_Y(struct __pyx_obj_7cyb
  */
     __pyx_v_self->__pyx_base.active = 1;
 
-    /* "cybrain.pyx":199
+    /* "cybrain.pyx":208
  *         if not self.active:
  *             self.active = True
  *             self.Z[...] = 0.0             # <<<<<<<<<<<<<<
  * 
  *             for connection in self.sourceConnections:
  */
-    if (unlikely(!__pyx_v_self->Z.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 199; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+    if (unlikely(!__pyx_v_self->Z.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 208; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
     {
         double __pyx_temp_scalar = 0.0;
         __Pyx_memviewslice __pyx_temp_slice = __pyx_v_self->Z;
@@ -5643,7 +6132,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_Y(struct __pyx_obj_7cyb
         }
     }
 
-    /* "cybrain.pyx":201
+    /* "cybrain.pyx":210
  *             self.Z[...] = 0.0
  * 
  *             for connection in self.sourceConnections:             # <<<<<<<<<<<<<<
@@ -5652,38 +6141,38 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_Y(struct __pyx_obj_7cyb
  */
     if (unlikely(__pyx_v_self->__pyx_base.sourceConnections == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 201; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __pyx_t_2 = __pyx_v_self->__pyx_base.sourceConnections; __Pyx_INCREF(__pyx_t_2); __pyx_t_3 = 0;
     for (;;) {
       if (__pyx_t_3 >= PyList_GET_SIZE(__pyx_t_2)) break;
       #if CYTHON_COMPILING_IN_CPYTHON
-      __pyx_t_4 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_4); __pyx_t_3++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 201; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_4); __pyx_t_3++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       #else
-      __pyx_t_4 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 201; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
       #endif
-      if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_7cybrain_Connection))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 201; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_7cybrain_Connection))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_XDECREF_SET(__pyx_v_connection, ((struct __pyx_obj_7cybrain_Connection *)__pyx_t_4));
       __pyx_t_4 = 0;
 
-      /* "cybrain.pyx":202
+      /* "cybrain.pyx":211
  * 
  *             for connection in self.sourceConnections:
  *                 self.Z = elementAdd (self.Z, connection.Zc())             # <<<<<<<<<<<<<<
  * 
  *             self._Y = self.H (self.Z)
  */
-      if (unlikely(!__pyx_v_self->Z.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 202; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
-      __pyx_t_5 = ((struct __pyx_vtabstruct_7cybrain_Connection *)__pyx_v_connection->__pyx_vtab)->Zc(__pyx_v_connection); if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 202; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __pyx_t_6 = __pyx_f_7cybrain_elementAdd(__pyx_v_self->Z, __pyx_t_5); if (unlikely(!__pyx_t_6.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 202; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (unlikely(!__pyx_v_self->Z.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+      __pyx_t_5 = ((struct __pyx_vtabstruct_7cybrain_Connection *)__pyx_v_connection->__pyx_vtab)->Zc(__pyx_v_connection); if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = __pyx_f_7cybrain_elementAdd(__pyx_v_self->Z, __pyx_t_5); if (unlikely(!__pyx_t_6.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
       __PYX_XDEC_MEMVIEW(&__pyx_v_self->Z, 0);
       __pyx_v_self->Z = __pyx_t_6;
       __pyx_t_6.memview = NULL;
       __pyx_t_6.data = NULL;
 
-      /* "cybrain.pyx":201
+      /* "cybrain.pyx":210
  *             self.Z[...] = 0.0
  * 
  *             for connection in self.sourceConnections:             # <<<<<<<<<<<<<<
@@ -5693,15 +6182,15 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_Y(struct __pyx_obj_7cyb
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "cybrain.pyx":204
+    /* "cybrain.pyx":213
  *                 self.Z = elementAdd (self.Z, connection.Zc())
  * 
  *             self._Y = self.H (self.Z)             # <<<<<<<<<<<<<<
  * 
  *         return self._Y
  */
-    if (unlikely(!__pyx_v_self->Z.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
-    __pyx_t_6 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.H(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self), __pyx_v_self->Z); if (unlikely(!__pyx_t_6.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(!__pyx_v_self->Z.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 213; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+    __pyx_t_6 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.H(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self), __pyx_v_self->Z); if (unlikely(!__pyx_t_6.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 213; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->_Y, 0);
     __pyx_v_self->_Y = __pyx_t_6;
     __pyx_t_6.memview = NULL;
@@ -5710,19 +6199,19 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_Y(struct __pyx_obj_7cyb
   }
   __pyx_L3:;
 
-  /* "cybrain.pyx":206
+  /* "cybrain.pyx":215
  *             self._Y = self.H (self.Z)
  * 
  *         return self._Y             # <<<<<<<<<<<<<<
  * 
  *     cdef double[:,:] dEdZ (self):
  */
-  if (unlikely(!__pyx_v_self->_Y.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 206; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  if (unlikely(!__pyx_v_self->_Y.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 215; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
   __PYX_INC_MEMVIEW(&__pyx_v_self->_Y, 0);
   __pyx_r = __pyx_v_self->_Y;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":191
+  /* "cybrain.pyx":201
  *         return Z
  * 
  *     cdef double[:,:] Y (self):             # <<<<<<<<<<<<<<
@@ -5751,7 +6240,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_Y(struct __pyx_obj_7cyb
   return __pyx_r;
 }
 
-/* "cybrain.pyx":208
+/* "cybrain.pyx":217
  *         return self._Y
  * 
  *     cdef double[:,:] dEdZ (self):             # <<<<<<<<<<<<<<
@@ -5774,7 +6263,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dEdZ(struct __pyx_obj_7
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("dEdZ", 0);
 
-  /* "cybrain.pyx":213
+  /* "cybrain.pyx":222
  *             int i
  * 
  *         if not self.back_active:             # <<<<<<<<<<<<<<
@@ -5784,7 +6273,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dEdZ(struct __pyx_obj_7
   __pyx_t_1 = ((!(__pyx_v_self->__pyx_base.back_active != 0)) != 0);
   if (__pyx_t_1) {
 
-    /* "cybrain.pyx":214
+    /* "cybrain.pyx":223
  * 
  *         if not self.back_active:
  *             self.back_active = True             # <<<<<<<<<<<<<<
@@ -5793,14 +6282,14 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dEdZ(struct __pyx_obj_7
  */
     __pyx_v_self->__pyx_base.back_active = 1;
 
-    /* "cybrain.pyx":215
+    /* "cybrain.pyx":224
  *         if not self.back_active:
  *             self.back_active = True
  *             self._dEdY[...] = 0.0             # <<<<<<<<<<<<<<
  * 
  *             for connection in self.receiverConnections:
  */
-    if (unlikely(!__pyx_v_self->_dEdY.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 215; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+    if (unlikely(!__pyx_v_self->_dEdY.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
     {
         double __pyx_temp_scalar = 0.0;
         __Pyx_memviewslice __pyx_temp_slice = __pyx_v_self->_dEdY;
@@ -5825,7 +6314,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dEdZ(struct __pyx_obj_7
         }
     }
 
-    /* "cybrain.pyx":217
+    /* "cybrain.pyx":226
  *             self._dEdY[...] = 0.0
  * 
  *             for connection in self.receiverConnections:             # <<<<<<<<<<<<<<
@@ -5834,38 +6323,38 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dEdZ(struct __pyx_obj_7
  */
     if (unlikely(__pyx_v_self->__pyx_base.receiverConnections == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __pyx_t_2 = __pyx_v_self->__pyx_base.receiverConnections; __Pyx_INCREF(__pyx_t_2); __pyx_t_3 = 0;
     for (;;) {
       if (__pyx_t_3 >= PyList_GET_SIZE(__pyx_t_2)) break;
       #if CYTHON_COMPILING_IN_CPYTHON
-      __pyx_t_4 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_4); __pyx_t_3++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_4); __pyx_t_3++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       #else
-      __pyx_t_4 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
       #endif
-      if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_7cybrain_Connection))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_7cybrain_Connection))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_XDECREF_SET(__pyx_v_connection, ((struct __pyx_obj_7cybrain_Connection *)__pyx_t_4));
       __pyx_t_4 = 0;
 
-      /* "cybrain.pyx":218
+      /* "cybrain.pyx":227
  * 
  *             for connection in self.receiverConnections:
  *                 self._dEdY = elementAdd (self._dEdY, connection.dEdY())             # <<<<<<<<<<<<<<
  * 
  *             self._dEdZ = elementMultiply (self.dYdZ(), self._dEdY)
  */
-      if (unlikely(!__pyx_v_self->_dEdY.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
-      __pyx_t_5 = ((struct __pyx_vtabstruct_7cybrain_Connection *)__pyx_v_connection->__pyx_vtab)->dEdY(__pyx_v_connection); if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __pyx_t_6 = __pyx_f_7cybrain_elementAdd(__pyx_v_self->_dEdY, __pyx_t_5); if (unlikely(!__pyx_t_6.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (unlikely(!__pyx_v_self->_dEdY.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+      __pyx_t_5 = ((struct __pyx_vtabstruct_7cybrain_Connection *)__pyx_v_connection->__pyx_vtab)->dEdY(__pyx_v_connection); if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = __pyx_f_7cybrain_elementAdd(__pyx_v_self->_dEdY, __pyx_t_5); if (unlikely(!__pyx_t_6.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
       __PYX_XDEC_MEMVIEW(&__pyx_v_self->_dEdY, 0);
       __pyx_v_self->_dEdY = __pyx_t_6;
       __pyx_t_6.memview = NULL;
       __pyx_t_6.data = NULL;
 
-      /* "cybrain.pyx":217
+      /* "cybrain.pyx":226
  *             self._dEdY[...] = 0.0
  * 
  *             for connection in self.receiverConnections:             # <<<<<<<<<<<<<<
@@ -5875,16 +6364,16 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dEdZ(struct __pyx_obj_7
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "cybrain.pyx":220
+    /* "cybrain.pyx":229
  *                 self._dEdY = elementAdd (self._dEdY, connection.dEdY())
  * 
  *             self._dEdZ = elementMultiply (self.dYdZ(), self._dEdY)             # <<<<<<<<<<<<<<
  * 
  *         return self._dEdZ
  */
-    __pyx_t_6 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.dYdZ(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self)); if (unlikely(!__pyx_t_6.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    if (unlikely(!__pyx_v_self->_dEdY.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
-    __pyx_t_5 = __pyx_f_7cybrain_elementMultiply(__pyx_t_6, __pyx_v_self->_dEdY); if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.dYdZ(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self)); if (unlikely(!__pyx_t_6.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(!__pyx_v_self->_dEdY.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+    __pyx_t_5 = __pyx_f_7cybrain_elementMultiply(__pyx_t_6, __pyx_v_self->_dEdY); if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __PYX_XDEC_MEMVIEW(&__pyx_t_6, 1);
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->_dEdZ, 0);
     __pyx_v_self->_dEdZ = __pyx_t_5;
@@ -5894,19 +6383,19 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dEdZ(struct __pyx_obj_7
   }
   __pyx_L3:;
 
-  /* "cybrain.pyx":222
+  /* "cybrain.pyx":231
  *             self._dEdZ = elementMultiply (self.dYdZ(), self._dEdY)
  * 
  *         return self._dEdZ             # <<<<<<<<<<<<<<
  * 
  *     cpdef np.ndarray get_dEdZ (self):
  */
-  if (unlikely(!__pyx_v_self->_dEdZ.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  if (unlikely(!__pyx_v_self->_dEdZ.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 231; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
   __PYX_INC_MEMVIEW(&__pyx_v_self->_dEdZ, 0);
   __pyx_r = __pyx_v_self->_dEdZ;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":208
+  /* "cybrain.pyx":217
  *         return self._Y
  * 
  *     cdef double[:,:] dEdZ (self):             # <<<<<<<<<<<<<<
@@ -5935,7 +6424,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dEdZ(struct __pyx_obj_7
   return __pyx_r;
 }
 
-/* "cybrain.pyx":224
+/* "cybrain.pyx":233
  *         return self._dEdZ
  * 
  *     cpdef np.ndarray get_dEdZ (self):             # <<<<<<<<<<<<<<
@@ -5961,7 +6450,7 @@ static PyArrayObject *__pyx_f_7cybrain_11LinearLayer_get_dEdZ(struct __pyx_obj_7
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_dEdZ); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_dEdZ); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 233; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_3get_dEdZ)) {
       __Pyx_XDECREF(((PyObject *)__pyx_r));
@@ -5977,14 +6466,14 @@ static PyArrayObject *__pyx_f_7cybrain_11LinearLayer_get_dEdZ(struct __pyx_obj_7
         }
       }
       if (__pyx_t_4) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 233; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       } else {
-        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 233; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 233; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_r = ((PyArrayObject *)__pyx_t_2);
       __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -5993,7 +6482,7 @@ static PyArrayObject *__pyx_f_7cybrain_11LinearLayer_get_dEdZ(struct __pyx_obj_7
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":225
+  /* "cybrain.pyx":234
  * 
  *     cpdef np.ndarray get_dEdZ (self):
  *         return np.asarray (self.dEdZ())             # <<<<<<<<<<<<<<
@@ -6001,13 +6490,13 @@ static PyArrayObject *__pyx_f_7cybrain_11LinearLayer_get_dEdZ(struct __pyx_obj_7
  * 
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_asarray); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_asarray); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_5 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.dEdZ(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self)); if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_5, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.dEdZ(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self)); if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_5, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   __pyx_t_4 = NULL;
@@ -6021,27 +6510,27 @@ static PyArrayObject *__pyx_f_7cybrain_11LinearLayer_get_dEdZ(struct __pyx_obj_7
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_2);
     __pyx_t_2 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":224
+  /* "cybrain.pyx":233
  *         return self._dEdZ
  * 
  *     cpdef np.ndarray get_dEdZ (self):             # <<<<<<<<<<<<<<
@@ -6087,7 +6576,7 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_2get_dEdZ(struct __pyx_obj_7cyb
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_dEdZ", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_7cybrain_11LinearLayer_get_dEdZ(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((PyObject *)__pyx_f_7cybrain_11LinearLayer_get_dEdZ(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 233; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6104,7 +6593,7 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_2get_dEdZ(struct __pyx_obj_7cyb
   return __pyx_r;
 }
 
-/* "cybrain.pyx":228
+/* "cybrain.pyx":237
  * 
  * 
  *     cpdef np.ndarray getY (self):             # <<<<<<<<<<<<<<
@@ -6130,7 +6619,7 @@ static PyArrayObject *__pyx_f_7cybrain_11LinearLayer_getY(struct __pyx_obj_7cybr
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_getY); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 228; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_getY); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_5getY)) {
       __Pyx_XDECREF(((PyObject *)__pyx_r));
@@ -6146,14 +6635,14 @@ static PyArrayObject *__pyx_f_7cybrain_11LinearLayer_getY(struct __pyx_obj_7cybr
         }
       }
       if (__pyx_t_4) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 228; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       } else {
-        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 228; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 228; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_r = ((PyArrayObject *)__pyx_t_2);
       __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6162,7 +6651,7 @@ static PyArrayObject *__pyx_f_7cybrain_11LinearLayer_getY(struct __pyx_obj_7cybr
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":229
+  /* "cybrain.pyx":238
  * 
  *     cpdef np.ndarray getY (self):
  *         return np.asarray (self.Y())             # <<<<<<<<<<<<<<
@@ -6170,13 +6659,13 @@ static PyArrayObject *__pyx_f_7cybrain_11LinearLayer_getY(struct __pyx_obj_7cybr
  *     cpdef setData (self, double [:,:] value):
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_asarray); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_asarray); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_5 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.Y(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self)); if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_5, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.Y(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self)); if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_5, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   __pyx_t_4 = NULL;
@@ -6190,27 +6679,27 @@ static PyArrayObject *__pyx_f_7cybrain_11LinearLayer_getY(struct __pyx_obj_7cybr
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_2);
     __pyx_t_2 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":228
+  /* "cybrain.pyx":237
  * 
  * 
  *     cpdef np.ndarray getY (self):             # <<<<<<<<<<<<<<
@@ -6256,7 +6745,7 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_4getY(struct __pyx_obj_7cybrain
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("getY", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_7cybrain_11LinearLayer_getY(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 228; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((PyObject *)__pyx_f_7cybrain_11LinearLayer_getY(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6273,7 +6762,7 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_4getY(struct __pyx_obj_7cybrain
   return __pyx_r;
 }
 
-/* "cybrain.pyx":231
+/* "cybrain.pyx":240
  *         return np.asarray (self.Y())
  * 
  *     cpdef setData (self, double [:,:] value):             # <<<<<<<<<<<<<<
@@ -6301,12 +6790,12 @@ static PyObject *__pyx_f_7cybrain_11LinearLayer_setData(struct __pyx_obj_7cybrai
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_setData); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 231; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_setData); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_7setData)) {
       __Pyx_XDECREF(__pyx_r);
-      if (unlikely(!__pyx_v_value.memview)) { __Pyx_RaiseUnboundLocalError("value"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 231; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_value, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 231; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (unlikely(!__pyx_v_value.memview)) { __Pyx_RaiseUnboundLocalError("value"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_value, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_1);
       __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -6320,17 +6809,17 @@ static PyObject *__pyx_f_7cybrain_11LinearLayer_setData(struct __pyx_obj_7cybrai
         }
       }
       if (!__pyx_t_5) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 231; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else {
-        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 231; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
         __Pyx_GIVEREF(__pyx_t_3);
         PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
         __pyx_t_3 = 0;
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 231; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
@@ -6343,28 +6832,28 @@ static PyObject *__pyx_f_7cybrain_11LinearLayer_setData(struct __pyx_obj_7cybrai
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":233
+  /* "cybrain.pyx":242
  *     cpdef setData (self, double [:,:] value):
  *         #TODO: check dimensions
  *         if value.shape[1] != self.neuronCount():             # <<<<<<<<<<<<<<
  *             raise Exception ("setData Error: Data shape error. Received {0}, expected {1}".format(value.shape[1], self.neuronCount()))
  * 
  */
-  __pyx_t_7 = (((__pyx_v_value.shape[1]) != ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.neuronCount(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self))) != 0);
+  __pyx_t_7 = (((__pyx_v_value.shape[1]) != ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_self, 0)) != 0);
   if (__pyx_t_7) {
 
-    /* "cybrain.pyx":234
+    /* "cybrain.pyx":243
  *         #TODO: check dimensions
  *         if value.shape[1] != self.neuronCount():
  *             raise Exception ("setData Error: Data shape error. Received {0}, expected {1}".format(value.shape[1], self.neuronCount()))             # <<<<<<<<<<<<<<
  * 
  *         self._Y = value
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_setData_Error_Data_shape_error_R, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_setData_Error_Data_shape_error_R, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = PyInt_FromSsize_t((__pyx_v_value.shape[1])); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyInt_FromSsize_t((__pyx_v_value.shape[1])); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.neuronCount(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self))); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_self, 0)); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_3 = NULL;
     __pyx_t_8 = 0;
@@ -6378,7 +6867,7 @@ static PyObject *__pyx_f_7cybrain_11LinearLayer_setData(struct __pyx_obj_7cybrai
         __pyx_t_8 = 1;
       }
     }
-    __pyx_t_5 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     if (__pyx_t_3) {
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -6389,24 +6878,24 @@ static PyObject *__pyx_f_7cybrain_11LinearLayer_setData(struct __pyx_obj_7cybrai
     PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_8, __pyx_t_6);
     __pyx_t_4 = 0;
     __pyx_t_6 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_GIVEREF(__pyx_t_1);
     PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
     __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "cybrain.pyx":236
+  /* "cybrain.pyx":245
  *             raise Exception ("setData Error: Data shape error. Received {0}, expected {1}".format(value.shape[1], self.neuronCount()))
  * 
  *         self._Y = value             # <<<<<<<<<<<<<<
@@ -6417,7 +6906,7 @@ static PyObject *__pyx_f_7cybrain_11LinearLayer_setData(struct __pyx_obj_7cybrai
   __PYX_INC_MEMVIEW(&__pyx_v_value, 0);
   __pyx_v_self->_Y = __pyx_v_value;
 
-  /* "cybrain.pyx":237
+  /* "cybrain.pyx":246
  * 
  *         self._Y = value
  *         self.active = True             # <<<<<<<<<<<<<<
@@ -6426,7 +6915,7 @@ static PyObject *__pyx_f_7cybrain_11LinearLayer_setData(struct __pyx_obj_7cybrai
  */
   __pyx_v_self->__pyx_base.active = 1;
 
-  /* "cybrain.pyx":231
+  /* "cybrain.pyx":240
  *         return np.asarray (self.Y())
  * 
  *     cpdef setData (self, double [:,:] value):             # <<<<<<<<<<<<<<
@@ -6463,7 +6952,7 @@ static PyObject *__pyx_pw_7cybrain_11LinearLayer_7setData(PyObject *__pyx_v_self
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("setData (wrapper)", 0);
   assert(__pyx_arg_value); {
-    __pyx_v_value = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_value); if (unlikely(!__pyx_v_value.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 231; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_value = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_value); if (unlikely(!__pyx_v_value.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -6487,8 +6976,8 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_6setData(struct __pyx_obj_7cybr
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("setData", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_value.memview)) { __Pyx_RaiseUnboundLocalError("value"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 231; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-  __pyx_t_1 = __pyx_f_7cybrain_11LinearLayer_setData(__pyx_v_self, __pyx_v_value, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 231; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_value.memview)) { __Pyx_RaiseUnboundLocalError("value"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+  __pyx_t_1 = __pyx_f_7cybrain_11LinearLayer_setData(__pyx_v_self, __pyx_v_value, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6506,12 +6995,12 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_6setData(struct __pyx_obj_7cybr
   return __pyx_r;
 }
 
-/* "cybrain.pyx":239
+/* "cybrain.pyx":248
  *         self.active = True
  * 
  *     cpdef setTarget (self, double [:,:] T):             # <<<<<<<<<<<<<<
  *         cdef double [:,:] dEdY = self.dEdY (T)
- *         self._dEdZ = elementMultiply (self.dYdZ(), dEdY)
+ * 
  */
 
 static PyObject *__pyx_pw_7cybrain_11LinearLayer_9setTarget(PyObject *__pyx_v_self, PyObject *__pyx_arg_T); /*proto*/
@@ -6526,7 +7015,9 @@ static PyObject *__pyx_f_7cybrain_11LinearLayer_setTarget(struct __pyx_obj_7cybr
   PyObject *__pyx_t_5 = NULL;
   PyObject *__pyx_t_6 = NULL;
   __Pyx_memviewslice __pyx_t_7 = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_t_8 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_t_8;
+  Py_ssize_t __pyx_t_9;
+  __Pyx_memviewslice __pyx_t_10 = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -6535,12 +7026,12 @@ static PyObject *__pyx_f_7cybrain_11LinearLayer_setTarget(struct __pyx_obj_7cybr
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_setTarget); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_setTarget); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_9setTarget)) {
       __Pyx_XDECREF(__pyx_r);
-      if (unlikely(!__pyx_v_T.memview)) { __Pyx_RaiseUnboundLocalError("T"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_T, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (unlikely(!__pyx_v_T.memview)) { __Pyx_RaiseUnboundLocalError("T"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_T, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_1);
       __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -6554,17 +7045,17 @@ static PyObject *__pyx_f_7cybrain_11LinearLayer_setTarget(struct __pyx_obj_7cybr
         }
       }
       if (!__pyx_t_5) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else {
-        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
         __Pyx_GIVEREF(__pyx_t_3);
         PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
         __pyx_t_3 = 0;
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
@@ -6577,35 +7068,111 @@ static PyObject *__pyx_f_7cybrain_11LinearLayer_setTarget(struct __pyx_obj_7cybr
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":240
+  /* "cybrain.pyx":249
  * 
  *     cpdef setTarget (self, double [:,:] T):
  *         cdef double [:,:] dEdY = self.dEdY (T)             # <<<<<<<<<<<<<<
- *         self._dEdZ = elementMultiply (self.dYdZ(), dEdY)
- *         self.back_active = True
+ * 
+ *         if T.shape[1] != self.neuronCount():
  */
-  __pyx_t_7 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.dEdY(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self), __pyx_v_T); if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.dEdY(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self), __pyx_v_T); if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 249; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_dEdY = __pyx_t_7;
   __pyx_t_7.memview = NULL;
   __pyx_t_7.data = NULL;
 
-  /* "cybrain.pyx":241
- *     cpdef setTarget (self, double [:,:] T):
+  /* "cybrain.pyx":251
  *         cdef double [:,:] dEdY = self.dEdY (T)
+ * 
+ *         if T.shape[1] != self.neuronCount():             # <<<<<<<<<<<<<<
+ *             raise Exception ("setTarget Error: Data shape error. Received {0}, expected {1}".format(T.shape[1], self.neuronCount()))
+ * 
+ */
+  __pyx_t_8 = (((__pyx_v_T.shape[1]) != ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_self, 0)) != 0);
+  if (__pyx_t_8) {
+
+    /* "cybrain.pyx":252
+ * 
+ *         if T.shape[1] != self.neuronCount():
+ *             raise Exception ("setTarget Error: Data shape error. Received {0}, expected {1}".format(T.shape[1], self.neuronCount()))             # <<<<<<<<<<<<<<
+ * 
+ *         dEdY = self.dEdY (T)
+ */
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_setTarget_Error_Data_shape_error, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_4 = PyInt_FromSsize_t((__pyx_v_T.shape[1])); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_6 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_self, 0)); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_6);
+    __pyx_t_3 = NULL;
+    __pyx_t_9 = 0;
+    if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+      if (likely(__pyx_t_3)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+        __Pyx_INCREF(__pyx_t_3);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_2, function);
+        __pyx_t_9 = 1;
+      }
+    }
+    __pyx_t_5 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_5);
+    if (__pyx_t_3) {
+      __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
+    }
+    __Pyx_GIVEREF(__pyx_t_4);
+    PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_9, __pyx_t_4);
+    __Pyx_GIVEREF(__pyx_t_6);
+    PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_9, __pyx_t_6);
+    __pyx_t_4 = 0;
+    __pyx_t_6 = 0;
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_GIVEREF(__pyx_t_1);
+    PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
+    __pyx_t_1 = 0;
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_Raise(__pyx_t_1, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+
+  /* "cybrain.pyx":254
+ *             raise Exception ("setTarget Error: Data shape error. Received {0}, expected {1}".format(T.shape[1], self.neuronCount()))
+ * 
+ *         dEdY = self.dEdY (T)             # <<<<<<<<<<<<<<
+ *         self._dEdZ = elementMultiply (self.dYdZ(), dEdY)
+ *         self.back_active = True
+ */
+  __pyx_t_7 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.dEdY(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self), __pyx_v_T); if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __PYX_XDEC_MEMVIEW(&__pyx_v_dEdY, 1);
+  __pyx_v_dEdY = __pyx_t_7;
+  __pyx_t_7.memview = NULL;
+  __pyx_t_7.data = NULL;
+
+  /* "cybrain.pyx":255
+ * 
+ *         dEdY = self.dEdY (T)
  *         self._dEdZ = elementMultiply (self.dYdZ(), dEdY)             # <<<<<<<<<<<<<<
  *         self.back_active = True
  * 
  */
-  __pyx_t_7 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.dYdZ(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self)); if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 241; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_8 = __pyx_f_7cybrain_elementMultiply(__pyx_t_7, __pyx_v_dEdY); if (unlikely(!__pyx_t_8.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 241; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.dYdZ(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self)); if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 255; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_10 = __pyx_f_7cybrain_elementMultiply(__pyx_t_7, __pyx_v_dEdY); if (unlikely(!__pyx_t_10.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 255; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_t_7, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->_dEdZ, 0);
-  __pyx_v_self->_dEdZ = __pyx_t_8;
-  __pyx_t_8.memview = NULL;
-  __pyx_t_8.data = NULL;
+  __pyx_v_self->_dEdZ = __pyx_t_10;
+  __pyx_t_10.memview = NULL;
+  __pyx_t_10.data = NULL;
 
-  /* "cybrain.pyx":242
- *         cdef double [:,:] dEdY = self.dEdY (T)
+  /* "cybrain.pyx":256
+ *         dEdY = self.dEdY (T)
  *         self._dEdZ = elementMultiply (self.dYdZ(), dEdY)
  *         self.back_active = True             # <<<<<<<<<<<<<<
  * 
@@ -6613,12 +7180,12 @@ static PyObject *__pyx_f_7cybrain_11LinearLayer_setTarget(struct __pyx_obj_7cybr
  */
   __pyx_v_self->__pyx_base.back_active = 1;
 
-  /* "cybrain.pyx":239
+  /* "cybrain.pyx":248
  *         self.active = True
  * 
  *     cpdef setTarget (self, double [:,:] T):             # <<<<<<<<<<<<<<
  *         cdef double [:,:] dEdY = self.dEdY (T)
- *         self._dEdZ = elementMultiply (self.dYdZ(), dEdY)
+ * 
  */
 
   /* function exit code */
@@ -6632,7 +7199,7 @@ static PyObject *__pyx_f_7cybrain_11LinearLayer_setTarget(struct __pyx_obj_7cybr
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
   __PYX_XDEC_MEMVIEW(&__pyx_t_7, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_t_8, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_10, 1);
   __Pyx_AddTraceback("cybrain.LinearLayer.setTarget", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
@@ -6653,7 +7220,7 @@ static PyObject *__pyx_pw_7cybrain_11LinearLayer_9setTarget(PyObject *__pyx_v_se
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("setTarget (wrapper)", 0);
   assert(__pyx_arg_T); {
-    __pyx_v_T = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_T); if (unlikely(!__pyx_v_T.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_T = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_T); if (unlikely(!__pyx_v_T.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -6677,8 +7244,8 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_8setTarget(struct __pyx_obj_7cy
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("setTarget", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_T.memview)) { __Pyx_RaiseUnboundLocalError("T"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-  __pyx_t_1 = __pyx_f_7cybrain_11LinearLayer_setTarget(__pyx_v_self, __pyx_v_T, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_T.memview)) { __Pyx_RaiseUnboundLocalError("T"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+  __pyx_t_1 = __pyx_f_7cybrain_11LinearLayer_setTarget(__pyx_v_self, __pyx_v_T, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6696,7 +7263,7 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_8setTarget(struct __pyx_obj_7cy
   return __pyx_r;
 }
 
-/* "cybrain.pyx":244
+/* "cybrain.pyx":258
  *         self.back_active = True
  * 
  *     cdef double[:,:] dEdY (self, double[:,:] T):             # <<<<<<<<<<<<<<
@@ -6714,22 +7281,22 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dEdY(struct __pyx_obj_7
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("dEdY", 0);
 
-  /* "cybrain.pyx":245
+  /* "cybrain.pyx":259
  * 
  *     cdef double[:,:] dEdY (self, double[:,:] T):
  *         return elementSubtract (self.Y(), T)             # <<<<<<<<<<<<<<
  * 
  *     cdef double[:,:] dYdZ (self):
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.Y(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self)); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 245; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __pyx_f_7cybrain_elementSubtract(__pyx_t_1, __pyx_v_T); if (unlikely(!__pyx_t_2.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 245; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base.Y(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self)); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 259; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_f_7cybrain_elementSubtract(__pyx_t_1, __pyx_v_T); if (unlikely(!__pyx_t_2.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 259; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
   __pyx_r = __pyx_t_2;
   __pyx_t_2.memview = NULL;
   __pyx_t_2.data = NULL;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":244
+  /* "cybrain.pyx":258
  *         self.back_active = True
  * 
  *     cdef double[:,:] dEdY (self, double[:,:] T):             # <<<<<<<<<<<<<<
@@ -6755,7 +7322,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dEdY(struct __pyx_obj_7
   return __pyx_r;
 }
 
-/* "cybrain.pyx":247
+/* "cybrain.pyx":261
  *         return elementSubtract (self.Y(), T)
  * 
  *     cdef double[:,:] dYdZ (self):             # <<<<<<<<<<<<<<
@@ -6776,22 +7343,22 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dYdZ(struct __pyx_obj_7
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("dYdZ", 0);
 
-  /* "cybrain.pyx":248
+  /* "cybrain.pyx":262
  * 
  *     cdef double[:,:] dYdZ (self):
  *         return np.ones ((1, self._Y.shape[1]), dtype="double")             # <<<<<<<<<<<<<<
  * 
- *     cdef int neuronCount (self):
+ *     cpdef int neuronCount (self):
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ones); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ones); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_v_self->_Y.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
-  __pyx_t_1 = PyInt_FromSsize_t((__pyx_v_self->_Y.shape[1])); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->_Y.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_1 = PyInt_FromSsize_t((__pyx_v_self->_Y.shape[1])); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
@@ -6799,28 +7366,28 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dYdZ(struct __pyx_obj_7
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_n_s_double) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_n_s_double) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_4);
-  if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_r = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":247
+  /* "cybrain.pyx":261
  *         return elementSubtract (self.Y(), T)
  * 
  *     cdef double[:,:] dYdZ (self):             # <<<<<<<<<<<<<<
@@ -6849,43 +7416,87 @@ static __Pyx_memviewslice __pyx_f_7cybrain_11LinearLayer_dYdZ(struct __pyx_obj_7
   return __pyx_r;
 }
 
-/* "cybrain.pyx":250
+/* "cybrain.pyx":264
  *         return np.ones ((1, self._Y.shape[1]), dtype="double")
  * 
- *     cdef int neuronCount (self):             # <<<<<<<<<<<<<<
+ *     cpdef int neuronCount (self):             # <<<<<<<<<<<<<<
  *         return self._Y.shape[1]
  * 
  */
 
-static int __pyx_f_7cybrain_11LinearLayer_neuronCount(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self) {
+static PyObject *__pyx_pw_7cybrain_11LinearLayer_11neuronCount(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+int __pyx_f_7cybrain_11LinearLayer_neuronCount(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, int __pyx_skip_dispatch) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  int __pyx_t_5;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("neuronCount", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_neuronCount); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_11neuronCount)) {
+      __Pyx_INCREF(__pyx_t_1);
+      __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
+      if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
+        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+        if (likely(__pyx_t_4)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+          __Pyx_INCREF(__pyx_t_4);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_3, function);
+        }
+      }
+      if (__pyx_t_4) {
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      } else {
+        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      }
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_r = __pyx_t_5;
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      goto __pyx_L0;
+    }
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  }
 
-  /* "cybrain.pyx":251
+  /* "cybrain.pyx":265
  * 
- *     cdef int neuronCount (self):
+ *     cpdef int neuronCount (self):
  *         return self._Y.shape[1]             # <<<<<<<<<<<<<<
  * 
  *     cpdef LinearLayer fullConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):
  */
-  if (unlikely(!__pyx_v_self->_Y.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 251; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  if (unlikely(!__pyx_v_self->_Y.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 265; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
   __pyx_r = (__pyx_v_self->_Y.shape[1]);
   goto __pyx_L0;
 
-  /* "cybrain.pyx":250
+  /* "cybrain.pyx":264
  *         return np.ones ((1, self._Y.shape[1]), dtype="double")
  * 
- *     cdef int neuronCount (self):             # <<<<<<<<<<<<<<
+ *     cpdef int neuronCount (self):             # <<<<<<<<<<<<<<
  *         return self._Y.shape[1]
  * 
  */
 
   /* function exit code */
   __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
   __Pyx_WriteUnraisable("cybrain.LinearLayer.neuronCount", __pyx_clineno, __pyx_lineno, __pyx_filename, 0, 0);
   __pyx_r = 0;
   __pyx_L0:;
@@ -6893,7 +7504,50 @@ static int __pyx_f_7cybrain_11LinearLayer_neuronCount(struct __pyx_obj_7cybrain_
   return __pyx_r;
 }
 
-/* "cybrain.pyx":253
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_11LinearLayer_11neuronCount(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_7cybrain_11LinearLayer_11neuronCount(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("neuronCount (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_11LinearLayer_10neuronCount(((struct __pyx_obj_7cybrain_LinearLayer *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_11LinearLayer_10neuronCount(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("neuronCount", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_7cybrain_11LinearLayer_neuronCount(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("cybrain.LinearLayer.neuronCount", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+int __pyx_f_7cybrain_11LinearLayer_neuronCount__pyx_wrap_1(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self) {
+  return __pyx_f_7cybrain_11LinearLayer_neuronCount(__pyx_v_self, 0);
+}
+
+/* "cybrain.pyx":267
  *         return self._Y.shape[1]
  * 
  *     cpdef LinearLayer fullConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):             # <<<<<<<<<<<<<<
@@ -6901,7 +7555,7 @@ static int __pyx_f_7cybrain_11LinearLayer_neuronCount(struct __pyx_obj_7cybrain_
  *         return  layer
  */
 
-static PyObject *__pyx_pw_7cybrain_11LinearLayer_11fullConnectTo(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_7cybrain_11LinearLayer_13fullConnectTo(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_fullConnectTo(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer, int __pyx_skip_dispatch, struct __pyx_opt_args_7cybrain_11LinearLayer_fullConnectTo *__pyx_optional_args) {
   double __pyx_v_weightMagnitud = ((double)1.0);
   struct __pyx_obj_7cybrain_LinearLayer *__pyx_r = NULL;
@@ -6926,11 +7580,11 @@ static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_ful
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_fullConnectTo); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_fullConnectTo); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_11fullConnectTo)) {
+    if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_13fullConnectTo)) {
       __Pyx_XDECREF(((PyObject *)__pyx_r));
-      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_weightMagnitud); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_weightMagnitud); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_1);
       __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -6945,7 +7599,7 @@ static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_ful
           __pyx_t_6 = 1;
         }
       }
-      __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_7);
       if (__pyx_t_5) {
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -6956,11 +7610,11 @@ static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_ful
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_6, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_LinearLayer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_LinearLayer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_r = ((struct __pyx_obj_7cybrain_LinearLayer *)__pyx_t_2);
       __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6969,16 +7623,16 @@ static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_ful
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":254
+  /* "cybrain.pyx":268
  * 
  *     cpdef LinearLayer fullConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):
  *         FullConnection (self, layer, weightMagnitud)             # <<<<<<<<<<<<<<
  *         return  layer
  * 
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_weightMagnitud); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_weightMagnitud); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(((PyObject *)__pyx_v_self));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
@@ -6989,12 +7643,12 @@ static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_ful
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_7cybrain_FullConnection)), __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_7cybrain_FullConnection)), __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":255
+  /* "cybrain.pyx":269
  *     cpdef LinearLayer fullConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):
  *         FullConnection (self, layer, weightMagnitud)
  *         return  layer             # <<<<<<<<<<<<<<
@@ -7006,7 +7660,7 @@ static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_ful
   __pyx_r = __pyx_v_layer;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":253
+  /* "cybrain.pyx":267
  *         return self._Y.shape[1]
  * 
  *     cpdef LinearLayer fullConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):             # <<<<<<<<<<<<<<
@@ -7031,8 +7685,8 @@ static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_ful
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7cybrain_11LinearLayer_11fullConnectTo(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_7cybrain_11LinearLayer_11fullConnectTo(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7cybrain_11LinearLayer_13fullConnectTo(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_7cybrain_11LinearLayer_13fullConnectTo(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer = 0;
   double __pyx_v_weightMagnitud;
   int __pyx_lineno = 0;
@@ -7065,7 +7719,7 @@ static PyObject *__pyx_pw_7cybrain_11LinearLayer_11fullConnectTo(PyObject *__pyx
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "fullConnectTo") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "fullConnectTo") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -7077,21 +7731,21 @@ static PyObject *__pyx_pw_7cybrain_11LinearLayer_11fullConnectTo(PyObject *__pyx
     }
     __pyx_v_layer = ((struct __pyx_obj_7cybrain_LinearLayer *)values[0]);
     if (values[1]) {
-      __pyx_v_weightMagnitud = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_weightMagnitud == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_weightMagnitud = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_weightMagnitud == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_weightMagnitud = ((double)1.0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("fullConnectTo", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("fullConnectTo", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("cybrain.LinearLayer.fullConnectTo", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_layer), __pyx_ptype_7cybrain_LinearLayer, 1, "layer", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_7cybrain_11LinearLayer_10fullConnectTo(((struct __pyx_obj_7cybrain_LinearLayer *)__pyx_v_self), __pyx_v_layer, __pyx_v_weightMagnitud);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_layer), __pyx_ptype_7cybrain_LinearLayer, 1, "layer", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7cybrain_11LinearLayer_12fullConnectTo(((struct __pyx_obj_7cybrain_LinearLayer *)__pyx_v_self), __pyx_v_layer, __pyx_v_weightMagnitud);
 
   /* function exit code */
   goto __pyx_L0;
@@ -7102,7 +7756,7 @@ static PyObject *__pyx_pw_7cybrain_11LinearLayer_11fullConnectTo(PyObject *__pyx
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7cybrain_11LinearLayer_10fullConnectTo(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer, double __pyx_v_weightMagnitud) {
+static PyObject *__pyx_pf_7cybrain_11LinearLayer_12fullConnectTo(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer, double __pyx_v_weightMagnitud) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -7114,7 +7768,7 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_10fullConnectTo(struct __pyx_ob
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2.__pyx_n = 1;
   __pyx_t_2.weightMagnitud = __pyx_v_weightMagnitud;
-  __pyx_t_1 = ((PyObject *)__pyx_vtabptr_7cybrain_LinearLayer->fullConnectTo(__pyx_v_self, __pyx_v_layer, 1, &__pyx_t_2)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((PyObject *)__pyx_vtabptr_7cybrain_LinearLayer->fullConnectTo(__pyx_v_self, __pyx_v_layer, 1, &__pyx_t_2)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -7131,7 +7785,7 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_10fullConnectTo(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "cybrain.pyx":257
+/* "cybrain.pyx":271
  *         return  layer
  * 
  *     cpdef LinearLayer linearConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):             # <<<<<<<<<<<<<<
@@ -7139,7 +7793,7 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_10fullConnectTo(struct __pyx_ob
  *         return  layer
  */
 
-static PyObject *__pyx_pw_7cybrain_11LinearLayer_13linearConnectTo(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_7cybrain_11LinearLayer_15linearConnectTo(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_linearConnectTo(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer, int __pyx_skip_dispatch, struct __pyx_opt_args_7cybrain_11LinearLayer_linearConnectTo *__pyx_optional_args) {
   double __pyx_v_weightMagnitud = ((double)1.0);
   struct __pyx_obj_7cybrain_LinearLayer *__pyx_r = NULL;
@@ -7164,11 +7818,11 @@ static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_lin
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_linearConnectTo); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_linearConnectTo); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_13linearConnectTo)) {
+    if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_15linearConnectTo)) {
       __Pyx_XDECREF(((PyObject *)__pyx_r));
-      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_weightMagnitud); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_weightMagnitud); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_1);
       __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -7183,7 +7837,7 @@ static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_lin
           __pyx_t_6 = 1;
         }
       }
-      __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_7);
       if (__pyx_t_5) {
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -7194,11 +7848,11 @@ static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_lin
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_6, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_LinearLayer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_LinearLayer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_r = ((struct __pyx_obj_7cybrain_LinearLayer *)__pyx_t_2);
       __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -7207,16 +7861,16 @@ static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_lin
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":258
+  /* "cybrain.pyx":272
  * 
  *     cpdef LinearLayer linearConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):
  *         LinearConnection (self, layer, weightMagnitud)             # <<<<<<<<<<<<<<
  *         return  layer
  * 
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_weightMagnitud); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_weightMagnitud); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 272; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 272; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(((PyObject *)__pyx_v_self));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
@@ -7227,12 +7881,12 @@ static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_lin
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_7cybrain_LinearConnection)), __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_7cybrain_LinearConnection)), __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 272; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":259
+  /* "cybrain.pyx":273
  *     cpdef LinearLayer linearConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):
  *         LinearConnection (self, layer, weightMagnitud)
  *         return  layer             # <<<<<<<<<<<<<<
@@ -7244,7 +7898,7 @@ static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_lin
   __pyx_r = __pyx_v_layer;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":257
+  /* "cybrain.pyx":271
  *         return  layer
  * 
  *     cpdef LinearLayer linearConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):             # <<<<<<<<<<<<<<
@@ -7269,8 +7923,8 @@ static struct __pyx_obj_7cybrain_LinearLayer *__pyx_f_7cybrain_11LinearLayer_lin
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7cybrain_11LinearLayer_13linearConnectTo(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_7cybrain_11LinearLayer_13linearConnectTo(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7cybrain_11LinearLayer_15linearConnectTo(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_7cybrain_11LinearLayer_15linearConnectTo(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer = 0;
   double __pyx_v_weightMagnitud;
   int __pyx_lineno = 0;
@@ -7303,7 +7957,7 @@ static PyObject *__pyx_pw_7cybrain_11LinearLayer_13linearConnectTo(PyObject *__p
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "linearConnectTo") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "linearConnectTo") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -7315,21 +7969,21 @@ static PyObject *__pyx_pw_7cybrain_11LinearLayer_13linearConnectTo(PyObject *__p
     }
     __pyx_v_layer = ((struct __pyx_obj_7cybrain_LinearLayer *)values[0]);
     if (values[1]) {
-      __pyx_v_weightMagnitud = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_weightMagnitud == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_weightMagnitud = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_weightMagnitud == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_weightMagnitud = ((double)1.0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("linearConnectTo", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("linearConnectTo", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("cybrain.LinearLayer.linearConnectTo", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_layer), __pyx_ptype_7cybrain_LinearLayer, 1, "layer", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_7cybrain_11LinearLayer_12linearConnectTo(((struct __pyx_obj_7cybrain_LinearLayer *)__pyx_v_self), __pyx_v_layer, __pyx_v_weightMagnitud);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_layer), __pyx_ptype_7cybrain_LinearLayer, 1, "layer", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7cybrain_11LinearLayer_14linearConnectTo(((struct __pyx_obj_7cybrain_LinearLayer *)__pyx_v_self), __pyx_v_layer, __pyx_v_weightMagnitud);
 
   /* function exit code */
   goto __pyx_L0;
@@ -7340,7 +7994,7 @@ static PyObject *__pyx_pw_7cybrain_11LinearLayer_13linearConnectTo(PyObject *__p
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7cybrain_11LinearLayer_12linearConnectTo(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer, double __pyx_v_weightMagnitud) {
+static PyObject *__pyx_pf_7cybrain_11LinearLayer_14linearConnectTo(struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_self, struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer, double __pyx_v_weightMagnitud) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -7352,7 +8006,7 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_12linearConnectTo(struct __pyx_
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2.__pyx_n = 1;
   __pyx_t_2.weightMagnitud = __pyx_v_weightMagnitud;
-  __pyx_t_1 = ((PyObject *)__pyx_vtabptr_7cybrain_LinearLayer->linearConnectTo(__pyx_v_self, __pyx_v_layer, 1, &__pyx_t_2)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((PyObject *)__pyx_vtabptr_7cybrain_LinearLayer->linearConnectTo(__pyx_v_self, __pyx_v_layer, 1, &__pyx_t_2)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -7369,7 +8023,7 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_12linearConnectTo(struct __pyx_
   return __pyx_r;
 }
 
-/* "cybrain.pyx":174
+/* "cybrain.pyx":184
  * 
  *     cdef:
  *         public double[:,:] _Y, Z, _dEdZ, _dEdY             # <<<<<<<<<<<<<<
@@ -7399,8 +8053,8 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_2_Y___get__(struct __pyx_obj_7c
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_self->_Y.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->_Y, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->_Y.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->_Y, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -7439,7 +8093,7 @@ static int __pyx_pf_7cybrain_11LinearLayer_2_Y_2__set__(struct __pyx_obj_7cybrai
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
   __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_v_value);
-  if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->_Y, 0);
   __pyx_v_self->_Y = __pyx_t_1;
   __pyx_t_1.memview = NULL;
@@ -7479,8 +8133,8 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_1Z___get__(struct __pyx_obj_7cy
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_self->Z.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->Z, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->Z.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->Z, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -7519,7 +8173,7 @@ static int __pyx_pf_7cybrain_11LinearLayer_1Z_2__set__(struct __pyx_obj_7cybrain
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
   __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_v_value);
-  if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->Z, 0);
   __pyx_v_self->Z = __pyx_t_1;
   __pyx_t_1.memview = NULL;
@@ -7559,8 +8213,8 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_5_dEdZ___get__(struct __pyx_obj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_self->_dEdZ.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->_dEdZ, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->_dEdZ.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->_dEdZ, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -7599,7 +8253,7 @@ static int __pyx_pf_7cybrain_11LinearLayer_5_dEdZ_2__set__(struct __pyx_obj_7cyb
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
   __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_v_value);
-  if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->_dEdZ, 0);
   __pyx_v_self->_dEdZ = __pyx_t_1;
   __pyx_t_1.memview = NULL;
@@ -7639,8 +8293,8 @@ static PyObject *__pyx_pf_7cybrain_11LinearLayer_5_dEdY___get__(struct __pyx_obj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_self->_dEdY.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->_dEdY, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_self->_dEdY.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->_dEdY, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -7679,7 +8333,7 @@ static int __pyx_pf_7cybrain_11LinearLayer_5_dEdY_2__set__(struct __pyx_obj_7cyb
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
   __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_v_value);
-  if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->_dEdY, 0);
   __pyx_v_self->_dEdY = __pyx_t_1;
   __pyx_t_1.memview = NULL;
@@ -7697,7 +8351,7 @@ static int __pyx_pf_7cybrain_11LinearLayer_5_dEdY_2__set__(struct __pyx_obj_7cyb
   return __pyx_r;
 }
 
-/* "cybrain.pyx":263
+/* "cybrain.pyx":277
  * cdef class LogisticLayer (LinearLayer):
  * 
  *     cdef double[:,:] H (self, double[:,:] Z):             # <<<<<<<<<<<<<<
@@ -7714,20 +8368,20 @@ static __Pyx_memviewslice __pyx_f_7cybrain_13LogisticLayer_H(CYTHON_UNUSED struc
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("H", 0);
 
-  /* "cybrain.pyx":264
+  /* "cybrain.pyx":278
  * 
  *     cdef double[:,:] H (self, double[:,:] Z):
  *         return elementUnaryOperation (Z, logisticFunction)             # <<<<<<<<<<<<<<
  * 
  *     cdef double[:,:] dEdY (self, double[:,:] T):
  */
-  __pyx_t_1 = __pyx_f_7cybrain_elementUnaryOperation(__pyx_v_Z, __pyx_f_7cybrain_logisticFunction); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_f_7cybrain_elementUnaryOperation(__pyx_v_Z, __pyx_f_7cybrain_logisticFunction); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":263
+  /* "cybrain.pyx":277
  * cdef class LogisticLayer (LinearLayer):
  * 
  *     cdef double[:,:] H (self, double[:,:] Z):             # <<<<<<<<<<<<<<
@@ -7752,7 +8406,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_13LogisticLayer_H(CYTHON_UNUSED struc
   return __pyx_r;
 }
 
-/* "cybrain.pyx":266
+/* "cybrain.pyx":280
  *         return elementUnaryOperation (Z, logisticFunction)
  * 
  *     cdef double[:,:] dEdY (self, double[:,:] T):             # <<<<<<<<<<<<<<
@@ -7770,22 +8424,22 @@ static __Pyx_memviewslice __pyx_f_7cybrain_13LogisticLayer_dEdY(struct __pyx_obj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("dEdY", 0);
 
-  /* "cybrain.pyx":267
+  /* "cybrain.pyx":281
  * 
  *     cdef double[:,:] dEdY (self, double[:,:] T):
  *         return elementBinaryOperation (T, self.Y(), logistic_dEdY)             # <<<<<<<<<<<<<<
  * 
  *     cdef double[:,:] dYdZ (self):
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_LogisticLayer *)__pyx_v_self->__pyx_base.__pyx_base.__pyx_vtab)->__pyx_base.__pyx_base.Y(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self)); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __pyx_f_7cybrain_elementBinaryOperation(__pyx_v_T, __pyx_t_1, __pyx_f_7cybrain_logistic_dEdY); if (unlikely(!__pyx_t_2.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_LogisticLayer *)__pyx_v_self->__pyx_base.__pyx_base.__pyx_vtab)->__pyx_base.__pyx_base.Y(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self)); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_f_7cybrain_elementBinaryOperation(__pyx_v_T, __pyx_t_1, __pyx_f_7cybrain_logistic_dEdY); if (unlikely(!__pyx_t_2.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
   __pyx_r = __pyx_t_2;
   __pyx_t_2.memview = NULL;
   __pyx_t_2.data = NULL;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":266
+  /* "cybrain.pyx":280
  *         return elementUnaryOperation (Z, logisticFunction)
  * 
  *     cdef double[:,:] dEdY (self, double[:,:] T):             # <<<<<<<<<<<<<<
@@ -7811,7 +8465,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_13LogisticLayer_dEdY(struct __pyx_obj
   return __pyx_r;
 }
 
-/* "cybrain.pyx":269
+/* "cybrain.pyx":283
  *         return elementBinaryOperation (T, self.Y(), logistic_dEdY)
  * 
  *     cdef double[:,:] dYdZ (self):             # <<<<<<<<<<<<<<
@@ -7829,22 +8483,22 @@ static __Pyx_memviewslice __pyx_f_7cybrain_13LogisticLayer_dYdZ(struct __pyx_obj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("dYdZ", 0);
 
-  /* "cybrain.pyx":270
+  /* "cybrain.pyx":284
  * 
  *     cdef double[:,:] dYdZ (self):
  *         return elementUnaryOperation(self.Y(), logistic_dYdZ)             # <<<<<<<<<<<<<<
  * 
- * 
+ * cdef class BiasUnit (LinearLayer):
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_LogisticLayer *)__pyx_v_self->__pyx_base.__pyx_base.__pyx_vtab)->__pyx_base.__pyx_base.Y(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self)); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 270; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __pyx_f_7cybrain_elementUnaryOperation(__pyx_t_1, __pyx_f_7cybrain_logistic_dYdZ); if (unlikely(!__pyx_t_2.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 270; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_LogisticLayer *)__pyx_v_self->__pyx_base.__pyx_base.__pyx_vtab)->__pyx_base.__pyx_base.Y(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_self)); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_f_7cybrain_elementUnaryOperation(__pyx_t_1, __pyx_f_7cybrain_logistic_dYdZ); if (unlikely(!__pyx_t_2.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
   __pyx_r = __pyx_t_2;
   __pyx_t_2.memview = NULL;
   __pyx_t_2.data = NULL;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":269
+  /* "cybrain.pyx":283
  *         return elementBinaryOperation (T, self.Y(), logistic_dEdY)
  * 
  *     cdef double[:,:] dYdZ (self):             # <<<<<<<<<<<<<<
@@ -7870,8 +8524,276 @@ static __Pyx_memviewslice __pyx_f_7cybrain_13LogisticLayer_dYdZ(struct __pyx_obj
   return __pyx_r;
 }
 
-/* "cybrain.pyx":281
- *         public list inputLayers, outputLayers, autoInputLayers, autoOutputLayers, layers, hiddenLayers, connections
+/* "cybrain.pyx":288
+ * cdef class BiasUnit (LinearLayer):
+ * 
+ *     def __init__(self):             # <<<<<<<<<<<<<<
+ *         LinearLayer.__init__(self, 1)
+ *         self._Y[0,0] = 1.0
+ */
+
+/* Python wrapper */
+static int __pyx_pw_7cybrain_8BiasUnit_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static int __pyx_pw_7cybrain_8BiasUnit_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
+  if (unlikely(PyTuple_GET_SIZE(__pyx_args) > 0)) {
+    __Pyx_RaiseArgtupleInvalid("__init__", 1, 0, 0, PyTuple_GET_SIZE(__pyx_args)); return -1;}
+  if (unlikely(__pyx_kwds) && unlikely(PyDict_Size(__pyx_kwds) > 0) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "__init__", 0))) return -1;
+  __pyx_r = __pyx_pf_7cybrain_8BiasUnit___init__(((struct __pyx_obj_7cybrain_BiasUnit *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7cybrain_8BiasUnit___init__(struct __pyx_obj_7cybrain_BiasUnit *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  Py_ssize_t __pyx_t_4;
+  PyObject *__pyx_t_5 = NULL;
+  Py_ssize_t __pyx_t_6;
+  int __pyx_t_7;
+  Py_ssize_t __pyx_t_8;
+  Py_ssize_t __pyx_t_9;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__init__", 0);
+
+  /* "cybrain.pyx":289
+ * 
+ *     def __init__(self):
+ *         LinearLayer.__init__(self, 1)             # <<<<<<<<<<<<<<
+ *         self._Y[0,0] = 1.0
+ *         self._dEdZ[0,0] = 1.0
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)((PyObject*)__pyx_ptype_7cybrain_LinearLayer)), __pyx_n_s_init); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  __pyx_t_4 = 0;
+  if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+      __pyx_t_4 = 1;
+    }
+  }
+  __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_5);
+  if (__pyx_t_3) {
+    __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
+  }
+  __Pyx_INCREF(((PyObject *)__pyx_v_self));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
+  PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_4, ((PyObject *)__pyx_v_self));
+  __Pyx_INCREF(__pyx_int_1);
+  __Pyx_GIVEREF(__pyx_int_1);
+  PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_4, __pyx_int_1);
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":290
+ *     def __init__(self):
+ *         LinearLayer.__init__(self, 1)
+ *         self._Y[0,0] = 1.0             # <<<<<<<<<<<<<<
+ *         self._dEdZ[0,0] = 1.0
+ * 
+ */
+  if (unlikely(!__pyx_v_self->__pyx_base._Y.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 290; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_4 = 0;
+  __pyx_t_6 = 0;
+  __pyx_t_7 = -1;
+  if (__pyx_t_4 < 0) {
+    __pyx_t_4 += __pyx_v_self->__pyx_base._Y.shape[0];
+    if (unlikely(__pyx_t_4 < 0)) __pyx_t_7 = 0;
+  } else if (unlikely(__pyx_t_4 >= __pyx_v_self->__pyx_base._Y.shape[0])) __pyx_t_7 = 0;
+  if (__pyx_t_6 < 0) {
+    __pyx_t_6 += __pyx_v_self->__pyx_base._Y.shape[1];
+    if (unlikely(__pyx_t_6 < 0)) __pyx_t_7 = 1;
+  } else if (unlikely(__pyx_t_6 >= __pyx_v_self->__pyx_base._Y.shape[1])) __pyx_t_7 = 1;
+  if (unlikely(__pyx_t_7 != -1)) {
+    __Pyx_RaiseBufferIndexError(__pyx_t_7);
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 290; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->__pyx_base._Y.data + __pyx_t_4 * __pyx_v_self->__pyx_base._Y.strides[0]) ) + __pyx_t_6 * __pyx_v_self->__pyx_base._Y.strides[1]) )) = 1.0;
+
+  /* "cybrain.pyx":291
+ *         LinearLayer.__init__(self, 1)
+ *         self._Y[0,0] = 1.0
+ *         self._dEdZ[0,0] = 1.0             # <<<<<<<<<<<<<<
+ * 
+ *     cdef double[:,:] H (self, double[:,:] Z):
+ */
+  if (unlikely(!__pyx_v_self->__pyx_base._dEdZ.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 291; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_8 = 0;
+  __pyx_t_9 = 0;
+  __pyx_t_7 = -1;
+  if (__pyx_t_8 < 0) {
+    __pyx_t_8 += __pyx_v_self->__pyx_base._dEdZ.shape[0];
+    if (unlikely(__pyx_t_8 < 0)) __pyx_t_7 = 0;
+  } else if (unlikely(__pyx_t_8 >= __pyx_v_self->__pyx_base._dEdZ.shape[0])) __pyx_t_7 = 0;
+  if (__pyx_t_9 < 0) {
+    __pyx_t_9 += __pyx_v_self->__pyx_base._dEdZ.shape[1];
+    if (unlikely(__pyx_t_9 < 0)) __pyx_t_7 = 1;
+  } else if (unlikely(__pyx_t_9 >= __pyx_v_self->__pyx_base._dEdZ.shape[1])) __pyx_t_7 = 1;
+  if (unlikely(__pyx_t_7 != -1)) {
+    __Pyx_RaiseBufferIndexError(__pyx_t_7);
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 291; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->__pyx_base._dEdZ.data + __pyx_t_8 * __pyx_v_self->__pyx_base._dEdZ.strides[0]) ) + __pyx_t_9 * __pyx_v_self->__pyx_base._dEdZ.strides[1]) )) = 1.0;
+
+  /* "cybrain.pyx":288
+ * cdef class BiasUnit (LinearLayer):
+ * 
+ *     def __init__(self):             # <<<<<<<<<<<<<<
+ *         LinearLayer.__init__(self, 1)
+ *         self._Y[0,0] = 1.0
+ */
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_AddTraceback("cybrain.BiasUnit.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":293
+ *         self._dEdZ[0,0] = 1.0
+ * 
+ *     cdef double[:,:] H (self, double[:,:] Z):             # <<<<<<<<<<<<<<
+ *         cdef double[:,:] h = cvarray ((1,1), sizeof(double), 'd')
+ * 
+ */
+
+static __Pyx_memviewslice __pyx_f_7cybrain_8BiasUnit_H(CYTHON_UNUSED struct __pyx_obj_7cybrain_BiasUnit *__pyx_v_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_Z) {
+  __Pyx_memviewslice __pyx_v_h = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_r = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  __Pyx_memviewslice __pyx_t_3 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  Py_ssize_t __pyx_t_4;
+  Py_ssize_t __pyx_t_5;
+  int __pyx_t_6;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("H", 0);
+
+  /* "cybrain.pyx":294
+ * 
+ *     cdef double[:,:] H (self, double[:,:] Z):
+ *         cdef double[:,:] h = cvarray ((1,1), sizeof(double), 'd')             # <<<<<<<<<<<<<<
+ * 
+ *         h[0,0] = 1.0
+ */
+  __pyx_t_1 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_INCREF(__pyx_tuple__6);
+  __Pyx_GIVEREF(__pyx_tuple__6);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_tuple__6);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_1);
+  __Pyx_INCREF(__pyx_n_s_d);
+  __Pyx_GIVEREF(__pyx_n_s_d);
+  PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_n_s_d);
+  __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_3 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_1);
+  if (unlikely(!__pyx_t_3.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_v_h = __pyx_t_3;
+  __pyx_t_3.memview = NULL;
+  __pyx_t_3.data = NULL;
+
+  /* "cybrain.pyx":296
+ *         cdef double[:,:] h = cvarray ((1,1), sizeof(double), 'd')
+ * 
+ *         h[0,0] = 1.0             # <<<<<<<<<<<<<<
+ * 
+ *         return h
+ */
+  __pyx_t_4 = 0;
+  __pyx_t_5 = 0;
+  __pyx_t_6 = -1;
+  if (__pyx_t_4 < 0) {
+    __pyx_t_4 += __pyx_v_h.shape[0];
+    if (unlikely(__pyx_t_4 < 0)) __pyx_t_6 = 0;
+  } else if (unlikely(__pyx_t_4 >= __pyx_v_h.shape[0])) __pyx_t_6 = 0;
+  if (__pyx_t_5 < 0) {
+    __pyx_t_5 += __pyx_v_h.shape[1];
+    if (unlikely(__pyx_t_5 < 0)) __pyx_t_6 = 1;
+  } else if (unlikely(__pyx_t_5 >= __pyx_v_h.shape[1])) __pyx_t_6 = 1;
+  if (unlikely(__pyx_t_6 != -1)) {
+    __Pyx_RaiseBufferIndexError(__pyx_t_6);
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 296; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_h.data + __pyx_t_4 * __pyx_v_h.strides[0]) ) + __pyx_t_5 * __pyx_v_h.strides[1]) )) = 1.0;
+
+  /* "cybrain.pyx":298
+ *         h[0,0] = 1.0
+ * 
+ *         return h             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __PYX_INC_MEMVIEW(&__pyx_v_h, 0);
+  __pyx_r = __pyx_v_h;
+  goto __pyx_L0;
+
+  /* "cybrain.pyx":293
+ *         self._dEdZ[0,0] = 1.0
+ * 
+ *     cdef double[:,:] H (self, double[:,:] Z):             # <<<<<<<<<<<<<<
+ *         cdef double[:,:] h = cvarray ((1,1), sizeof(double), 'd')
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_3, 1);
+  __pyx_r.data = NULL;
+  __pyx_r.memview = NULL;
+  __Pyx_AddTraceback("cybrain.BiasUnit.H", __pyx_clineno, __pyx_lineno, __pyx_filename);
+
+  goto __pyx_L2;
+  __pyx_L0:;
+  if (unlikely(!__pyx_r.memview)) {
+    PyErr_SetString(PyExc_TypeError,"Memoryview return value is not initialized");
+  }
+  __pyx_L2:;
+  __PYX_XDEC_MEMVIEW(&__pyx_v_h, 1);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":309
+ *         public list inputLayers, outputLayers, autoInputLayers, autoOutputLayers, layers, hiddenLayers, connections, all_input_layers, all_output_layers
  * 
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         self.inputLayers = []
@@ -7903,14 +8825,14 @@ static int __pyx_pf_7cybrain_7Network___init__(struct __pyx_obj_7cybrain_Network
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "cybrain.pyx":282
+  /* "cybrain.pyx":310
  * 
  *     def __init__(self):
  *         self.inputLayers = []             # <<<<<<<<<<<<<<
  *         self.outputLayers = []
  *         self.autoInputLayers = []
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 282; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 310; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->inputLayers);
@@ -7918,14 +8840,14 @@ static int __pyx_pf_7cybrain_7Network___init__(struct __pyx_obj_7cybrain_Network
   __pyx_v_self->inputLayers = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":283
+  /* "cybrain.pyx":311
  *     def __init__(self):
  *         self.inputLayers = []
  *         self.outputLayers = []             # <<<<<<<<<<<<<<
  *         self.autoInputLayers = []
  *         self.autoOutputLayers = []
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 283; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 311; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->outputLayers);
@@ -7933,14 +8855,14 @@ static int __pyx_pf_7cybrain_7Network___init__(struct __pyx_obj_7cybrain_Network
   __pyx_v_self->outputLayers = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":284
+  /* "cybrain.pyx":312
  *         self.inputLayers = []
  *         self.outputLayers = []
  *         self.autoInputLayers = []             # <<<<<<<<<<<<<<
  *         self.autoOutputLayers = []
- * 
+ *         self.all_output_layers = []
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->autoInputLayers);
@@ -7948,14 +8870,14 @@ static int __pyx_pf_7cybrain_7Network___init__(struct __pyx_obj_7cybrain_Network
   __pyx_v_self->autoInputLayers = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":285
+  /* "cybrain.pyx":313
  *         self.outputLayers = []
  *         self.autoInputLayers = []
  *         self.autoOutputLayers = []             # <<<<<<<<<<<<<<
- * 
- *         self.hiddenLayers = []
+ *         self.all_output_layers = []
+ *         self.all_input_layers = []
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 285; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 313; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->autoOutputLayers);
@@ -7963,14 +8885,44 @@ static int __pyx_pf_7cybrain_7Network___init__(struct __pyx_obj_7cybrain_Network
   __pyx_v_self->autoOutputLayers = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":287
+  /* "cybrain.pyx":314
+ *         self.autoInputLayers = []
  *         self.autoOutputLayers = []
+ *         self.all_output_layers = []             # <<<<<<<<<<<<<<
+ *         self.all_input_layers = []
+ * 
+ */
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v_self->all_output_layers);
+  __Pyx_DECREF(__pyx_v_self->all_output_layers);
+  __pyx_v_self->all_output_layers = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":315
+ *         self.autoOutputLayers = []
+ *         self.all_output_layers = []
+ *         self.all_input_layers = []             # <<<<<<<<<<<<<<
+ * 
+ *         self.hiddenLayers = []
+ */
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v_self->all_input_layers);
+  __Pyx_DECREF(__pyx_v_self->all_input_layers);
+  __pyx_v_self->all_input_layers = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":317
+ *         self.all_input_layers = []
  * 
  *         self.hiddenLayers = []             # <<<<<<<<<<<<<<
  *         self.layers = []
  *         self.connections = []
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 287; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 317; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->hiddenLayers);
@@ -7978,14 +8930,14 @@ static int __pyx_pf_7cybrain_7Network___init__(struct __pyx_obj_7cybrain_Network
   __pyx_v_self->hiddenLayers = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":288
+  /* "cybrain.pyx":318
  * 
  *         self.hiddenLayers = []
  *         self.layers = []             # <<<<<<<<<<<<<<
  *         self.connections = []
  * 
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 288; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 318; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->layers);
@@ -7993,14 +8945,14 @@ static int __pyx_pf_7cybrain_7Network___init__(struct __pyx_obj_7cybrain_Network
   __pyx_v_self->layers = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":289
+  /* "cybrain.pyx":319
  *         self.hiddenLayers = []
  *         self.layers = []
  *         self.connections = []             # <<<<<<<<<<<<<<
  * 
- *     cpdef findHiddenComponents (self):
+ *     cpdef setup (self):
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 319; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->connections);
@@ -8008,8 +8960,8 @@ static int __pyx_pf_7cybrain_7Network___init__(struct __pyx_obj_7cybrain_Network
   __pyx_v_self->connections = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":281
- *         public list inputLayers, outputLayers, autoInputLayers, autoOutputLayers, layers, hiddenLayers, connections
+  /* "cybrain.pyx":309
+ *         public list inputLayers, outputLayers, autoInputLayers, autoOutputLayers, layers, hiddenLayers, connections, all_input_layers, all_output_layers
  * 
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         self.inputLayers = []
@@ -8028,16 +8980,16 @@ static int __pyx_pf_7cybrain_7Network___init__(struct __pyx_obj_7cybrain_Network
   return __pyx_r;
 }
 
-/* "cybrain.pyx":291
+/* "cybrain.pyx":321
  *         self.connections = []
  * 
- *     cpdef findHiddenComponents (self):             # <<<<<<<<<<<<<<
+ *     cpdef setup (self):             # <<<<<<<<<<<<<<
  *         cdef:
  *             Layer layer
  */
 
-static PyObject *__pyx_pw_7cybrain_7Network_3findHiddenComponents(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_f_7cybrain_7Network_findHiddenComponents(struct __pyx_obj_7cybrain_Network *__pyx_v_self, int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_7cybrain_7Network_3setup(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_f_7cybrain_7Network_setup(struct __pyx_obj_7cybrain_Network *__pyx_v_self, int __pyx_skip_dispatch) {
   struct __pyx_obj_7cybrain_Layer *__pyx_v_layer = 0;
   PyObject *__pyx_v_layers = NULL;
   PyObject *__pyx_v_connections = NULL;
@@ -8051,14 +9003,14 @@ static PyObject *__pyx_f_7cybrain_7Network_findHiddenComponents(struct __pyx_obj
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("findHiddenComponents", 0);
+  __Pyx_RefNannySetupContext("setup", 0);
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_findHiddenComponents); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 291; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_setup); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_7Network_3findHiddenComponents)) {
+    if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_7Network_3setup)) {
       __Pyx_XDECREF(__pyx_r);
       __Pyx_INCREF(__pyx_t_1);
       __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
@@ -8072,10 +9024,10 @@ static PyObject *__pyx_f_7cybrain_7Network_findHiddenComponents(struct __pyx_obj
         }
       }
       if (__pyx_t_4) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 291; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       } else {
-        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 291; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -8087,106 +9039,137 @@ static PyObject *__pyx_f_7cybrain_7Network_findHiddenComponents(struct __pyx_obj
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":295
+  /* "cybrain.pyx":325
  *             Layer layer
+ * 
+ *         self.all_input_layers = self.inputLayers + self.autoInputLayers             # <<<<<<<<<<<<<<
+ *         self.all_output_layers = self.outputLayers + self.autoOutputLayers
+ * 
+ */
+  __pyx_t_1 = PyNumber_Add(__pyx_v_self->inputLayers, __pyx_v_self->autoInputLayers); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 325; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v_self->all_input_layers);
+  __Pyx_DECREF(__pyx_v_self->all_input_layers);
+  __pyx_v_self->all_input_layers = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":326
+ * 
+ *         self.all_input_layers = self.inputLayers + self.autoInputLayers
+ *         self.all_output_layers = self.outputLayers + self.autoOutputLayers             # <<<<<<<<<<<<<<
+ * 
+ *         layers = set()
+ */
+  __pyx_t_1 = PyNumber_Add(__pyx_v_self->outputLayers, __pyx_v_self->autoOutputLayers); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v_self->all_output_layers);
+  __Pyx_DECREF(__pyx_v_self->all_output_layers);
+  __pyx_v_self->all_output_layers = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":328
+ *         self.all_output_layers = self.outputLayers + self.autoOutputLayers
  * 
  *         layers = set()             # <<<<<<<<<<<<<<
  *         connections = set()
  * 
  */
-  __pyx_t_1 = PySet_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 295; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PySet_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 328; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_layers = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":296
+  /* "cybrain.pyx":329
  * 
  *         layers = set()
  *         connections = set()             # <<<<<<<<<<<<<<
  * 
- *         for layer in self.inputLayers + self.autoInputLayers:
+ *         for layer in self.all_input_layers:
  */
-  __pyx_t_1 = PySet_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 296; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PySet_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 329; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_connections = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":298
+  /* "cybrain.pyx":331
  *         connections = set()
  * 
- *         for layer in self.inputLayers + self.autoInputLayers:             # <<<<<<<<<<<<<<
+ *         for layer in self.all_input_layers:             # <<<<<<<<<<<<<<
  *             self.recursivelyFindLayersAndConnections (layer, layers, connections)
  * 
  */
-  __pyx_t_1 = PyNumber_Add(__pyx_v_self->inputLayers, __pyx_v_self->autoInputLayers); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 298; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __pyx_t_1; __Pyx_INCREF(__pyx_t_2); __pyx_t_5 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(__pyx_v_self->all_input_layers == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 331; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_t_1 = __pyx_v_self->all_input_layers; __Pyx_INCREF(__pyx_t_1); __pyx_t_5 = 0;
   for (;;) {
-    if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_2)) break;
+    if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_5); __Pyx_INCREF(__pyx_t_1); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 298; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_5); __Pyx_INCREF(__pyx_t_2); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 331; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 298; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 331; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_2);
     #endif
-    if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7cybrain_Layer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 298; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __Pyx_XDECREF_SET(__pyx_v_layer, ((struct __pyx_obj_7cybrain_Layer *)__pyx_t_1));
-    __pyx_t_1 = 0;
+    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_Layer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 331; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_XDECREF_SET(__pyx_v_layer, ((struct __pyx_obj_7cybrain_Layer *)__pyx_t_2));
+    __pyx_t_2 = 0;
 
-    /* "cybrain.pyx":299
+    /* "cybrain.pyx":332
  * 
- *         for layer in self.inputLayers + self.autoInputLayers:
+ *         for layer in self.all_input_layers:
  *             self.recursivelyFindLayersAndConnections (layer, layers, connections)             # <<<<<<<<<<<<<<
  * 
  *         self.layers = list (layers)
  */
     ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->__pyx_vtab)->recursivelyFindLayersAndConnections(__pyx_v_self, __pyx_v_layer, __pyx_v_layers, __pyx_v_connections);
 
-    /* "cybrain.pyx":298
+    /* "cybrain.pyx":331
  *         connections = set()
  * 
- *         for layer in self.inputLayers + self.autoInputLayers:             # <<<<<<<<<<<<<<
+ *         for layer in self.all_input_layers:             # <<<<<<<<<<<<<<
  *             self.recursivelyFindLayersAndConnections (layer, layers, connections)
  * 
  */
   }
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":301
+  /* "cybrain.pyx":334
  *             self.recursivelyFindLayersAndConnections (layer, layers, connections)
  * 
  *         self.layers = list (layers)             # <<<<<<<<<<<<<<
  *         self.connections = list (connections)
  * 
  */
-  __pyx_t_2 = PySequence_List(__pyx_v_layers); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 301; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_t_1 = PySequence_List(__pyx_v_layers); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 334; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->layers);
   __Pyx_DECREF(__pyx_v_self->layers);
-  __pyx_v_self->layers = ((PyObject*)__pyx_t_2);
-  __pyx_t_2 = 0;
+  __pyx_v_self->layers = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":302
+  /* "cybrain.pyx":335
  * 
  *         self.layers = list (layers)
  *         self.connections = list (connections)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = PySequence_List(__pyx_v_connections); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 302; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_t_1 = PySequence_List(__pyx_v_connections); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 335; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->connections);
   __Pyx_DECREF(__pyx_v_self->connections);
-  __pyx_v_self->connections = ((PyObject*)__pyx_t_2);
-  __pyx_t_2 = 0;
+  __pyx_v_self->connections = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":291
+  /* "cybrain.pyx":321
  *         self.connections = []
  * 
- *     cpdef findHiddenComponents (self):             # <<<<<<<<<<<<<<
+ *     cpdef setup (self):             # <<<<<<<<<<<<<<
  *         cdef:
  *             Layer layer
  */
@@ -8199,7 +9182,7 @@ static PyObject *__pyx_f_7cybrain_7Network_findHiddenComponents(struct __pyx_obj
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("cybrain.Network.findHiddenComponents", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("cybrain.Network.setup", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XDECREF((PyObject *)__pyx_v_layer);
@@ -8211,28 +9194,28 @@ static PyObject *__pyx_f_7cybrain_7Network_findHiddenComponents(struct __pyx_obj
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7cybrain_7Network_3findHiddenComponents(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_7cybrain_7Network_3findHiddenComponents(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7cybrain_7Network_3setup(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_7cybrain_7Network_3setup(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("findHiddenComponents (wrapper)", 0);
-  __pyx_r = __pyx_pf_7cybrain_7Network_2findHiddenComponents(((struct __pyx_obj_7cybrain_Network *)__pyx_v_self));
+  __Pyx_RefNannySetupContext("setup (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_7Network_2setup(((struct __pyx_obj_7cybrain_Network *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7cybrain_7Network_2findHiddenComponents(struct __pyx_obj_7cybrain_Network *__pyx_v_self) {
+static PyObject *__pyx_pf_7cybrain_7Network_2setup(struct __pyx_obj_7cybrain_Network *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("findHiddenComponents", 0);
+  __Pyx_RefNannySetupContext("setup", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_7cybrain_7Network_findHiddenComponents(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 291; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_f_7cybrain_7Network_setup(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -8241,7 +9224,7 @@ static PyObject *__pyx_pf_7cybrain_7Network_2findHiddenComponents(struct __pyx_o
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("cybrain.Network.findHiddenComponents", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("cybrain.Network.setup", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -8249,7 +9232,7 @@ static PyObject *__pyx_pf_7cybrain_7Network_2findHiddenComponents(struct __pyx_o
   return __pyx_r;
 }
 
-/* "cybrain.pyx":305
+/* "cybrain.pyx":338
  * 
  * 
  *     cdef void recursivelyFindLayersAndConnections (self, Layer layer, layers, connections):             # <<<<<<<<<<<<<<
@@ -8271,14 +9254,14 @@ static void __pyx_f_7cybrain_7Network_recursivelyFindLayersAndConnections(struct
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("recursivelyFindLayersAndConnections", 0);
 
-  /* "cybrain.pyx":310
+  /* "cybrain.pyx":343
  *             Layer nextLayer
  * 
  *         layers.add (layer)             # <<<<<<<<<<<<<<
  *         for connection in layer.receiverConnections:
  *             connections.add (connection)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_layers, __pyx_n_s_add); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 310; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_layers, __pyx_n_s_add); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 343; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -8291,23 +9274,23 @@ static void __pyx_f_7cybrain_7Network_recursivelyFindLayersAndConnections(struct
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_layer)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 310; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_layer)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 343; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 310; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 343; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(((PyObject *)__pyx_v_layer));
     __Pyx_GIVEREF(((PyObject *)__pyx_v_layer));
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, ((PyObject *)__pyx_v_layer));
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 310; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 343; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":311
+  /* "cybrain.pyx":344
  * 
  *         layers.add (layer)
  *         for connection in layer.receiverConnections:             # <<<<<<<<<<<<<<
@@ -8316,29 +9299,29 @@ static void __pyx_f_7cybrain_7Network_recursivelyFindLayersAndConnections(struct
  */
   if (unlikely(__pyx_v_layer->receiverConnections == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 311; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 344; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_1 = __pyx_v_layer->receiverConnections; __Pyx_INCREF(__pyx_t_1); __pyx_t_5 = 0;
   for (;;) {
     if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_5); __Pyx_INCREF(__pyx_t_2); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 311; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_5); __Pyx_INCREF(__pyx_t_2); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 344; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 311; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 344; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     #endif
-    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_Connection))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 311; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_Connection))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 344; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XDECREF_SET(__pyx_v_connection, ((struct __pyx_obj_7cybrain_Connection *)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "cybrain.pyx":312
+    /* "cybrain.pyx":345
  *         layers.add (layer)
  *         for connection in layer.receiverConnections:
  *             connections.add (connection)             # <<<<<<<<<<<<<<
  *             self.recursivelyFindLayersAndConnections (connection.receiver, layers, connections)
  * 
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_connections, __pyx_n_s_add); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_connections, __pyx_n_s_add); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 345; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_3 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
@@ -8351,35 +9334,35 @@ static void __pyx_f_7cybrain_7Network_recursivelyFindLayersAndConnections(struct
       }
     }
     if (!__pyx_t_3) {
-      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, ((PyObject *)__pyx_v_connection)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, ((PyObject *)__pyx_v_connection)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 345; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_2);
     } else {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 345; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_3); __pyx_t_3 = NULL;
       __Pyx_INCREF(((PyObject *)__pyx_v_connection));
       __Pyx_GIVEREF(((PyObject *)__pyx_v_connection));
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, ((PyObject *)__pyx_v_connection));
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 345; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "cybrain.pyx":313
+    /* "cybrain.pyx":346
  *         for connection in layer.receiverConnections:
  *             connections.add (connection)
  *             self.recursivelyFindLayersAndConnections (connection.receiver, layers, connections)             # <<<<<<<<<<<<<<
  * 
- *     cpdef restartNetwork (self):
+ *     cdef vector[double*] get_gradient_pointers (self):
  */
     __pyx_t_2 = ((PyObject *)__pyx_v_connection->receiver);
     __Pyx_INCREF(__pyx_t_2);
     ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->__pyx_vtab)->recursivelyFindLayersAndConnections(__pyx_v_self, ((struct __pyx_obj_7cybrain_Layer *)__pyx_t_2), __pyx_v_layers, __pyx_v_connections);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "cybrain.pyx":311
+    /* "cybrain.pyx":344
  * 
  *         layers.add (layer)
  *         for connection in layer.receiverConnections:             # <<<<<<<<<<<<<<
@@ -8389,7 +9372,7 @@ static void __pyx_f_7cybrain_7Network_recursivelyFindLayersAndConnections(struct
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":305
+  /* "cybrain.pyx":338
  * 
  * 
  *     cdef void recursivelyFindLayersAndConnections (self, Layer layer, layers, connections):             # <<<<<<<<<<<<<<
@@ -8411,8 +9394,224 @@ static void __pyx_f_7cybrain_7Network_recursivelyFindLayersAndConnections(struct
   __Pyx_RefNannyFinishContext();
 }
 
-/* "cybrain.pyx":315
+/* "cybrain.pyx":348
  *             self.recursivelyFindLayersAndConnections (connection.receiver, layers, connections)
+ * 
+ *     cdef vector[double*] get_gradient_pointers (self):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             vector[double*] total, partial
+ */
+
+static std::vector<double *>  __pyx_f_7cybrain_7Network_get_gradient_pointers(struct __pyx_obj_7cybrain_Network *__pyx_v_self) {
+  std::vector<double *>  __pyx_v_total;
+  std::vector<double *>  __pyx_v_partial;
+  struct __pyx_obj_7cybrain_Connection *__pyx_v_connection = 0;
+  std::vector<double *>  __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  Py_ssize_t __pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_gradient_pointers", 0);
+
+  /* "cybrain.pyx":353
+ *             Connection connection
+ * 
+ *         for connection in self.connections:             # <<<<<<<<<<<<<<
+ *             partial = connection.get_gradient_pointers()
+ *             total.insert(total.end(), partial.begin(), partial.end())
+ */
+  if (unlikely(__pyx_v_self->connections == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 353; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_t_1 = __pyx_v_self->connections; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
+  for (;;) {
+    if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
+    #if CYTHON_COMPILING_IN_CPYTHON
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 353; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    #else
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 353; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_3);
+    #endif
+    if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7cybrain_Connection))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 353; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_XDECREF_SET(__pyx_v_connection, ((struct __pyx_obj_7cybrain_Connection *)__pyx_t_3));
+    __pyx_t_3 = 0;
+
+    /* "cybrain.pyx":354
+ * 
+ *         for connection in self.connections:
+ *             partial = connection.get_gradient_pointers()             # <<<<<<<<<<<<<<
+ *             total.insert(total.end(), partial.begin(), partial.end())
+ * 
+ */
+    __pyx_v_partial = ((struct __pyx_vtabstruct_7cybrain_Connection *)__pyx_v_connection->__pyx_vtab)->get_gradient_pointers(__pyx_v_connection);
+
+    /* "cybrain.pyx":355
+ *         for connection in self.connections:
+ *             partial = connection.get_gradient_pointers()
+ *             total.insert(total.end(), partial.begin(), partial.end())             # <<<<<<<<<<<<<<
+ * 
+ *         return total
+ */
+    try {
+      __pyx_v_total.insert(__pyx_v_total.end(), __pyx_v_partial.begin(), __pyx_v_partial.end());
+    } catch(...) {
+      __Pyx_CppExn2PyErr();
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 355; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+
+    /* "cybrain.pyx":353
+ *             Connection connection
+ * 
+ *         for connection in self.connections:             # <<<<<<<<<<<<<<
+ *             partial = connection.get_gradient_pointers()
+ *             total.insert(total.end(), partial.begin(), partial.end())
+ */
+  }
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":357
+ *             total.insert(total.end(), partial.begin(), partial.end())
+ * 
+ *         return total             # <<<<<<<<<<<<<<
+ * 
+ *     cdef vector[double*] get_weight_pointers (self):
+ */
+  __pyx_r = __pyx_v_total;
+  goto __pyx_L0;
+
+  /* "cybrain.pyx":348
+ *             self.recursivelyFindLayersAndConnections (connection.receiver, layers, connections)
+ * 
+ *     cdef vector[double*] get_gradient_pointers (self):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             vector[double*] total, partial
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_WriteUnraisable("cybrain.Network.get_gradient_pointers", __pyx_clineno, __pyx_lineno, __pyx_filename, 0, 0);
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_connection);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":359
+ *         return total
+ * 
+ *     cdef vector[double*] get_weight_pointers (self):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             vector[double*] total, partial
+ */
+
+static std::vector<double *>  __pyx_f_7cybrain_7Network_get_weight_pointers(struct __pyx_obj_7cybrain_Network *__pyx_v_self) {
+  std::vector<double *>  __pyx_v_total;
+  std::vector<double *>  __pyx_v_partial;
+  struct __pyx_obj_7cybrain_Connection *__pyx_v_connection = 0;
+  std::vector<double *>  __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  Py_ssize_t __pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_weight_pointers", 0);
+
+  /* "cybrain.pyx":364
+ *             Connection connection
+ * 
+ *         for connection in self.connections:             # <<<<<<<<<<<<<<
+ *             partial = connection.get_weight_pointers()
+ *             total.insert(total.end(), partial.begin(), partial.end())
+ */
+  if (unlikely(__pyx_v_self->connections == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 364; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_t_1 = __pyx_v_self->connections; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
+  for (;;) {
+    if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
+    #if CYTHON_COMPILING_IN_CPYTHON
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 364; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    #else
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 364; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_3);
+    #endif
+    if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7cybrain_Connection))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 364; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_XDECREF_SET(__pyx_v_connection, ((struct __pyx_obj_7cybrain_Connection *)__pyx_t_3));
+    __pyx_t_3 = 0;
+
+    /* "cybrain.pyx":365
+ * 
+ *         for connection in self.connections:
+ *             partial = connection.get_weight_pointers()             # <<<<<<<<<<<<<<
+ *             total.insert(total.end(), partial.begin(), partial.end())
+ * 
+ */
+    __pyx_v_partial = ((struct __pyx_vtabstruct_7cybrain_Connection *)__pyx_v_connection->__pyx_vtab)->get_weight_pointers(__pyx_v_connection);
+
+    /* "cybrain.pyx":366
+ *         for connection in self.connections:
+ *             partial = connection.get_weight_pointers()
+ *             total.insert(total.end(), partial.begin(), partial.end())             # <<<<<<<<<<<<<<
+ * 
+ *         return total
+ */
+    try {
+      __pyx_v_total.insert(__pyx_v_total.end(), __pyx_v_partial.begin(), __pyx_v_partial.end());
+    } catch(...) {
+      __Pyx_CppExn2PyErr();
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 366; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+
+    /* "cybrain.pyx":364
+ *             Connection connection
+ * 
+ *         for connection in self.connections:             # <<<<<<<<<<<<<<
+ *             partial = connection.get_weight_pointers()
+ *             total.insert(total.end(), partial.begin(), partial.end())
+ */
+  }
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":368
+ *             total.insert(total.end(), partial.begin(), partial.end())
+ * 
+ *         return total             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef restartNetwork (self):
+ */
+  __pyx_r = __pyx_v_total;
+  goto __pyx_L0;
+
+  /* "cybrain.pyx":359
+ *         return total
+ * 
+ *     cdef vector[double*] get_weight_pointers (self):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             vector[double*] total, partial
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_WriteUnraisable("cybrain.Network.get_weight_pointers", __pyx_clineno, __pyx_lineno, __pyx_filename, 0, 0);
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_connection);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":370
+ *         return total
  * 
  *     cpdef restartNetwork (self):             # <<<<<<<<<<<<<<
  *         cdef Layer layer
@@ -8437,7 +9636,7 @@ static PyObject *__pyx_f_7cybrain_7Network_restartNetwork(struct __pyx_obj_7cybr
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_restartNetwork); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_restartNetwork); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_7Network_5restartNetwork)) {
       __Pyx_XDECREF(__pyx_r);
@@ -8453,10 +9652,10 @@ static PyObject *__pyx_f_7cybrain_7Network_restartNetwork(struct __pyx_obj_7cybr
         }
       }
       if (__pyx_t_4) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       } else {
-        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -8468,51 +9667,60 @@ static PyObject *__pyx_f_7cybrain_7Network_restartNetwork(struct __pyx_obj_7cybr
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":318
+  /* "cybrain.pyx":373
  *         cdef Layer layer
  * 
  *         for layer in self.layers:             # <<<<<<<<<<<<<<
  *             layer.active = False
- * 
+ *             layer.back_active = False
  */
   if (unlikely(__pyx_v_self->layers == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 318; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 373; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_1 = __pyx_v_self->layers; __Pyx_INCREF(__pyx_t_1); __pyx_t_5 = 0;
   for (;;) {
     if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_5); __Pyx_INCREF(__pyx_t_2); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 318; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_5); __Pyx_INCREF(__pyx_t_2); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 373; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 318; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 373; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     #endif
-    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_Layer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 318; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_Layer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 373; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XDECREF_SET(__pyx_v_layer, ((struct __pyx_obj_7cybrain_Layer *)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "cybrain.pyx":319
+    /* "cybrain.pyx":374
  * 
  *         for layer in self.layers:
  *             layer.active = False             # <<<<<<<<<<<<<<
+ *             layer.back_active = False
  * 
- *     cpdef setData (self, double[:,:] X):
  */
     __pyx_v_layer->active = 0;
 
-    /* "cybrain.pyx":318
+    /* "cybrain.pyx":375
+ *         for layer in self.layers:
+ *             layer.active = False
+ *             layer.back_active = False             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef setData (self, double[:,:] X):
+ */
+    __pyx_v_layer->back_active = 0;
+
+    /* "cybrain.pyx":373
  *         cdef Layer layer
  * 
  *         for layer in self.layers:             # <<<<<<<<<<<<<<
  *             layer.active = False
- * 
+ *             layer.back_active = False
  */
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":315
- *             self.recursivelyFindLayersAndConnections (connection.receiver, layers, connections)
+  /* "cybrain.pyx":370
+ *         return total
  * 
  *     cpdef restartNetwork (self):             # <<<<<<<<<<<<<<
  *         cdef Layer layer
@@ -8558,7 +9766,7 @@ static PyObject *__pyx_pf_7cybrain_7Network_4restartNetwork(struct __pyx_obj_7cy
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("restartNetwork", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_7cybrain_7Network_restartNetwork(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_f_7cybrain_7Network_restartNetwork(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -8575,8 +9783,8 @@ static PyObject *__pyx_pf_7cybrain_7Network_4restartNetwork(struct __pyx_obj_7cy
   return __pyx_r;
 }
 
-/* "cybrain.pyx":321
- *             layer.active = False
+/* "cybrain.pyx":377
+ *             layer.back_active = False
  * 
  *     cpdef setData (self, double[:,:] X):             # <<<<<<<<<<<<<<
  *         cdef:
@@ -8609,12 +9817,12 @@ static PyObject *__pyx_f_7cybrain_7Network_setData(struct __pyx_obj_7cybrain_Net
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_setData); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_setData); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_7Network_7setData)) {
       __Pyx_XDECREF(__pyx_r);
-      if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_X, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_X, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_1);
       __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -8628,17 +9836,17 @@ static PyObject *__pyx_f_7cybrain_7Network_setData(struct __pyx_obj_7cybrain_Net
         }
       }
       if (!__pyx_t_5) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else {
-        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
         __Pyx_GIVEREF(__pyx_t_3);
         PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
         __pyx_t_3 = 0;
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
@@ -8651,7 +9859,7 @@ static PyObject *__pyx_f_7cybrain_7Network_setData(struct __pyx_obj_7cybrain_Net
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":323
+  /* "cybrain.pyx":379
  *     cpdef setData (self, double[:,:] X):
  *         cdef:
  *             int start = 0, end             # <<<<<<<<<<<<<<
@@ -8660,73 +9868,73 @@ static PyObject *__pyx_f_7cybrain_7Network_setData(struct __pyx_obj_7cybrain_Net
  */
   __pyx_v_start = 0;
 
-  /* "cybrain.pyx":326
+  /* "cybrain.pyx":382
  *             LinearLayer layer
  * 
  *         neuron_count = sum([layer.neuronCount() for layer in self.inputLayers])             # <<<<<<<<<<<<<<
  *         if  neuron_count != X.shape[1]:
  *             raise Exception("The input data has {0} entries but there are {1} neurons.".format(X.shape[1], neuron_count))
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   if (unlikely(__pyx_v_self->inputLayers == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_2 = __pyx_v_self->inputLayers; __Pyx_INCREF(__pyx_t_2); __pyx_t_7 = 0;
   for (;;) {
     if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_2)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_4 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_4 = PySequence_ITEM(__pyx_t_2, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PySequence_ITEM(__pyx_t_2, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     #endif
-    if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_7cybrain_LinearLayer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_7cybrain_LinearLayer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XDECREF_SET(__pyx_v_layer, ((struct __pyx_obj_7cybrain_LinearLayer *)__pyx_t_4));
     __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_layer->__pyx_base.__pyx_vtab)->__pyx_base.neuronCount(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_layer))); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_layer->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_layer, 0)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_4))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_4))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_sum, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_sum, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_neuron_count = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":327
+  /* "cybrain.pyx":383
  * 
  *         neuron_count = sum([layer.neuronCount() for layer in self.inputLayers])
  *         if  neuron_count != X.shape[1]:             # <<<<<<<<<<<<<<
  *             raise Exception("The input data has {0} entries but there are {1} neurons.".format(X.shape[1], neuron_count))
  * 
  */
-  __pyx_t_1 = PyInt_FromSsize_t((__pyx_v_X.shape[1])); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 327; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyInt_FromSsize_t((__pyx_v_X.shape[1])); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 383; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_RichCompare(__pyx_v_neuron_count, __pyx_t_1, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 327; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyObject_RichCompare(__pyx_v_neuron_count, __pyx_t_1, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 383; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 327; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 383; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_8) {
 
-    /* "cybrain.pyx":328
+    /* "cybrain.pyx":384
  *         neuron_count = sum([layer.neuronCount() for layer in self.inputLayers])
  *         if  neuron_count != X.shape[1]:
  *             raise Exception("The input data has {0} entries but there are {1} neurons.".format(X.shape[1], neuron_count))             # <<<<<<<<<<<<<<
  * 
  *         for layer in self.inputLayers:
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_The_input_data_has_0_entries_but, __pyx_n_s_format); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 328; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_The_input_data_has_0_entries_but, __pyx_n_s_format); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = PyInt_FromSsize_t((__pyx_v_X.shape[1])); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 328; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyInt_FromSsize_t((__pyx_v_X.shape[1])); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_6 = NULL;
     __pyx_t_7 = 0;
@@ -8740,7 +9948,7 @@ static PyObject *__pyx_f_7cybrain_7Network_setData(struct __pyx_obj_7cybrain_Net
         __pyx_t_7 = 1;
       }
     }
-    __pyx_t_3 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 328; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     if (__pyx_t_6) {
       __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -8751,24 +9959,24 @@ static PyObject *__pyx_f_7cybrain_7Network_setData(struct __pyx_obj_7cybrain_Net
     __Pyx_GIVEREF(__pyx_v_neuron_count);
     PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_7, __pyx_v_neuron_count);
     __pyx_t_4 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 328; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 328; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
     __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 328; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 328; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "cybrain.pyx":330
+  /* "cybrain.pyx":386
  *             raise Exception("The input data has {0} entries but there are {1} neurons.".format(X.shape[1], neuron_count))
  * 
  *         for layer in self.inputLayers:             # <<<<<<<<<<<<<<
@@ -8777,31 +9985,31 @@ static PyObject *__pyx_f_7cybrain_7Network_setData(struct __pyx_obj_7cybrain_Net
  */
   if (unlikely(__pyx_v_self->inputLayers == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 330; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 386; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_2 = __pyx_v_self->inputLayers; __Pyx_INCREF(__pyx_t_2); __pyx_t_7 = 0;
   for (;;) {
     if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_2)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_7); __Pyx_INCREF(__pyx_t_1); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 330; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_7); __Pyx_INCREF(__pyx_t_1); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 386; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 330; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 386; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     #endif
-    if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7cybrain_LinearLayer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 330; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7cybrain_LinearLayer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 386; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XDECREF_SET(__pyx_v_layer, ((struct __pyx_obj_7cybrain_LinearLayer *)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "cybrain.pyx":331
+    /* "cybrain.pyx":387
  * 
  *         for layer in self.inputLayers:
  *             end = start + layer.neuronCount()             # <<<<<<<<<<<<<<
  *             layer.setData(X [0:1, start : end])
  *             start = end
  */
-    __pyx_v_end = (__pyx_v_start + ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_layer->__pyx_base.__pyx_vtab)->__pyx_base.neuronCount(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_layer)));
+    __pyx_v_end = (__pyx_v_start + ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_layer->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_layer, 0));
 
-    /* "cybrain.pyx":332
+    /* "cybrain.pyx":388
  *         for layer in self.inputLayers:
  *             end = start + layer.neuronCount()
  *             layer.setData(X [0:1, start : end])             # <<<<<<<<<<<<<<
@@ -8826,7 +10034,7 @@ static PyObject *__pyx_f_7cybrain_7Network_setData(struct __pyx_obj_7cybrain_Net
     0,
     1) < 0))
 {
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 332; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 }
 
 if (unlikely(__pyx_memoryview_slice_memviewslice(
@@ -8843,15 +10051,15 @@ if (unlikely(__pyx_memoryview_slice_memviewslice(
     0,
     1) < 0))
 {
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 332; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 }
 
-__pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_layer->__pyx_base.__pyx_vtab)->__pyx_base.setData(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_layer), __pyx_t_9, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 332; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+__pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_layer->__pyx_base.__pyx_vtab)->__pyx_base.setData(((struct __pyx_obj_7cybrain_Layer *)__pyx_v_layer), __pyx_t_9, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __PYX_XDEC_MEMVIEW(&__pyx_t_9, 1);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "cybrain.pyx":333
+    /* "cybrain.pyx":389
  *             end = start + layer.neuronCount()
  *             layer.setData(X [0:1, start : end])
  *             start = end             # <<<<<<<<<<<<<<
@@ -8860,7 +10068,7 @@ __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_layer->__py
  */
     __pyx_v_start = __pyx_v_end;
 
-    /* "cybrain.pyx":330
+    /* "cybrain.pyx":386
  *             raise Exception("The input data has {0} entries but there are {1} neurons.".format(X.shape[1], neuron_count))
  * 
  *         for layer in self.inputLayers:             # <<<<<<<<<<<<<<
@@ -8870,8 +10078,8 @@ __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_layer->__py
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "cybrain.pyx":321
- *             layer.active = False
+  /* "cybrain.pyx":377
+ *             layer.back_active = False
  * 
  *     cpdef setData (self, double[:,:] X):             # <<<<<<<<<<<<<<
  *         cdef:
@@ -8910,7 +10118,7 @@ static PyObject *__pyx_pw_7cybrain_7Network_7setData(PyObject *__pyx_v_self, PyO
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("setData (wrapper)", 0);
   assert(__pyx_arg_X); {
-    __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_X); if (unlikely(!__pyx_v_X.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_X); if (unlikely(!__pyx_v_X.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -8934,8 +10142,8 @@ static PyObject *__pyx_pf_7cybrain_7Network_6setData(struct __pyx_obj_7cybrain_N
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("setData", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-  __pyx_t_1 = __pyx_f_7cybrain_7Network_setData(__pyx_v_self, __pyx_v_X, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+  __pyx_t_1 = __pyx_f_7cybrain_7Network_setData(__pyx_v_self, __pyx_v_X, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -8953,7 +10161,7 @@ static PyObject *__pyx_pf_7cybrain_7Network_6setData(struct __pyx_obj_7cybrain_N
   return __pyx_r;
 }
 
-/* "cybrain.pyx":337
+/* "cybrain.pyx":393
  * 
  * 
  *     cpdef activate_layers(self, double[:,:] X):             # <<<<<<<<<<<<<<
@@ -8982,12 +10190,12 @@ static PyObject *__pyx_f_7cybrain_7Network_activate_layers(struct __pyx_obj_7cyb
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_activate_layers); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 337; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_activate_layers); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_7Network_9activate_layers)) {
       __Pyx_XDECREF(__pyx_r);
-      if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 337; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_X, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 337; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_X, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_1);
       __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -9001,17 +10209,17 @@ static PyObject *__pyx_f_7cybrain_7Network_activate_layers(struct __pyx_obj_7cyb
         }
       }
       if (!__pyx_t_5) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 337; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else {
-        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 337; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
         __Pyx_GIVEREF(__pyx_t_3);
         PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
         __pyx_t_3 = 0;
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 337; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
@@ -9024,62 +10232,62 @@ static PyObject *__pyx_f_7cybrain_7Network_activate_layers(struct __pyx_obj_7cyb
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":341
- *             Layer layer
+  /* "cybrain.pyx":398
+ * 
  * 
  *         self.setData(X)             # <<<<<<<<<<<<<<
  * 
- *         for layer in self.layers:
+ *         for layer in self.all_output_layers:
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->__pyx_vtab)->setData(__pyx_v_self, __pyx_v_X, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 341; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->__pyx_vtab)->setData(__pyx_v_self, __pyx_v_X, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 398; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":343
+  /* "cybrain.pyx":400
  *         self.setData(X)
  * 
- *         for layer in self.layers:             # <<<<<<<<<<<<<<
+ *         for layer in self.all_output_layers:             # <<<<<<<<<<<<<<
  *             layer.Y()
  * 
  */
-  if (unlikely(__pyx_v_self->layers == Py_None)) {
+  if (unlikely(__pyx_v_self->all_output_layers == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 343; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 400; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_1 = __pyx_v_self->layers; __Pyx_INCREF(__pyx_t_1); __pyx_t_7 = 0;
+  __pyx_t_1 = __pyx_v_self->all_output_layers; __Pyx_INCREF(__pyx_t_1); __pyx_t_7 = 0;
   for (;;) {
     if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 343; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 400; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 343; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 400; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     #endif
-    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_Layer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 343; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_Layer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 400; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XDECREF_SET(__pyx_v_layer, ((struct __pyx_obj_7cybrain_Layer *)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "cybrain.pyx":344
+    /* "cybrain.pyx":401
  * 
- *         for layer in self.layers:
+ *         for layer in self.all_output_layers:
  *             layer.Y()             # <<<<<<<<<<<<<<
  * 
  * 
  */
-    __pyx_t_8 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_layer->__pyx_vtab)->Y(__pyx_v_layer); if (unlikely(!__pyx_t_8.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 344; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_8 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_layer->__pyx_vtab)->Y(__pyx_v_layer); if (unlikely(!__pyx_t_8.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 401; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __PYX_XDEC_MEMVIEW(&__pyx_t_8, 1);
 
-    /* "cybrain.pyx":343
+    /* "cybrain.pyx":400
  *         self.setData(X)
  * 
- *         for layer in self.layers:             # <<<<<<<<<<<<<<
+ *         for layer in self.all_output_layers:             # <<<<<<<<<<<<<<
  *             layer.Y()
  * 
  */
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":337
+  /* "cybrain.pyx":393
  * 
  * 
  *     cpdef activate_layers(self, double[:,:] X):             # <<<<<<<<<<<<<<
@@ -9118,7 +10326,7 @@ static PyObject *__pyx_pw_7cybrain_7Network_9activate_layers(PyObject *__pyx_v_s
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("activate_layers (wrapper)", 0);
   assert(__pyx_arg_X); {
-    __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_X); if (unlikely(!__pyx_v_X.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 337; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_X); if (unlikely(!__pyx_v_X.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9142,8 +10350,8 @@ static PyObject *__pyx_pf_7cybrain_7Network_8activate_layers(struct __pyx_obj_7c
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("activate_layers", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 337; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-  __pyx_t_1 = __pyx_f_7cybrain_7Network_activate_layers(__pyx_v_self, __pyx_v_X, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 337; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+  __pyx_t_1 = __pyx_f_7cybrain_7Network_activate_layers(__pyx_v_self, __pyx_v_X, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -9161,7 +10369,7 @@ static PyObject *__pyx_pf_7cybrain_7Network_8activate_layers(struct __pyx_obj_7c
   return __pyx_r;
 }
 
-/* "cybrain.pyx":347
+/* "cybrain.pyx":404
  * 
  * 
  *     cpdef double[:,:] activate(self, double[:,:] X):             # <<<<<<<<<<<<<<
@@ -9192,11 +10400,11 @@ static __Pyx_memviewslice __pyx_f_7cybrain_7Network_activate(struct __pyx_obj_7c
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_activate); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_activate); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_7Network_11activate)) {
-      if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_X, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_X, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_1);
       __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -9210,23 +10418,23 @@ static __Pyx_memviewslice __pyx_f_7cybrain_7Network_activate(struct __pyx_obj_7c
         }
       }
       if (!__pyx_t_5) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else {
-        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
         __Pyx_GIVEREF(__pyx_t_3);
         PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
         __pyx_t_3 = 0;
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_2);
-      if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_r = __pyx_t_7;
       __pyx_t_7.memview = NULL;
@@ -9237,93 +10445,119 @@ static __Pyx_memviewslice __pyx_f_7cybrain_7Network_activate(struct __pyx_obj_7c
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "cybrain.pyx":350
+  /* "cybrain.pyx":407
  *         cdef:
  *             Layer layer
  *             double[:,:] result = None             # <<<<<<<<<<<<<<
  * 
- *         self.activate_layers(X)
+ *         self.restartNetwork()
  */
   __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(Py_None);
-  if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 350; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 407; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_result = __pyx_t_7;
   __pyx_t_7.memview = NULL;
   __pyx_t_7.data = NULL;
 
-  /* "cybrain.pyx":352
+  /* "cybrain.pyx":409
  *             double[:,:] result = None
  * 
- *         self.activate_layers(X)             # <<<<<<<<<<<<<<
+ *         self.restartNetwork()             # <<<<<<<<<<<<<<
+ *         self.activate_layers(X)
  * 
- *         for layer in self.layers:
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->__pyx_vtab)->activate_layers(__pyx_v_self, __pyx_v_X, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 352; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->__pyx_vtab)->restartNetwork(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 409; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":354
+  /* "cybrain.pyx":410
+ * 
+ *         self.restartNetwork()
+ *         self.activate_layers(X)             # <<<<<<<<<<<<<<
+ * 
+ *         for layer in self.all_output_layers:
+ */
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->__pyx_vtab)->activate_layers(__pyx_v_self, __pyx_v_X, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 410; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":412
  *         self.activate_layers(X)
  * 
- *         for layer in self.layers:             # <<<<<<<<<<<<<<
+ *         for layer in self.all_output_layers:             # <<<<<<<<<<<<<<
  *             if result is None:
- *                 result = layer.getY()
+ *                 result = np.asarray(layer.Y())
  */
-  if (unlikely(__pyx_v_self->layers == Py_None)) {
+  if (unlikely(__pyx_v_self->all_output_layers == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 354; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 412; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_1 = __pyx_v_self->layers; __Pyx_INCREF(__pyx_t_1); __pyx_t_8 = 0;
+  __pyx_t_1 = __pyx_v_self->all_output_layers; __Pyx_INCREF(__pyx_t_1); __pyx_t_8 = 0;
   for (;;) {
     if (__pyx_t_8 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_8); __Pyx_INCREF(__pyx_t_2); __pyx_t_8++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 354; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_8); __Pyx_INCREF(__pyx_t_2); __pyx_t_8++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 412; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 354; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 412; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     #endif
-    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_Layer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 354; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_Layer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 412; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XDECREF_SET(__pyx_v_layer, ((struct __pyx_obj_7cybrain_Layer *)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "cybrain.pyx":355
+    /* "cybrain.pyx":413
  * 
- *         for layer in self.layers:
+ *         for layer in self.all_output_layers:
  *             if result is None:             # <<<<<<<<<<<<<<
- *                 result = layer.getY()
+ *                 result = np.asarray(layer.Y())
  *             else:
  */
     __pyx_t_9 = ((((PyObject *) __pyx_v_result.memview) == Py_None) != 0);
     if (__pyx_t_9) {
 
-      /* "cybrain.pyx":356
- *         for layer in self.layers:
+      /* "cybrain.pyx":414
+ *         for layer in self.all_output_layers:
  *             if result is None:
- *                 result = layer.getY()             # <<<<<<<<<<<<<<
+ *                 result = np.asarray(layer.Y())             # <<<<<<<<<<<<<<
  *             else:
  *                 result = np.concatenate((result, layer.Y()), axis=1)
  */
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_layer), __pyx_n_s_getY); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 414; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_6 = NULL;
-      if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
-        __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_4);
-        if (likely(__pyx_t_6)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-          __Pyx_INCREF(__pyx_t_6);
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_asarray); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 414; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_6);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_t_7 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_layer->__pyx_vtab)->Y(__pyx_v_layer); if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 414; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_t_7, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 414; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_4);
+      __PYX_XDEC_MEMVIEW(&__pyx_t_7, 1);
+      __pyx_t_3 = NULL;
+      if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_6))) {
+        __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_6);
+        if (likely(__pyx_t_3)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
+          __Pyx_INCREF(__pyx_t_3);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_4, function);
+          __Pyx_DECREF_SET(__pyx_t_6, function);
         }
       }
-      if (__pyx_t_6) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_6); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      if (!__pyx_t_3) {
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 414; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_GOTREF(__pyx_t_2);
       } else {
-        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 414; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_GOTREF(__pyx_t_5);
+        __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
+        __Pyx_GIVEREF(__pyx_t_4);
+        PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_4);
+        __pyx_t_4 = 0;
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 414; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_GOTREF(__pyx_t_2);
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       }
-      __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_2);
-      if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 414; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __PYX_XDEC_MEMVIEW(&__pyx_v_result, 1);
       __pyx_v_result = __pyx_t_7;
@@ -9333,47 +10567,47 @@ static __Pyx_memviewslice __pyx_f_7cybrain_7Network_activate(struct __pyx_obj_7c
     }
     /*else*/ {
 
-      /* "cybrain.pyx":358
- *                 result = layer.getY()
+      /* "cybrain.pyx":416
+ *                 result = np.asarray(layer.Y())
  *             else:
  *                 result = np.concatenate((result, layer.Y()), axis=1)             # <<<<<<<<<<<<<<
  * 
  *         return result
  */
-      __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 358; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 416; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_concatenate); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 358; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_concatenate); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 416; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_result, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 358; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_result, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 416; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_7 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_layer->__pyx_vtab)->Y(__pyx_v_layer); if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 358; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __pyx_t_6 = __pyx_memoryview_fromslice(__pyx_t_7, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 358; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __Pyx_GOTREF(__pyx_t_6);
+      __pyx_t_7 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_layer->__pyx_vtab)->Y(__pyx_v_layer); if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 416; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_t_7, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 416; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_5);
       __PYX_XDEC_MEMVIEW(&__pyx_t_7, 1);
-      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 358; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 416; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_2);
-      PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_6);
+      PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2);
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_5);
       __pyx_t_2 = 0;
-      __pyx_t_6 = 0;
-      __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 358; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_GIVEREF(__pyx_t_3);
-      PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_3);
-      __pyx_t_3 = 0;
-      __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 358; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __Pyx_GOTREF(__pyx_t_3);
-      if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_axis, __pyx_int_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 358; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 358; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = 0;
+      __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 416; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_5);
+      __Pyx_GIVEREF(__pyx_t_4);
+      PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4);
+      __pyx_t_4 = 0;
+      __pyx_t_4 = PyDict_New(); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 416; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_4);
+      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_axis, __pyx_int_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 416; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_5, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 416; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_2);
-      if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 358; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 416; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __PYX_XDEC_MEMVIEW(&__pyx_v_result, 1);
       __pyx_v_result = __pyx_t_7;
@@ -9382,28 +10616,28 @@ static __Pyx_memviewslice __pyx_f_7cybrain_7Network_activate(struct __pyx_obj_7c
     }
     __pyx_L5:;
 
-    /* "cybrain.pyx":354
+    /* "cybrain.pyx":412
  *         self.activate_layers(X)
  * 
- *         for layer in self.layers:             # <<<<<<<<<<<<<<
+ *         for layer in self.all_output_layers:             # <<<<<<<<<<<<<<
  *             if result is None:
- *                 result = layer.getY()
+ *                 result = np.asarray(layer.Y())
  */
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cybrain.pyx":360
+  /* "cybrain.pyx":418
  *                 result = np.concatenate((result, layer.Y()), axis=1)
  * 
  *         return result             # <<<<<<<<<<<<<<
  * 
- * 
+ *     ## Backactivation
  */
   __PYX_INC_MEMVIEW(&__pyx_v_result, 0);
   __pyx_r = __pyx_v_result;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":347
+  /* "cybrain.pyx":404
  * 
  * 
  *     cpdef double[:,:] activate(self, double[:,:] X):             # <<<<<<<<<<<<<<
@@ -9447,7 +10681,7 @@ static PyObject *__pyx_pw_7cybrain_7Network_11activate(PyObject *__pyx_v_self, P
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("activate (wrapper)", 0);
   assert(__pyx_arg_X); {
-    __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_X); if (unlikely(!__pyx_v_X.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_X); if (unlikely(!__pyx_v_X.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9472,9 +10706,9 @@ static PyObject *__pyx_pf_7cybrain_7Network_10activate(struct __pyx_obj_7cybrain
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("activate", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-  __pyx_t_1 = __pyx_f_7cybrain_7Network_activate(__pyx_v_self, __pyx_v_X, 1); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_1, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+  __pyx_t_1 = __pyx_f_7cybrain_7Network_activate(__pyx_v_self, __pyx_v_X, 1); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_1, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
   __pyx_r = __pyx_t_2;
@@ -9494,10 +10728,955 @@ static PyObject *__pyx_pf_7cybrain_7Network_10activate(struct __pyx_obj_7cybrain
   return __pyx_r;
 }
 
-/* "cybrain.pyx":279
+/* "cybrain.pyx":422
+ *     ## Backactivation
+ * 
+ *     cpdef setTarget (self, double[:,:] T):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             int start = 0, end
+ */
+
+static PyObject *__pyx_pw_7cybrain_7Network_13setTarget(PyObject *__pyx_v_self, PyObject *__pyx_arg_T); /*proto*/
+static PyObject *__pyx_f_7cybrain_7Network_setTarget(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_T, int __pyx_skip_dispatch) {
+  int __pyx_v_start;
+  int __pyx_v_end;
+  struct __pyx_obj_7cybrain_LinearLayer *__pyx_v_layer = 0;
+  PyObject *__pyx_v_neuron_count = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
+  Py_ssize_t __pyx_t_7;
+  int __pyx_t_8;
+  __Pyx_memviewslice __pyx_t_9 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_t_10;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("setTarget", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_setTarget); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 422; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_7Network_13setTarget)) {
+      __Pyx_XDECREF(__pyx_r);
+      if (unlikely(!__pyx_v_T.memview)) { __Pyx_RaiseUnboundLocalError("T"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 422; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_T, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 422; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_1);
+      __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
+      if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_4))) {
+        __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_4);
+        if (likely(__pyx_t_5)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_5);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_4, function);
+        }
+      }
+      if (!__pyx_t_5) {
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 422; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_GOTREF(__pyx_t_2);
+      } else {
+        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 422; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_GOTREF(__pyx_t_6);
+        __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
+        __Pyx_GIVEREF(__pyx_t_3);
+        PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
+        __pyx_t_3 = 0;
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 422; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_GOTREF(__pyx_t_2);
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      }
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_r = __pyx_t_2;
+      __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      goto __pyx_L0;
+    }
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  }
+
+  /* "cybrain.pyx":424
+ *     cpdef setTarget (self, double[:,:] T):
+ *         cdef:
+ *             int start = 0, end             # <<<<<<<<<<<<<<
+ *             LinearLayer layer
+ * 
+ */
+  __pyx_v_start = 0;
+
+  /* "cybrain.pyx":427
+ *             LinearLayer layer
+ * 
+ *         neuron_count = sum([layer.neuronCount() for layer in self.outputLayers])             # <<<<<<<<<<<<<<
+ *         if  neuron_count != T.shape[1]:
+ *             raise Exception("The input data has {0} entries but there are {1} neurons.".format(T.shape[1], neuron_count))
+ */
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 427; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  if (unlikely(__pyx_v_self->outputLayers == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 427; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_t_2 = __pyx_v_self->outputLayers; __Pyx_INCREF(__pyx_t_2); __pyx_t_7 = 0;
+  for (;;) {
+    if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_2)) break;
+    #if CYTHON_COMPILING_IN_CPYTHON
+    __pyx_t_4 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 427; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    #else
+    __pyx_t_4 = PySequence_ITEM(__pyx_t_2, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 427; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_4);
+    #endif
+    if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_7cybrain_LinearLayer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 427; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_XDECREF_SET(__pyx_v_layer, ((struct __pyx_obj_7cybrain_LinearLayer *)__pyx_t_4));
+    __pyx_t_4 = 0;
+    __pyx_t_4 = __Pyx_PyInt_From_int(((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_layer->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_layer, 0)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 427; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_4);
+    if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_4))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 427; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 427; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
+  __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_sum, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 427; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_neuron_count = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":428
+ * 
+ *         neuron_count = sum([layer.neuronCount() for layer in self.outputLayers])
+ *         if  neuron_count != T.shape[1]:             # <<<<<<<<<<<<<<
+ *             raise Exception("The input data has {0} entries but there are {1} neurons.".format(T.shape[1], neuron_count))
+ * 
+ */
+  __pyx_t_1 = PyInt_FromSsize_t((__pyx_v_T.shape[1])); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 428; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = PyObject_RichCompare(__pyx_v_neuron_count, __pyx_t_1, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 428; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 428; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__pyx_t_8) {
+
+    /* "cybrain.pyx":429
+ *         neuron_count = sum([layer.neuronCount() for layer in self.outputLayers])
+ *         if  neuron_count != T.shape[1]:
+ *             raise Exception("The input data has {0} entries but there are {1} neurons.".format(T.shape[1], neuron_count))             # <<<<<<<<<<<<<<
+ * 
+ *         for layer in self.outputLayers:
+ */
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_The_input_data_has_0_entries_but, __pyx_n_s_format); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 429; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_4 = PyInt_FromSsize_t((__pyx_v_T.shape[1])); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 429; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_6 = NULL;
+    __pyx_t_7 = 0;
+    if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_1))) {
+      __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_1);
+      if (likely(__pyx_t_6)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+        __Pyx_INCREF(__pyx_t_6);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_1, function);
+        __pyx_t_7 = 1;
+      }
+    }
+    __pyx_t_3 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 429; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_3);
+    if (__pyx_t_6) {
+      __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_6); __pyx_t_6 = NULL;
+    }
+    __Pyx_GIVEREF(__pyx_t_4);
+    PyTuple_SET_ITEM(__pyx_t_3, 0+__pyx_t_7, __pyx_t_4);
+    __Pyx_INCREF(__pyx_v_neuron_count);
+    __Pyx_GIVEREF(__pyx_v_neuron_count);
+    PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_7, __pyx_v_neuron_count);
+    __pyx_t_4 = 0;
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 429; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 429; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_GIVEREF(__pyx_t_2);
+    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
+    __pyx_t_2 = 0;
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 429; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 429; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+
+  /* "cybrain.pyx":431
+ *             raise Exception("The input data has {0} entries but there are {1} neurons.".format(T.shape[1], neuron_count))
+ * 
+ *         for layer in self.outputLayers:             # <<<<<<<<<<<<<<
+ *             end = start + layer.neuronCount()
+ *             layer.setTarget(T [0:1, start : end])
+ */
+  if (unlikely(__pyx_v_self->outputLayers == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 431; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_t_2 = __pyx_v_self->outputLayers; __Pyx_INCREF(__pyx_t_2); __pyx_t_7 = 0;
+  for (;;) {
+    if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_2)) break;
+    #if CYTHON_COMPILING_IN_CPYTHON
+    __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_7); __Pyx_INCREF(__pyx_t_1); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 431; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    #else
+    __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 431; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    #endif
+    if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7cybrain_LinearLayer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 431; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_XDECREF_SET(__pyx_v_layer, ((struct __pyx_obj_7cybrain_LinearLayer *)__pyx_t_1));
+    __pyx_t_1 = 0;
+
+    /* "cybrain.pyx":432
+ * 
+ *         for layer in self.outputLayers:
+ *             end = start + layer.neuronCount()             # <<<<<<<<<<<<<<
+ *             layer.setTarget(T [0:1, start : end])
+ *             start = end
+ */
+    __pyx_v_end = (__pyx_v_start + ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_layer->__pyx_base.__pyx_vtab)->neuronCount(__pyx_v_layer, 0));
+
+    /* "cybrain.pyx":433
+ *         for layer in self.outputLayers:
+ *             end = start + layer.neuronCount()
+ *             layer.setTarget(T [0:1, start : end])             # <<<<<<<<<<<<<<
+ *             start = end
+ * 
+ */
+    __pyx_t_9.data = __pyx_v_T.data;
+    __pyx_t_9.memview = __pyx_v_T.memview;
+    __PYX_INC_MEMVIEW(&__pyx_t_9, 0);
+    __pyx_t_10 = -1;
+    if (unlikely(__pyx_memoryview_slice_memviewslice(
+    &__pyx_t_9,
+    __pyx_v_T.shape[0], __pyx_v_T.strides[0], __pyx_v_T.suboffsets[0],
+    0,
+    0,
+    &__pyx_t_10,
+    0,
+    1,
+    0,
+    1,
+    1,
+    0,
+    1) < 0))
+{
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 433; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+}
+
+if (unlikely(__pyx_memoryview_slice_memviewslice(
+    &__pyx_t_9,
+    __pyx_v_T.shape[1], __pyx_v_T.strides[1], __pyx_v_T.suboffsets[1],
+    1,
+    1,
+    &__pyx_t_10,
+    __pyx_v_start,
+    __pyx_v_end,
+    0,
+    1,
+    1,
+    0,
+    1) < 0))
+{
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 433; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+}
+
+__pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_LinearLayer *)__pyx_v_layer->__pyx_base.__pyx_vtab)->setTarget(__pyx_v_layer, __pyx_t_9, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 433; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    __PYX_XDEC_MEMVIEW(&__pyx_t_9, 1);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+    /* "cybrain.pyx":434
+ *             end = start + layer.neuronCount()
+ *             layer.setTarget(T [0:1, start : end])
+ *             start = end             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+    __pyx_v_start = __pyx_v_end;
+
+    /* "cybrain.pyx":431
+ *             raise Exception("The input data has {0} entries but there are {1} neurons.".format(T.shape[1], neuron_count))
+ * 
+ *         for layer in self.outputLayers:             # <<<<<<<<<<<<<<
+ *             end = start + layer.neuronCount()
+ *             layer.setTarget(T [0:1, start : end])
+ */
+  }
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "cybrain.pyx":422
+ *     ## Backactivation
+ * 
+ *     cpdef setTarget (self, double[:,:] T):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             int start = 0, end
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_9, 1);
+  __Pyx_AddTraceback("cybrain.Network.setTarget", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_layer);
+  __Pyx_XDECREF(__pyx_v_neuron_count);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_7Network_13setTarget(PyObject *__pyx_v_self, PyObject *__pyx_arg_T); /*proto*/
+static PyObject *__pyx_pw_7cybrain_7Network_13setTarget(PyObject *__pyx_v_self, PyObject *__pyx_arg_T) {
+  __Pyx_memviewslice __pyx_v_T = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("setTarget (wrapper)", 0);
+  assert(__pyx_arg_T); {
+    __pyx_v_T = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_T); if (unlikely(!__pyx_v_T.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 422; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("cybrain.Network.setTarget", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_7cybrain_7Network_12setTarget(((struct __pyx_obj_7cybrain_Network *)__pyx_v_self), __pyx_v_T);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_7Network_12setTarget(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_T) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("setTarget", 0);
+  __Pyx_XDECREF(__pyx_r);
+  if (unlikely(!__pyx_v_T.memview)) { __Pyx_RaiseUnboundLocalError("T"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 422; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+  __pyx_t_1 = __pyx_f_7cybrain_7Network_setTarget(__pyx_v_self, __pyx_v_T, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 422; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("cybrain.Network.setTarget", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __PYX_XDEC_MEMVIEW(&__pyx_v_T, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":438
+ * 
+ * 
+ *     cpdef back_activate_layers(self, double[:,:] T):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             Layer layer
+ */
+
+static PyObject *__pyx_pw_7cybrain_7Network_15back_activate_layers(PyObject *__pyx_v_self, PyObject *__pyx_arg_T); /*proto*/
+static PyObject *__pyx_f_7cybrain_7Network_back_activate_layers(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_T, int __pyx_skip_dispatch) {
+  struct __pyx_obj_7cybrain_Layer *__pyx_v_layer = 0;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
+  Py_ssize_t __pyx_t_7;
+  __Pyx_memviewslice __pyx_t_8 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("back_activate_layers", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_back_activate_layers); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_7Network_15back_activate_layers)) {
+      __Pyx_XDECREF(__pyx_r);
+      if (unlikely(!__pyx_v_T.memview)) { __Pyx_RaiseUnboundLocalError("T"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_T, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_1);
+      __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
+      if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_4))) {
+        __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_4);
+        if (likely(__pyx_t_5)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_5);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_4, function);
+        }
+      }
+      if (!__pyx_t_5) {
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_GOTREF(__pyx_t_2);
+      } else {
+        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_GOTREF(__pyx_t_6);
+        __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
+        __Pyx_GIVEREF(__pyx_t_3);
+        PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
+        __pyx_t_3 = 0;
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_GOTREF(__pyx_t_2);
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      }
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_r = __pyx_t_2;
+      __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      goto __pyx_L0;
+    }
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  }
+
+  /* "cybrain.pyx":443
+ * 
+ * 
+ *         self.setTarget(T)             # <<<<<<<<<<<<<<
+ * 
+ *         for layer in self.all_input_layers:
+ */
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->__pyx_vtab)->setTarget(__pyx_v_self, __pyx_v_T, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 443; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":445
+ *         self.setTarget(T)
+ * 
+ *         for layer in self.all_input_layers:             # <<<<<<<<<<<<<<
+ *             layer.dEdZ()
+ * 
+ */
+  if (unlikely(__pyx_v_self->all_input_layers == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 445; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_t_1 = __pyx_v_self->all_input_layers; __Pyx_INCREF(__pyx_t_1); __pyx_t_7 = 0;
+  for (;;) {
+    if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_1)) break;
+    #if CYTHON_COMPILING_IN_CPYTHON
+    __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 445; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    #else
+    __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 445; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_2);
+    #endif
+    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_Layer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 445; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_XDECREF_SET(__pyx_v_layer, ((struct __pyx_obj_7cybrain_Layer *)__pyx_t_2));
+    __pyx_t_2 = 0;
+
+    /* "cybrain.pyx":446
+ * 
+ *         for layer in self.all_input_layers:
+ *             layer.dEdZ()             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+    __pyx_t_8 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_layer->__pyx_vtab)->dEdZ(__pyx_v_layer); if (unlikely(!__pyx_t_8.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 446; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __PYX_XDEC_MEMVIEW(&__pyx_t_8, 1);
+
+    /* "cybrain.pyx":445
+ *         self.setTarget(T)
+ * 
+ *         for layer in self.all_input_layers:             # <<<<<<<<<<<<<<
+ *             layer.dEdZ()
+ * 
+ */
+  }
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":438
+ * 
+ * 
+ *     cpdef back_activate_layers(self, double[:,:] T):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             Layer layer
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_8, 1);
+  __Pyx_AddTraceback("cybrain.Network.back_activate_layers", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_layer);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_7Network_15back_activate_layers(PyObject *__pyx_v_self, PyObject *__pyx_arg_T); /*proto*/
+static PyObject *__pyx_pw_7cybrain_7Network_15back_activate_layers(PyObject *__pyx_v_self, PyObject *__pyx_arg_T) {
+  __Pyx_memviewslice __pyx_v_T = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("back_activate_layers (wrapper)", 0);
+  assert(__pyx_arg_T); {
+    __pyx_v_T = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_T); if (unlikely(!__pyx_v_T.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("cybrain.Network.back_activate_layers", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_7cybrain_7Network_14back_activate_layers(((struct __pyx_obj_7cybrain_Network *)__pyx_v_self), __pyx_v_T);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_7Network_14back_activate_layers(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_T) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("back_activate_layers", 0);
+  __Pyx_XDECREF(__pyx_r);
+  if (unlikely(!__pyx_v_T.memview)) { __Pyx_RaiseUnboundLocalError("T"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+  __pyx_t_1 = __pyx_f_7cybrain_7Network_back_activate_layers(__pyx_v_self, __pyx_v_T, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("cybrain.Network.back_activate_layers", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __PYX_XDEC_MEMVIEW(&__pyx_v_T, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":449
+ * 
+ * 
+ *     cpdef double[:,:] back_activate(self, double[:,:] X):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             Layer layer
+ */
+
+static PyObject *__pyx_pw_7cybrain_7Network_17back_activate(PyObject *__pyx_v_self, PyObject *__pyx_arg_X); /*proto*/
+static __Pyx_memviewslice __pyx_f_7cybrain_7Network_back_activate(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, int __pyx_skip_dispatch) {
+  struct __pyx_obj_7cybrain_Layer *__pyx_v_layer = 0;
+  __Pyx_memviewslice __pyx_v_result = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_r = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
+  __Pyx_memviewslice __pyx_t_7 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  Py_ssize_t __pyx_t_8;
+  int __pyx_t_9;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("back_activate", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_back_activate); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_7Network_17back_activate)) {
+      if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+      __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_X, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_1);
+      __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
+      if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_4))) {
+        __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_4);
+        if (likely(__pyx_t_5)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_5);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_4, function);
+        }
+      }
+      if (!__pyx_t_5) {
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_GOTREF(__pyx_t_2);
+      } else {
+        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_GOTREF(__pyx_t_6);
+        __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
+        __Pyx_GIVEREF(__pyx_t_3);
+        PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
+        __pyx_t_3 = 0;
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_GOTREF(__pyx_t_2);
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      }
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_2);
+      if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_r = __pyx_t_7;
+      __pyx_t_7.memview = NULL;
+      __pyx_t_7.data = NULL;
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      goto __pyx_L0;
+    }
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  }
+
+  /* "cybrain.pyx":452
+ *         cdef:
+ *             Layer layer
+ *             double[:,:] result = None             # <<<<<<<<<<<<<<
+ * 
+ *         self.restartNetwork()
+ */
+  __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(Py_None);
+  if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 452; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_result = __pyx_t_7;
+  __pyx_t_7.memview = NULL;
+  __pyx_t_7.data = NULL;
+
+  /* "cybrain.pyx":454
+ *             double[:,:] result = None
+ * 
+ *         self.restartNetwork()             # <<<<<<<<<<<<<<
+ *         self.back_activate_layers(X)
+ * 
+ */
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->__pyx_vtab)->restartNetwork(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 454; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":455
+ * 
+ *         self.restartNetwork()
+ *         self.back_activate_layers(X)             # <<<<<<<<<<<<<<
+ * 
+ *         for layer in self.all_input_layers:
+ */
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->__pyx_vtab)->back_activate_layers(__pyx_v_self, __pyx_v_X, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 455; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":457
+ *         self.back_activate_layers(X)
+ * 
+ *         for layer in self.all_input_layers:             # <<<<<<<<<<<<<<
+ *             if result is None:
+ *                 result = np.asarray(layer.dEdZ())
+ */
+  if (unlikely(__pyx_v_self->all_input_layers == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 457; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_t_1 = __pyx_v_self->all_input_layers; __Pyx_INCREF(__pyx_t_1); __pyx_t_8 = 0;
+  for (;;) {
+    if (__pyx_t_8 >= PyList_GET_SIZE(__pyx_t_1)) break;
+    #if CYTHON_COMPILING_IN_CPYTHON
+    __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_8); __Pyx_INCREF(__pyx_t_2); __pyx_t_8++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 457; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    #else
+    __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 457; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_2);
+    #endif
+    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7cybrain_Layer))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 457; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_XDECREF_SET(__pyx_v_layer, ((struct __pyx_obj_7cybrain_Layer *)__pyx_t_2));
+    __pyx_t_2 = 0;
+
+    /* "cybrain.pyx":458
+ * 
+ *         for layer in self.all_input_layers:
+ *             if result is None:             # <<<<<<<<<<<<<<
+ *                 result = np.asarray(layer.dEdZ())
+ *             else:
+ */
+    __pyx_t_9 = ((((PyObject *) __pyx_v_result.memview) == Py_None) != 0);
+    if (__pyx_t_9) {
+
+      /* "cybrain.pyx":459
+ *         for layer in self.all_input_layers:
+ *             if result is None:
+ *                 result = np.asarray(layer.dEdZ())             # <<<<<<<<<<<<<<
+ *             else:
+ *                 result = np.concatenate((result, layer.dEdZ()), axis=1)
+ */
+      __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_asarray); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_6);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_t_7 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_layer->__pyx_vtab)->dEdZ(__pyx_v_layer); if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_t_7, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_4);
+      __PYX_XDEC_MEMVIEW(&__pyx_t_7, 1);
+      __pyx_t_3 = NULL;
+      if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_6))) {
+        __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_6);
+        if (likely(__pyx_t_3)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
+          __Pyx_INCREF(__pyx_t_3);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_6, function);
+        }
+      }
+      if (!__pyx_t_3) {
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_GOTREF(__pyx_t_2);
+      } else {
+        __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_GOTREF(__pyx_t_5);
+        __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
+        __Pyx_GIVEREF(__pyx_t_4);
+        PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_4);
+        __pyx_t_4 = 0;
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_GOTREF(__pyx_t_2);
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      }
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_2);
+      if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __PYX_XDEC_MEMVIEW(&__pyx_v_result, 1);
+      __pyx_v_result = __pyx_t_7;
+      __pyx_t_7.memview = NULL;
+      __pyx_t_7.data = NULL;
+      goto __pyx_L5;
+    }
+    /*else*/ {
+
+      /* "cybrain.pyx":461
+ *                 result = np.asarray(layer.dEdZ())
+ *             else:
+ *                 result = np.concatenate((result, layer.dEdZ()), axis=1)             # <<<<<<<<<<<<<<
+ * 
+ *         return result
+ */
+      __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_concatenate); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_6);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_result, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_7 = ((struct __pyx_vtabstruct_7cybrain_Layer *)__pyx_v_layer->__pyx_vtab)->dEdZ(__pyx_v_layer); if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_t_7, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_5);
+      __PYX_XDEC_MEMVIEW(&__pyx_t_7, 1);
+      __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_GIVEREF(__pyx_t_2);
+      PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2);
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_5);
+      __pyx_t_2 = 0;
+      __pyx_t_5 = 0;
+      __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_5);
+      __Pyx_GIVEREF(__pyx_t_4);
+      PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4);
+      __pyx_t_4 = 0;
+      __pyx_t_4 = PyDict_New(); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_4);
+      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_axis, __pyx_int_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_5, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_2);
+      if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __PYX_XDEC_MEMVIEW(&__pyx_v_result, 1);
+      __pyx_v_result = __pyx_t_7;
+      __pyx_t_7.memview = NULL;
+      __pyx_t_7.data = NULL;
+    }
+    __pyx_L5:;
+
+    /* "cybrain.pyx":457
+ *         self.back_activate_layers(X)
+ * 
+ *         for layer in self.all_input_layers:             # <<<<<<<<<<<<<<
+ *             if result is None:
+ *                 result = np.asarray(layer.dEdZ())
+ */
+  }
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":463
+ *                 result = np.concatenate((result, layer.dEdZ()), axis=1)
+ * 
+ *         return result             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __PYX_INC_MEMVIEW(&__pyx_v_result, 0);
+  __pyx_r = __pyx_v_result;
+  goto __pyx_L0;
+
+  /* "cybrain.pyx":449
+ * 
+ * 
+ *     cpdef double[:,:] back_activate(self, double[:,:] X):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             Layer layer
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_7, 1);
+  __pyx_r.data = NULL;
+  __pyx_r.memview = NULL;
+  __Pyx_AddTraceback("cybrain.Network.back_activate", __pyx_clineno, __pyx_lineno, __pyx_filename);
+
+  goto __pyx_L2;
+  __pyx_L0:;
+  if (unlikely(!__pyx_r.memview)) {
+    PyErr_SetString(PyExc_TypeError,"Memoryview return value is not initialized");
+  }
+  __pyx_L2:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_layer);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_result, 1);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_7Network_17back_activate(PyObject *__pyx_v_self, PyObject *__pyx_arg_X); /*proto*/
+static PyObject *__pyx_pw_7cybrain_7Network_17back_activate(PyObject *__pyx_v_self, PyObject *__pyx_arg_X) {
+  __Pyx_memviewslice __pyx_v_X = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("back_activate (wrapper)", 0);
+  assert(__pyx_arg_X); {
+    __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_X); if (unlikely(!__pyx_v_X.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("cybrain.Network.back_activate", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_7cybrain_7Network_16back_activate(((struct __pyx_obj_7cybrain_Network *)__pyx_v_self), __pyx_v_X);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_7Network_16back_activate(struct __pyx_obj_7cybrain_Network *__pyx_v_self, __Pyx_memviewslice __pyx_v_X) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  PyObject *__pyx_t_2 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("back_activate", 0);
+  __Pyx_XDECREF(__pyx_r);
+  if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+  __pyx_t_1 = __pyx_f_7cybrain_7Network_back_activate(__pyx_v_self, __pyx_v_X, 1); if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_1, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
+  __pyx_r = __pyx_t_2;
+  __pyx_t_2 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_AddTraceback("cybrain.Network.back_activate", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __PYX_XDEC_MEMVIEW(&__pyx_v_X, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":307
  * cdef class Network (object):
  *     cdef:
- *         public list inputLayers, outputLayers, autoInputLayers, autoOutputLayers, layers, hiddenLayers, connections             # <<<<<<<<<<<<<<
+ *         public list inputLayers, outputLayers, autoInputLayers, autoOutputLayers, layers, hiddenLayers, connections, all_input_layers, all_output_layers             # <<<<<<<<<<<<<<
  * 
  *     def __init__(self):
  */
@@ -9552,7 +11731,7 @@ static int __pyx_pf_7cybrain_7Network_11inputLayers_2__set__(struct __pyx_obj_7c
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
-  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 307; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_1 = __pyx_v_value;
   __Pyx_INCREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
@@ -9652,7 +11831,7 @@ static int __pyx_pf_7cybrain_7Network_12outputLayers_2__set__(struct __pyx_obj_7
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
-  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 307; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_1 = __pyx_v_value;
   __Pyx_INCREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
@@ -9752,7 +11931,7 @@ static int __pyx_pf_7cybrain_7Network_15autoInputLayers_2__set__(struct __pyx_ob
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
-  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 307; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_1 = __pyx_v_value;
   __Pyx_INCREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
@@ -9852,7 +12031,7 @@ static int __pyx_pf_7cybrain_7Network_16autoOutputLayers_2__set__(struct __pyx_o
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
-  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 307; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_1 = __pyx_v_value;
   __Pyx_INCREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
@@ -9952,7 +12131,7 @@ static int __pyx_pf_7cybrain_7Network_6layers_2__set__(struct __pyx_obj_7cybrain
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
-  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 307; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_1 = __pyx_v_value;
   __Pyx_INCREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
@@ -10052,7 +12231,7 @@ static int __pyx_pf_7cybrain_7Network_12hiddenLayers_2__set__(struct __pyx_obj_7
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
-  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 307; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_1 = __pyx_v_value;
   __Pyx_INCREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
@@ -10152,7 +12331,7 @@ static int __pyx_pf_7cybrain_7Network_11connections_2__set__(struct __pyx_obj_7c
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
-  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 307; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_1 = __pyx_v_value;
   __Pyx_INCREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
@@ -10202,7 +12381,1820 @@ static int __pyx_pf_7cybrain_7Network_11connections_4__del__(struct __pyx_obj_7c
   return __pyx_r;
 }
 
-/* "cybrain.pyx":366
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_7Network_16all_input_layers_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_7cybrain_7Network_16all_input_layers_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_7Network_16all_input_layers___get__(((struct __pyx_obj_7cybrain_Network *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_7Network_16all_input_layers___get__(struct __pyx_obj_7cybrain_Network *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_self->all_input_layers);
+  __pyx_r = __pyx_v_self->all_input_layers;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_7cybrain_7Network_16all_input_layers_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_7cybrain_7Network_16all_input_layers_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_7Network_16all_input_layers_2__set__(((struct __pyx_obj_7cybrain_Network *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7cybrain_7Network_16all_input_layers_2__set__(struct __pyx_obj_7cybrain_Network *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 307; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_v_value;
+  __Pyx_INCREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v_self->all_input_layers);
+  __Pyx_DECREF(__pyx_v_self->all_input_layers);
+  __pyx_v_self->all_input_layers = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("cybrain.Network.all_input_layers.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_7cybrain_7Network_16all_input_layers_5__del__(PyObject *__pyx_v_self); /*proto*/
+static int __pyx_pw_7cybrain_7Network_16all_input_layers_5__del__(PyObject *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_7Network_16all_input_layers_4__del__(((struct __pyx_obj_7cybrain_Network *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7cybrain_7Network_16all_input_layers_4__del__(struct __pyx_obj_7cybrain_Network *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__", 0);
+  __Pyx_INCREF(Py_None);
+  __Pyx_GIVEREF(Py_None);
+  __Pyx_GOTREF(__pyx_v_self->all_input_layers);
+  __Pyx_DECREF(__pyx_v_self->all_input_layers);
+  __pyx_v_self->all_input_layers = ((PyObject*)Py_None);
+
+  /* function exit code */
+  __pyx_r = 0;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_7Network_17all_output_layers_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_7cybrain_7Network_17all_output_layers_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_7Network_17all_output_layers___get__(((struct __pyx_obj_7cybrain_Network *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_7Network_17all_output_layers___get__(struct __pyx_obj_7cybrain_Network *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_self->all_output_layers);
+  __pyx_r = __pyx_v_self->all_output_layers;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_7cybrain_7Network_17all_output_layers_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_7cybrain_7Network_17all_output_layers_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_7Network_17all_output_layers_2__set__(((struct __pyx_obj_7cybrain_Network *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7cybrain_7Network_17all_output_layers_2__set__(struct __pyx_obj_7cybrain_Network *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  if (!(likely(PyList_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_value)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 307; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_v_value;
+  __Pyx_INCREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v_self->all_output_layers);
+  __Pyx_DECREF(__pyx_v_self->all_output_layers);
+  __pyx_v_self->all_output_layers = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("cybrain.Network.all_output_layers.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_7cybrain_7Network_17all_output_layers_5__del__(PyObject *__pyx_v_self); /*proto*/
+static int __pyx_pw_7cybrain_7Network_17all_output_layers_5__del__(PyObject *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_7Network_17all_output_layers_4__del__(((struct __pyx_obj_7cybrain_Network *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7cybrain_7Network_17all_output_layers_4__del__(struct __pyx_obj_7cybrain_Network *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__", 0);
+  __Pyx_INCREF(Py_None);
+  __Pyx_GIVEREF(Py_None);
+  __Pyx_GOTREF(__pyx_v_self->all_output_layers);
+  __Pyx_DECREF(__pyx_v_self->all_output_layers);
+  __pyx_v_self->all_output_layers = ((PyObject*)Py_None);
+
+  /* function exit code */
+  __pyx_r = 0;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":483
+ *         public int len_data
+ * 
+ *     def __init__(self, Network net, double[:,:] input_data, double[:,:] output_data, double learning_rate):             # <<<<<<<<<<<<<<
+ *         self.net = net
+ *         self.input_data = input_data
+ */
+
+/* Python wrapper */
+static int __pyx_pw_7cybrain_16FullBatchTrainer_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static int __pyx_pw_7cybrain_16FullBatchTrainer_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  struct __pyx_obj_7cybrain_Network *__pyx_v_net = 0;
+  __Pyx_memviewslice __pyx_v_input_data = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_output_data = { 0, 0, { 0 }, { 0 }, { 0 } };
+  double __pyx_v_learning_rate;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_net,&__pyx_n_s_input_data,&__pyx_n_s_output_data,&__pyx_n_s_learning_rate,0};
+    PyObject* values[4] = {0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_net)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        case  1:
+        if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_input_data)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        }
+        case  2:
+        if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_output_data)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        }
+        case  3:
+        if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_learning_rate)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+    }
+    __pyx_v_net = ((struct __pyx_obj_7cybrain_Network *)values[0]);
+    __pyx_v_input_data = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[1]); if (unlikely(!__pyx_v_input_data.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_output_data = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[2]); if (unlikely(!__pyx_v_output_data.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_learning_rate = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_learning_rate == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return -1;
+  __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_net), __pyx_ptype_7cybrain_Network, 1, "net", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer___init__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self), __pyx_v_net, __pyx_v_input_data, __pyx_v_output_data, __pyx_v_learning_rate);
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7cybrain_16FullBatchTrainer___init__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, struct __pyx_obj_7cybrain_Network *__pyx_v_net, __Pyx_memviewslice __pyx_v_input_data, __Pyx_memviewslice __pyx_v_output_data, double __pyx_v_learning_rate) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  Py_ssize_t __pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  __Pyx_memviewslice __pyx_t_5 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__init__", 0);
+
+  /* "cybrain.pyx":484
+ * 
+ *     def __init__(self, Network net, double[:,:] input_data, double[:,:] output_data, double learning_rate):
+ *         self.net = net             # <<<<<<<<<<<<<<
+ *         self.input_data = input_data
+ *         self.output_data = output_data
+ */
+  __Pyx_INCREF(((PyObject *)__pyx_v_net));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_net));
+  __Pyx_GOTREF(__pyx_v_self->net);
+  __Pyx_DECREF(((PyObject *)__pyx_v_self->net));
+  __pyx_v_self->net = __pyx_v_net;
+
+  /* "cybrain.pyx":485
+ *     def __init__(self, Network net, double[:,:] input_data, double[:,:] output_data, double learning_rate):
+ *         self.net = net
+ *         self.input_data = input_data             # <<<<<<<<<<<<<<
+ *         self.output_data = output_data
+ *         self.learning_rate = learning_rate
+ */
+  __PYX_XDEC_MEMVIEW(&__pyx_v_self->input_data, 0);
+  __PYX_INC_MEMVIEW(&__pyx_v_input_data, 0);
+  __pyx_v_self->input_data = __pyx_v_input_data;
+
+  /* "cybrain.pyx":486
+ *         self.net = net
+ *         self.input_data = input_data
+ *         self.output_data = output_data             # <<<<<<<<<<<<<<
+ *         self.learning_rate = learning_rate
+ *         self._weights = net.get_weight_pointers()
+ */
+  __PYX_XDEC_MEMVIEW(&__pyx_v_self->output_data, 0);
+  __PYX_INC_MEMVIEW(&__pyx_v_output_data, 0);
+  __pyx_v_self->output_data = __pyx_v_output_data;
+
+  /* "cybrain.pyx":487
+ *         self.input_data = input_data
+ *         self.output_data = output_data
+ *         self.learning_rate = learning_rate             # <<<<<<<<<<<<<<
+ *         self._weights = net.get_weight_pointers()
+ *         self._gradient = net.get_gradient_pointers()
+ */
+  __pyx_v_self->learning_rate = __pyx_v_learning_rate;
+
+  /* "cybrain.pyx":488
+ *         self.output_data = output_data
+ *         self.learning_rate = learning_rate
+ *         self._weights = net.get_weight_pointers()             # <<<<<<<<<<<<<<
+ *         self._gradient = net.get_gradient_pointers()
+ *         self.len_gradient = self._gradient.size()
+ */
+  __pyx_v_self->_weights = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_net->__pyx_vtab)->get_weight_pointers(__pyx_v_net);
+
+  /* "cybrain.pyx":489
+ *         self.learning_rate = learning_rate
+ *         self._weights = net.get_weight_pointers()
+ *         self._gradient = net.get_gradient_pointers()             # <<<<<<<<<<<<<<
+ *         self.len_gradient = self._gradient.size()
+ *         self.len_data = len(input_data)
+ */
+  __pyx_v_self->_gradient = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_net->__pyx_vtab)->get_gradient_pointers(__pyx_v_net);
+
+  /* "cybrain.pyx":490
+ *         self._weights = net.get_weight_pointers()
+ *         self._gradient = net.get_gradient_pointers()
+ *         self.len_gradient = self._gradient.size()             # <<<<<<<<<<<<<<
+ *         self.len_data = len(input_data)
+ *         self.len_data = len(input_data)
+ */
+  __pyx_v_self->len_gradient = __pyx_v_self->_gradient.size();
+
+  /* "cybrain.pyx":491
+ *         self._gradient = net.get_gradient_pointers()
+ *         self.len_gradient = self._gradient.size()
+ *         self.len_data = len(input_data)             # <<<<<<<<<<<<<<
+ *         self.len_data = len(input_data)
+ *         self.total_gradient = cvarray ((self.len_gradient,), sizeof(double), 'd')
+ */
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_input_data, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_v_self->len_data = __pyx_t_2;
+
+  /* "cybrain.pyx":492
+ *         self.len_gradient = self._gradient.size()
+ *         self.len_data = len(input_data)
+ *         self.len_data = len(input_data)             # <<<<<<<<<<<<<<
+ *         self.total_gradient = cvarray ((self.len_gradient,), sizeof(double), 'd')
+ * 
+ */
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_input_data, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 492; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 492; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_v_self->len_data = __pyx_t_2;
+
+  /* "cybrain.pyx":493
+ *         self.len_data = len(input_data)
+ *         self.len_data = len(input_data)
+ *         self.total_gradient = cvarray ((self.len_gradient,), sizeof(double), 'd')             # <<<<<<<<<<<<<<
+ * 
+ *     cdef restart_gradient(self):
+ */
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->len_gradient); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 493; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 493; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
+  __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 493; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = PyTuple_New(3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 493; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_1);
+  __Pyx_INCREF(__pyx_n_s_d);
+  __Pyx_GIVEREF(__pyx_n_s_d);
+  PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_n_s_d);
+  __pyx_t_3 = 0;
+  __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 493; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_1);
+  if (unlikely(!__pyx_t_5.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 493; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __PYX_XDEC_MEMVIEW(&__pyx_v_self->total_gradient, 0);
+  __pyx_v_self->total_gradient = __pyx_t_5;
+  __pyx_t_5.memview = NULL;
+  __pyx_t_5.data = NULL;
+
+  /* "cybrain.pyx":483
+ *         public int len_data
+ * 
+ *     def __init__(self, Network net, double[:,:] input_data, double[:,:] output_data, double learning_rate):             # <<<<<<<<<<<<<<
+ *         self.net = net
+ *         self.input_data = input_data
+ */
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __PYX_XDEC_MEMVIEW(&__pyx_v_input_data, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_output_data, 1);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":495
+ *         self.total_gradient = cvarray ((self.len_gradient,), sizeof(double), 'd')
+ * 
+ *     cdef restart_gradient(self):             # <<<<<<<<<<<<<<
+ *         self.total_gradient[...] = 0.0
+ * 
+ */
+
+static PyObject *__pyx_f_7cybrain_16FullBatchTrainer_restart_gradient(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("restart_gradient", 0);
+
+  /* "cybrain.pyx":496
+ * 
+ *     cdef restart_gradient(self):
+ *         self.total_gradient[...] = 0.0             # <<<<<<<<<<<<<<
+ * 
+ *     cdef print_gradient(self):
+ */
+  if (unlikely(!__pyx_v_self->total_gradient.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 496; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  {
+      double __pyx_temp_scalar = 0.0;
+      __Pyx_memviewslice __pyx_temp_slice = __pyx_v_self->total_gradient;
+      {
+          Py_ssize_t __pyx_temp_extent_0 = __pyx_temp_slice.shape[0];
+          Py_ssize_t __pyx_temp_stride_0 = __pyx_temp_slice.strides[0];
+          char *__pyx_temp_pointer_0;
+          Py_ssize_t __pyx_temp_idx_0;
+          __pyx_temp_pointer_0 = __pyx_temp_slice.data;
+          for (__pyx_temp_idx_0 = 0; __pyx_temp_idx_0 < __pyx_temp_extent_0; __pyx_temp_idx_0++) {
+            *((double *) __pyx_temp_pointer_0) = __pyx_temp_scalar;
+            __pyx_temp_pointer_0 += __pyx_temp_stride_0;
+          }
+      }
+  }
+
+  /* "cybrain.pyx":495
+ *         self.total_gradient = cvarray ((self.len_gradient,), sizeof(double), 'd')
+ * 
+ *     cdef restart_gradient(self):             # <<<<<<<<<<<<<<
+ *         self.total_gradient[...] = 0.0
+ * 
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.restart_gradient", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":498
+ *         self.total_gradient[...] = 0.0
+ * 
+ *     cdef print_gradient(self):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             int i
+ */
+
+static PyObject *__pyx_f_7cybrain_16FullBatchTrainer_print_gradient(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self) {
+  int __pyx_v_i;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  int __pyx_t_2;
+  int __pyx_t_3;
+  int __pyx_t_4;
+  PyObject *__pyx_t_5 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("print_gradient", 0);
+
+  /* "cybrain.pyx":501
+ *         cdef:
+ *             int i
+ *         for i in range(self.len_gradient):             # <<<<<<<<<<<<<<
+ *             print(self.total_gradient[i])
+ * 
+ */
+  __pyx_t_1 = __pyx_v_self->len_gradient;
+  for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
+    __pyx_v_i = __pyx_t_2;
+
+    /* "cybrain.pyx":502
+ *             int i
+ *         for i in range(self.len_gradient):
+ *             print(self.total_gradient[i])             # <<<<<<<<<<<<<<
+ * 
+ *     cdef print_actual_gradient(self):
+ */
+    if (unlikely(!__pyx_v_self->total_gradient.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 502; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+    __pyx_t_3 = __pyx_v_i;
+    __pyx_t_4 = -1;
+    if (__pyx_t_3 < 0) {
+      __pyx_t_3 += __pyx_v_self->total_gradient.shape[0];
+      if (unlikely(__pyx_t_3 < 0)) __pyx_t_4 = 0;
+    } else if (unlikely(__pyx_t_3 >= __pyx_v_self->total_gradient.shape[0])) __pyx_t_4 = 0;
+    if (unlikely(__pyx_t_4 != -1)) {
+      __Pyx_RaiseBufferIndexError(__pyx_t_4);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 502; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+    __pyx_t_5 = PyFloat_FromDouble((*((double *) ( /* dim=0 */ (__pyx_v_self->total_gradient.data + __pyx_t_3 * __pyx_v_self->total_gradient.strides[0]) )))); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 502; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_5);
+    if (__Pyx_PrintOne(0, __pyx_t_5) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 502; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  }
+
+  /* "cybrain.pyx":498
+ *         self.total_gradient[...] = 0.0
+ * 
+ *     cdef print_gradient(self):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             int i
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.print_gradient", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":504
+ *             print(self.total_gradient[i])
+ * 
+ *     cdef print_actual_gradient(self):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             int i
+ */
+
+static PyObject *__pyx_f_7cybrain_16FullBatchTrainer_print_actual_gradient(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self) {
+  int __pyx_v_i;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  int __pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("print_actual_gradient", 0);
+
+  /* "cybrain.pyx":507
+ *         cdef:
+ *             int i
+ *         for i in range(self.len_gradient):             # <<<<<<<<<<<<<<
+ *             print(self._gradient[i][0],)
+ * 
+ */
+  __pyx_t_1 = __pyx_v_self->len_gradient;
+  for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
+    __pyx_v_i = __pyx_t_2;
+
+    /* "cybrain.pyx":508
+ *             int i
+ *         for i in range(self.len_gradient):
+ *             print(self._gradient[i][0],)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef print_weights(self):
+ */
+    __pyx_t_3 = PyFloat_FromDouble(((__pyx_v_self->_gradient[__pyx_v_i])[0])); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 508; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 508; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_GIVEREF(__pyx_t_3);
+    PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3);
+    __pyx_t_3 = 0;
+    if (__Pyx_PrintOne(0, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 508; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  }
+
+  /* "cybrain.pyx":504
+ *             print(self.total_gradient[i])
+ * 
+ *     cdef print_actual_gradient(self):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             int i
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.print_actual_gradient", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":510
+ *             print(self._gradient[i][0],)
+ * 
+ *     cdef print_weights(self):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             int i
+ */
+
+static PyObject *__pyx_f_7cybrain_16FullBatchTrainer_print_weights(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self) {
+  int __pyx_v_i;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  int __pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("print_weights", 0);
+
+  /* "cybrain.pyx":513
+ *         cdef:
+ *             int i
+ *         for i in range(self.len_gradient):             # <<<<<<<<<<<<<<
+ *             print (self._weights[i][0],)
+ * 
+ */
+  __pyx_t_1 = __pyx_v_self->len_gradient;
+  for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
+    __pyx_v_i = __pyx_t_2;
+
+    /* "cybrain.pyx":514
+ *             int i
+ *         for i in range(self.len_gradient):
+ *             print (self._weights[i][0],)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef add_to_total_gradient(self):
+ */
+    __pyx_t_3 = PyFloat_FromDouble(((__pyx_v_self->_weights[__pyx_v_i])[0])); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 514; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 514; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_GIVEREF(__pyx_t_3);
+    PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3);
+    __pyx_t_3 = 0;
+    if (__Pyx_PrintOne(0, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 514; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  }
+
+  /* "cybrain.pyx":510
+ *             print(self._gradient[i][0],)
+ * 
+ *     cdef print_weights(self):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             int i
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.print_weights", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":516
+ *             print (self._weights[i][0],)
+ * 
+ *     cdef add_to_total_gradient(self):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             int i
+ */
+
+static PyObject *__pyx_f_7cybrain_16FullBatchTrainer_add_to_total_gradient(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self) {
+  int __pyx_v_i;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  int __pyx_t_2;
+  int __pyx_t_3;
+  int __pyx_t_4;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("add_to_total_gradient", 0);
+
+  /* "cybrain.pyx":519
+ *         cdef:
+ *             int i
+ *         for i in range(self.len_gradient):             # <<<<<<<<<<<<<<
+ *             self.total_gradient[i] += self._gradient[i][0]
+ * 
+ */
+  __pyx_t_1 = __pyx_v_self->len_gradient;
+  for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
+    __pyx_v_i = __pyx_t_2;
+
+    /* "cybrain.pyx":520
+ *             int i
+ *         for i in range(self.len_gradient):
+ *             self.total_gradient[i] += self._gradient[i][0]             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef epochs(self, int epochs):
+ */
+    if (unlikely(!__pyx_v_self->total_gradient.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 520; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+    __pyx_t_3 = __pyx_v_i;
+    __pyx_t_4 = -1;
+    if (__pyx_t_3 < 0) {
+      __pyx_t_3 += __pyx_v_self->total_gradient.shape[0];
+      if (unlikely(__pyx_t_3 < 0)) __pyx_t_4 = 0;
+    } else if (unlikely(__pyx_t_3 >= __pyx_v_self->total_gradient.shape[0])) __pyx_t_4 = 0;
+    if (unlikely(__pyx_t_4 != -1)) {
+      __Pyx_RaiseBufferIndexError(__pyx_t_4);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 520; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+    *((double *) ( /* dim=0 */ (__pyx_v_self->total_gradient.data + __pyx_t_3 * __pyx_v_self->total_gradient.strides[0]) )) += ((__pyx_v_self->_gradient[__pyx_v_i])[0]);
+  }
+
+  /* "cybrain.pyx":516
+ *             print (self._weights[i][0],)
+ * 
+ *     cdef add_to_total_gradient(self):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             int i
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.add_to_total_gradient", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":522
+ *             self.total_gradient[i] += self._gradient[i][0]
+ * 
+ *     cpdef epochs(self, int epochs):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             int i
+ */
+
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_3epochs(PyObject *__pyx_v_self, PyObject *__pyx_arg_epochs); /*proto*/
+static PyObject *__pyx_f_7cybrain_16FullBatchTrainer_epochs(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, int __pyx_v_epochs, int __pyx_skip_dispatch) {
+  CYTHON_UNUSED int __pyx_v_i;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
+  int __pyx_t_7;
+  int __pyx_t_8;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("epochs", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_epochs); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7cybrain_16FullBatchTrainer_3epochs)) {
+      __Pyx_XDECREF(__pyx_r);
+      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_epochs); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_1);
+      __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
+      if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_4))) {
+        __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_4);
+        if (likely(__pyx_t_5)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_5);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_4, function);
+        }
+      }
+      if (!__pyx_t_5) {
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_GOTREF(__pyx_t_2);
+      } else {
+        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_GOTREF(__pyx_t_6);
+        __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
+        __Pyx_GIVEREF(__pyx_t_3);
+        PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
+        __pyx_t_3 = 0;
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_GOTREF(__pyx_t_2);
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      }
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_r = __pyx_t_2;
+      __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      goto __pyx_L0;
+    }
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  }
+
+  /* "cybrain.pyx":525
+ *         cdef:
+ *             int i
+ *         for i in range(epochs):             # <<<<<<<<<<<<<<
+ *             self.train()
+ * 
+ */
+  __pyx_t_7 = __pyx_v_epochs;
+  for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
+    __pyx_v_i = __pyx_t_8;
+
+    /* "cybrain.pyx":526
+ *             int i
+ *         for i in range(epochs):
+ *             self.train()             # <<<<<<<<<<<<<<
+ * 
+ *     cdef train(self):
+ */
+    __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_FullBatchTrainer *)__pyx_v_self->__pyx_vtab)->train(__pyx_v_self); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 526; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  }
+
+  /* "cybrain.pyx":522
+ *             self.total_gradient[i] += self._gradient[i][0]
+ * 
+ *     cpdef epochs(self, int epochs):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             int i
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.epochs", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_3epochs(PyObject *__pyx_v_self, PyObject *__pyx_arg_epochs); /*proto*/
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_3epochs(PyObject *__pyx_v_self, PyObject *__pyx_arg_epochs) {
+  int __pyx_v_epochs;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("epochs (wrapper)", 0);
+  assert(__pyx_arg_epochs); {
+    __pyx_v_epochs = __Pyx_PyInt_As_int(__pyx_arg_epochs); if (unlikely((__pyx_v_epochs == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.epochs", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_2epochs(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self), ((int)__pyx_v_epochs));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_2epochs(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, int __pyx_v_epochs) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("epochs", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_f_7cybrain_16FullBatchTrainer_epochs(__pyx_v_self, __pyx_v_epochs, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.epochs", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":528
+ *             self.train()
+ * 
+ *     cdef train(self):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             int i
+ */
+
+static PyObject *__pyx_f_7cybrain_16FullBatchTrainer_train(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self) {
+  int __pyx_v_i;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_t_2;
+  int __pyx_t_3;
+  __Pyx_memviewslice __pyx_t_4 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_t_5 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_t_6;
+  long __pyx_t_7;
+  int __pyx_t_8;
+  int __pyx_t_9;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("train", 0);
+
+  /* "cybrain.pyx":531
+ *         cdef:
+ *             int i
+ *         self.restart_gradient()             # <<<<<<<<<<<<<<
+ *         for i in range(self.len_data):
+ *             self.net.restartNetwork()
+ */
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_FullBatchTrainer *)__pyx_v_self->__pyx_vtab)->restart_gradient(__pyx_v_self); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 531; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "cybrain.pyx":532
+ *             int i
+ *         self.restart_gradient()
+ *         for i in range(self.len_data):             # <<<<<<<<<<<<<<
+ *             self.net.restartNetwork()
+ *             self.net.activate_layers(self.input_data[i:i+1,:])
+ */
+  __pyx_t_2 = __pyx_v_self->len_data;
+  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
+    __pyx_v_i = __pyx_t_3;
+
+    /* "cybrain.pyx":533
+ *         self.restart_gradient()
+ *         for i in range(self.len_data):
+ *             self.net.restartNetwork()             # <<<<<<<<<<<<<<
+ *             self.net.activate_layers(self.input_data[i:i+1,:])
+ *             self.net.back_activate_layers(self.output_data[i:i+1,:])
+ */
+    __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->net->__pyx_vtab)->restartNetwork(__pyx_v_self->net, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 533; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+    /* "cybrain.pyx":534
+ *         for i in range(self.len_data):
+ *             self.net.restartNetwork()
+ *             self.net.activate_layers(self.input_data[i:i+1,:])             # <<<<<<<<<<<<<<
+ *             self.net.back_activate_layers(self.output_data[i:i+1,:])
+ *             self.add_to_total_gradient()
+ */
+    if (unlikely(!__pyx_v_self->input_data.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 534; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+    __pyx_t_4 = __pyx_v_self->input_data;
+    __PYX_INC_MEMVIEW(&__pyx_t_4, 1);
+    __pyx_t_5.data = __pyx_t_4.data;
+    __pyx_t_5.memview = __pyx_t_4.memview;
+    __PYX_INC_MEMVIEW(&__pyx_t_5, 0);
+    __pyx_t_6 = -1;
+    if (unlikely(__pyx_memoryview_slice_memviewslice(
+    &__pyx_t_5,
+    __pyx_t_4.shape[0], __pyx_t_4.strides[0], __pyx_t_4.suboffsets[0],
+    0,
+    0,
+    &__pyx_t_6,
+    __pyx_v_i,
+    (__pyx_v_i + 1),
+    0,
+    1,
+    1,
+    0,
+    1) < 0))
+{
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 534; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+}
+
+__pyx_t_5.shape[1] = __pyx_t_4.shape[1];
+__pyx_t_5.strides[1] = __pyx_t_4.strides[1];
+    __pyx_t_5.suboffsets[1] = -1;
+
+__PYX_XDEC_MEMVIEW(&__pyx_t_4, 1);
+    __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->net->__pyx_vtab)->activate_layers(__pyx_v_self->net, __pyx_t_5, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 534; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+    /* "cybrain.pyx":535
+ *             self.net.restartNetwork()
+ *             self.net.activate_layers(self.input_data[i:i+1,:])
+ *             self.net.back_activate_layers(self.output_data[i:i+1,:])             # <<<<<<<<<<<<<<
+ *             self.add_to_total_gradient()
+ * 
+ */
+    if (unlikely(!__pyx_v_self->output_data.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 535; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+    __pyx_t_5 = __pyx_v_self->output_data;
+    __PYX_INC_MEMVIEW(&__pyx_t_5, 1);
+    __pyx_t_4.data = __pyx_t_5.data;
+    __pyx_t_4.memview = __pyx_t_5.memview;
+    __PYX_INC_MEMVIEW(&__pyx_t_4, 0);
+    __pyx_t_6 = -1;
+    if (unlikely(__pyx_memoryview_slice_memviewslice(
+    &__pyx_t_4,
+    __pyx_t_5.shape[0], __pyx_t_5.strides[0], __pyx_t_5.suboffsets[0],
+    0,
+    0,
+    &__pyx_t_6,
+    __pyx_v_i,
+    (__pyx_v_i + 1),
+    0,
+    1,
+    1,
+    0,
+    1) < 0))
+{
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 535; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+}
+
+__pyx_t_4.shape[1] = __pyx_t_5.shape[1];
+__pyx_t_4.strides[1] = __pyx_t_5.strides[1];
+    __pyx_t_4.suboffsets[1] = -1;
+
+__PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
+    __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_Network *)__pyx_v_self->net->__pyx_vtab)->back_activate_layers(__pyx_v_self->net, __pyx_t_4, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 535; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    __PYX_XDEC_MEMVIEW(&__pyx_t_4, 1);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+    /* "cybrain.pyx":536
+ *             self.net.activate_layers(self.input_data[i:i+1,:])
+ *             self.net.back_activate_layers(self.output_data[i:i+1,:])
+ *             self.add_to_total_gradient()             # <<<<<<<<<<<<<<
+ * 
+ *         for i in range(self.len_gradient):
+ */
+    __pyx_t_1 = ((struct __pyx_vtabstruct_7cybrain_FullBatchTrainer *)__pyx_v_self->__pyx_vtab)->add_to_total_gradient(__pyx_v_self); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  }
+
+  /* "cybrain.pyx":538
+ *             self.add_to_total_gradient()
+ * 
+ *         for i in range(self.len_gradient):             # <<<<<<<<<<<<<<
+ *             self._weights[i][0] -= self.learning_rate * self.total_gradient[i]
+ * 
+ */
+  __pyx_t_2 = __pyx_v_self->len_gradient;
+  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
+    __pyx_v_i = __pyx_t_3;
+
+    /* "cybrain.pyx":539
+ * 
+ *         for i in range(self.len_gradient):
+ *             self._weights[i][0] -= self.learning_rate * self.total_gradient[i]             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+    __pyx_t_6 = __pyx_v_i;
+    __pyx_t_7 = 0;
+    if (unlikely(!__pyx_v_self->total_gradient.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 539; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+    __pyx_t_8 = __pyx_v_i;
+    __pyx_t_9 = -1;
+    if (__pyx_t_8 < 0) {
+      __pyx_t_8 += __pyx_v_self->total_gradient.shape[0];
+      if (unlikely(__pyx_t_8 < 0)) __pyx_t_9 = 0;
+    } else if (unlikely(__pyx_t_8 >= __pyx_v_self->total_gradient.shape[0])) __pyx_t_9 = 0;
+    if (unlikely(__pyx_t_9 != -1)) {
+      __Pyx_RaiseBufferIndexError(__pyx_t_9);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 539; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+    ((__pyx_v_self->_weights[__pyx_t_6])[__pyx_t_7]) = (((__pyx_v_self->_weights[__pyx_t_6])[__pyx_t_7]) - (__pyx_v_self->learning_rate * (*((double *) ( /* dim=0 */ (__pyx_v_self->total_gradient.data + __pyx_t_8 * __pyx_v_self->total_gradient.strides[0]) )))));
+  }
+
+  /* "cybrain.pyx":528
+ *             self.train()
+ * 
+ *     cdef train(self):             # <<<<<<<<<<<<<<
+ *         cdef:
+ *             int i
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_4, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.train", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":475
+ *         vector[double*] _gradient
+ *         double[:] total_gradient
+ *         public double cost             # <<<<<<<<<<<<<<
+ *         public Network net
+ *         public double[:,:] input_data
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_4cost_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_4cost_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_4cost___get__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_4cost___get__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cost); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 475; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.cost.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_7cybrain_16FullBatchTrainer_4cost_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_7cybrain_16FullBatchTrainer_4cost_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_4cost_2__set__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7cybrain_16FullBatchTrainer_4cost_2__set__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  double __pyx_t_1;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __pyx_PyFloat_AsDouble(__pyx_v_value); if (unlikely((__pyx_t_1 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 475; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_self->cost = __pyx_t_1;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.cost.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":476
+ *         double[:] total_gradient
+ *         public double cost
+ *         public Network net             # <<<<<<<<<<<<<<
+ *         public double[:,:] input_data
+ *         public double[:,:] output_data
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_3net_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_3net_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_3net___get__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_3net___get__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(((PyObject *)__pyx_v_self->net));
+  __pyx_r = ((PyObject *)__pyx_v_self->net);
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_7cybrain_16FullBatchTrainer_3net_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_7cybrain_16FullBatchTrainer_3net_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_3net_2__set__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7cybrain_16FullBatchTrainer_3net_2__set__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  if (!(likely(((__pyx_v_value) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_value, __pyx_ptype_7cybrain_Network))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 476; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_v_value;
+  __Pyx_INCREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v_self->net);
+  __Pyx_DECREF(((PyObject *)__pyx_v_self->net));
+  __pyx_v_self->net = ((struct __pyx_obj_7cybrain_Network *)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.net.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_7cybrain_16FullBatchTrainer_3net_5__del__(PyObject *__pyx_v_self); /*proto*/
+static int __pyx_pw_7cybrain_16FullBatchTrainer_3net_5__del__(PyObject *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_3net_4__del__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7cybrain_16FullBatchTrainer_3net_4__del__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__", 0);
+  __Pyx_INCREF(Py_None);
+  __Pyx_GIVEREF(Py_None);
+  __Pyx_GOTREF(__pyx_v_self->net);
+  __Pyx_DECREF(((PyObject *)__pyx_v_self->net));
+  __pyx_v_self->net = ((struct __pyx_obj_7cybrain_Network *)Py_None);
+
+  /* function exit code */
+  __pyx_r = 0;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":477
+ *         public double cost
+ *         public Network net
+ *         public double[:,:] input_data             # <<<<<<<<<<<<<<
+ *         public double[:,:] output_data
+ *         public double learning_rate
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_10input_data_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_10input_data_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_10input_data___get__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_10input_data___get__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  if (unlikely(!__pyx_v_self->input_data.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 477; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->input_data, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 477; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.input_data.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_7cybrain_16FullBatchTrainer_10input_data_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_7cybrain_16FullBatchTrainer_10input_data_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_10input_data_2__set__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7cybrain_16FullBatchTrainer_10input_data_2__set__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_v_value);
+  if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 477; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __PYX_XDEC_MEMVIEW(&__pyx_v_self->input_data, 0);
+  __pyx_v_self->input_data = __pyx_t_1;
+  __pyx_t_1.memview = NULL;
+  __pyx_t_1.data = NULL;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.input_data.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":478
+ *         public Network net
+ *         public double[:,:] input_data
+ *         public double[:,:] output_data             # <<<<<<<<<<<<<<
+ *         public double learning_rate
+ *         public int len_gradient
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_11output_data_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_11output_data_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_11output_data___get__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_11output_data___get__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  if (unlikely(!__pyx_v_self->output_data.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 478; __pyx_clineno = __LINE__; goto __pyx_L1_error;}}
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->output_data, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 478; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.output_data.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_7cybrain_16FullBatchTrainer_11output_data_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_7cybrain_16FullBatchTrainer_11output_data_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_11output_data_2__set__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7cybrain_16FullBatchTrainer_11output_data_2__set__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_v_value);
+  if (unlikely(!__pyx_t_1.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 478; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __PYX_XDEC_MEMVIEW(&__pyx_v_self->output_data, 0);
+  __pyx_v_self->output_data = __pyx_t_1;
+  __pyx_t_1.memview = NULL;
+  __pyx_t_1.data = NULL;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.output_data.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":479
+ *         public double[:,:] input_data
+ *         public double[:,:] output_data
+ *         public double learning_rate             # <<<<<<<<<<<<<<
+ *         public int len_gradient
+ *         public int len_data
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_13learning_rate_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_13learning_rate_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_13learning_rate___get__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_13learning_rate___get__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->learning_rate); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 479; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.learning_rate.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_7cybrain_16FullBatchTrainer_13learning_rate_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_7cybrain_16FullBatchTrainer_13learning_rate_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_13learning_rate_2__set__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7cybrain_16FullBatchTrainer_13learning_rate_2__set__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  double __pyx_t_1;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __pyx_PyFloat_AsDouble(__pyx_v_value); if (unlikely((__pyx_t_1 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 479; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_self->learning_rate = __pyx_t_1;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.learning_rate.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":480
+ *         public double[:,:] output_data
+ *         public double learning_rate
+ *         public int len_gradient             # <<<<<<<<<<<<<<
+ *         public int len_data
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_12len_gradient_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_12len_gradient_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_12len_gradient___get__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_12len_gradient___get__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->len_gradient); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 480; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.len_gradient.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_7cybrain_16FullBatchTrainer_12len_gradient_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_7cybrain_16FullBatchTrainer_12len_gradient_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_12len_gradient_2__set__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7cybrain_16FullBatchTrainer_12len_gradient_2__set__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 480; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_self->len_gradient = __pyx_t_1;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.len_gradient.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":481
+ *         public double learning_rate
+ *         public int len_gradient
+ *         public int len_data             # <<<<<<<<<<<<<<
+ * 
+ *     def __init__(self, Network net, double[:,:] input_data, double[:,:] output_data, double learning_rate):
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_8len_data_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_7cybrain_16FullBatchTrainer_8len_data_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_8len_data___get__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7cybrain_16FullBatchTrainer_8len_data___get__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->len_data); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 481; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.len_data.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_7cybrain_16FullBatchTrainer_8len_data_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_7cybrain_16FullBatchTrainer_8len_data_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7cybrain_16FullBatchTrainer_8len_data_2__set__(((struct __pyx_obj_7cybrain_FullBatchTrainer *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7cybrain_16FullBatchTrainer_8len_data_2__set__(struct __pyx_obj_7cybrain_FullBatchTrainer *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 481; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_self->len_data = __pyx_t_1;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("cybrain.FullBatchTrainer.len_data.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":545
  * ##HELPER FUNCTIONS
  * ####################
  * cdef double logistic_dEdY (double t, double y):             # <<<<<<<<<<<<<<
@@ -10220,7 +14212,7 @@ static double __pyx_f_7cybrain_logistic_dEdY(double __pyx_v_t, double __pyx_v_y)
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("logistic_dEdY", 0);
 
-  /* "cybrain.pyx":367
+  /* "cybrain.pyx":546
  * ####################
  * cdef double logistic_dEdY (double t, double y):
  *     return (t - y) / ((-1.0 + y) * y)             # <<<<<<<<<<<<<<
@@ -10237,12 +14229,12 @@ static double __pyx_f_7cybrain_logistic_dEdY(double __pyx_v_t, double __pyx_v_y)
     #ifdef WITH_THREAD
     PyGILState_Release(__pyx_gilstate_save);
     #endif
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 367; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 546; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_r = (__pyx_t_1 / __pyx_t_2);
   goto __pyx_L0;
 
-  /* "cybrain.pyx":366
+  /* "cybrain.pyx":545
  * ##HELPER FUNCTIONS
  * ####################
  * cdef double logistic_dEdY (double t, double y):             # <<<<<<<<<<<<<<
@@ -10259,7 +14251,7 @@ static double __pyx_f_7cybrain_logistic_dEdY(double __pyx_v_t, double __pyx_v_y)
   return __pyx_r;
 }
 
-/* "cybrain.pyx":369
+/* "cybrain.pyx":548
  *     return (t - y) / ((-1.0 + y) * y)
  * 
  * cdef double logistic_dYdZ (double y):             # <<<<<<<<<<<<<<
@@ -10272,7 +14264,7 @@ static double __pyx_f_7cybrain_logistic_dYdZ(double __pyx_v_y) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("logistic_dYdZ", 0);
 
-  /* "cybrain.pyx":370
+  /* "cybrain.pyx":549
  * 
  * cdef double logistic_dYdZ (double y):
  *     return y * (1.0 - y)             # <<<<<<<<<<<<<<
@@ -10282,7 +14274,7 @@ static double __pyx_f_7cybrain_logistic_dYdZ(double __pyx_v_y) {
   __pyx_r = (__pyx_v_y * (1.0 - __pyx_v_y));
   goto __pyx_L0;
 
-  /* "cybrain.pyx":369
+  /* "cybrain.pyx":548
  *     return (t - y) / ((-1.0 + y) * y)
  * 
  * cdef double logistic_dYdZ (double y):             # <<<<<<<<<<<<<<
@@ -10296,7 +14288,7 @@ static double __pyx_f_7cybrain_logistic_dYdZ(double __pyx_v_y) {
   return __pyx_r;
 }
 
-/* "cybrain.pyx":372
+/* "cybrain.pyx":551
  *     return y * (1.0 - y)
  * 
  * cdef double quadraticDistance (double a, double b):             # <<<<<<<<<<<<<<
@@ -10309,7 +14301,7 @@ static double __pyx_f_7cybrain_quadraticDistance(double __pyx_v_a, double __pyx_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("quadraticDistance", 0);
 
-  /* "cybrain.pyx":373
+  /* "cybrain.pyx":552
  * 
  * cdef double quadraticDistance (double a, double b):
  *     return 0.5 * (a - b)**2             # <<<<<<<<<<<<<<
@@ -10319,7 +14311,7 @@ static double __pyx_f_7cybrain_quadraticDistance(double __pyx_v_a, double __pyx_
   __pyx_r = (0.5 * pow((__pyx_v_a - __pyx_v_b), 2.0));
   goto __pyx_L0;
 
-  /* "cybrain.pyx":372
+  /* "cybrain.pyx":551
  *     return y * (1.0 - y)
  * 
  * cdef double quadraticDistance (double a, double b):             # <<<<<<<<<<<<<<
@@ -10333,7 +14325,7 @@ static double __pyx_f_7cybrain_quadraticDistance(double __pyx_v_a, double __pyx_
   return __pyx_r;
 }
 
-/* "cybrain.pyx":375
+/* "cybrain.pyx":554
  *     return 0.5 * (a - b)**2
  * 
  * cdef double logisticFunction (double z):             # <<<<<<<<<<<<<<
@@ -10350,7 +14342,7 @@ static double __pyx_f_7cybrain_logisticFunction(double __pyx_v_z) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("logisticFunction", 0);
 
-  /* "cybrain.pyx":376
+  /* "cybrain.pyx":555
  * 
  * cdef double logisticFunction (double z):
  *     return 1. / (1. + cmath.exp (-z))             # <<<<<<<<<<<<<<
@@ -10366,12 +14358,12 @@ static double __pyx_f_7cybrain_logisticFunction(double __pyx_v_z) {
     #ifdef WITH_THREAD
     PyGILState_Release(__pyx_gilstate_save);
     #endif
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 376; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 555; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_r = (1. / __pyx_t_1);
   goto __pyx_L0;
 
-  /* "cybrain.pyx":375
+  /* "cybrain.pyx":554
  *     return 0.5 * (a - b)**2
  * 
  * cdef double logisticFunction (double z):             # <<<<<<<<<<<<<<
@@ -10388,7 +14380,7 @@ static double __pyx_f_7cybrain_logisticFunction(double __pyx_v_z) {
   return __pyx_r;
 }
 
-/* "cybrain.pyx":378
+/* "cybrain.pyx":557
  *     return 1. / (1. + cmath.exp (-z))
  * 
  * cdef double [:,:] dotMultiply (double [:,:] A, double[:,:] B):             # <<<<<<<<<<<<<<
@@ -10427,7 +14419,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_dotMultiply(__Pyx_memviewslice __pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("dotMultiply", 0);
 
-  /* "cybrain.pyx":380
+  /* "cybrain.pyx":559
  * cdef double [:,:] dotMultiply (double [:,:] A, double[:,:] B):
  *     cdef:
  *         int i, j, k, m = A.shape[0], n = B.shape[1], o = A.shape[1]             # <<<<<<<<<<<<<<
@@ -10438,18 +14430,18 @@ static __Pyx_memviewslice __pyx_f_7cybrain_dotMultiply(__Pyx_memviewslice __pyx_
   __pyx_v_n = (__pyx_v_B.shape[1]);
   __pyx_v_o = (__pyx_v_A.shape[1]);
 
-  /* "cybrain.pyx":382
+  /* "cybrain.pyx":561
  *         int i, j, k, m = A.shape[0], n = B.shape[1], o = A.shape[1]
  *         double acc
  *         double [:,:] result = cvarray ((m, n), sizeof(double), 'd')             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_m); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_m); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 561; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 561; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 561; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
@@ -10457,9 +14449,9 @@ static __Pyx_memviewslice __pyx_f_7cybrain_dotMultiply(__Pyx_memviewslice __pyx_
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_2);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 561; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 561; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
@@ -10470,17 +14462,17 @@ static __Pyx_memviewslice __pyx_f_7cybrain_dotMultiply(__Pyx_memviewslice __pyx_
   PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_n_s_d);
   __pyx_t_3 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 561; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_2);
-  if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 561; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_result = __pyx_t_4;
   __pyx_t_4.memview = NULL;
   __pyx_t_4.data = NULL;
 
-  /* "cybrain.pyx":385
+  /* "cybrain.pyx":564
  * 
  * 
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -10491,7 +14483,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_dotMultiply(__Pyx_memviewslice __pyx_
   for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
     __pyx_v_i = __pyx_t_6;
 
-    /* "cybrain.pyx":386
+    /* "cybrain.pyx":565
  * 
  *     for i in range(m):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -10502,7 +14494,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_dotMultiply(__Pyx_memviewslice __pyx_
     for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
       __pyx_v_j = __pyx_t_8;
 
-      /* "cybrain.pyx":387
+      /* "cybrain.pyx":566
  *     for i in range(m):
  *         for j in range(n):
  *             acc = 0.0             # <<<<<<<<<<<<<<
@@ -10511,7 +14503,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_dotMultiply(__Pyx_memviewslice __pyx_
  */
       __pyx_v_acc = 0.0;
 
-      /* "cybrain.pyx":388
+      /* "cybrain.pyx":567
  *         for j in range(n):
  *             acc = 0.0
  *             for k in range(o):             # <<<<<<<<<<<<<<
@@ -10522,7 +14514,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_dotMultiply(__Pyx_memviewslice __pyx_
       for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
         __pyx_v_k = __pyx_t_10;
 
-        /* "cybrain.pyx":389
+        /* "cybrain.pyx":568
  *             acc = 0.0
  *             for k in range(o):
  *                 acc += A[i,k] * B[k,j]             # <<<<<<<<<<<<<<
@@ -10542,7 +14534,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_dotMultiply(__Pyx_memviewslice __pyx_
         } else if (unlikely(__pyx_t_12 >= __pyx_v_A.shape[1])) __pyx_t_13 = 1;
         if (unlikely(__pyx_t_13 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_13);
-          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 568; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
         __pyx_t_13 = __pyx_v_k;
         __pyx_t_14 = __pyx_v_j;
@@ -10557,12 +14549,12 @@ static __Pyx_memviewslice __pyx_f_7cybrain_dotMultiply(__Pyx_memviewslice __pyx_
         } else if (unlikely(__pyx_t_14 >= __pyx_v_B.shape[1])) __pyx_t_15 = 1;
         if (unlikely(__pyx_t_15 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_15);
-          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 568; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
         __pyx_v_acc = (__pyx_v_acc + ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_11 * __pyx_v_A.strides[0]) ) + __pyx_t_12 * __pyx_v_A.strides[1]) ))) * (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_B.data + __pyx_t_13 * __pyx_v_B.strides[0]) ) + __pyx_t_14 * __pyx_v_B.strides[1]) )))));
       }
 
-      /* "cybrain.pyx":391
+      /* "cybrain.pyx":570
  *                 acc += A[i,k] * B[k,j]
  * 
  *             result[i,j] = acc             # <<<<<<<<<<<<<<
@@ -10582,13 +14574,13 @@ static __Pyx_memviewslice __pyx_f_7cybrain_dotMultiply(__Pyx_memviewslice __pyx_
       } else if (unlikely(__pyx_t_10 >= __pyx_v_result.shape[1])) __pyx_t_15 = 1;
       if (unlikely(__pyx_t_15 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_15);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 391; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_result.data + __pyx_t_9 * __pyx_v_result.strides[0]) ) + __pyx_t_10 * __pyx_v_result.strides[1]) )) = __pyx_v_acc;
     }
   }
 
-  /* "cybrain.pyx":393
+  /* "cybrain.pyx":572
  *             result[i,j] = acc
  * 
  *     return result             # <<<<<<<<<<<<<<
@@ -10599,7 +14591,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_dotMultiply(__Pyx_memviewslice __pyx_
   __pyx_r = __pyx_v_result;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":378
+  /* "cybrain.pyx":557
  *     return 1. / (1. + cmath.exp (-z))
  * 
  * cdef double [:,:] dotMultiply (double [:,:] A, double[:,:] B):             # <<<<<<<<<<<<<<
@@ -10628,7 +14620,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_dotMultiply(__Pyx_memviewslice __pyx_
   return __pyx_r;
 }
 
-/* "cybrain.pyx":395
+/* "cybrain.pyx":574
  *     return result
  * 
  * cdef double [:,:] elementMultiply (double [:,:] A, double[:,:] B):             # <<<<<<<<<<<<<<
@@ -10664,7 +14656,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementMultiply(__Pyx_memviewslice __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("elementMultiply", 0);
 
-  /* "cybrain.pyx":397
+  /* "cybrain.pyx":576
  * cdef double [:,:] elementMultiply (double [:,:] A, double[:,:] B):
  *     cdef:
  *         int i, j, k, m = A.shape[0], n = A.shape[1]             # <<<<<<<<<<<<<<
@@ -10674,18 +14666,18 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementMultiply(__Pyx_memviewslice __
   __pyx_v_m = (__pyx_v_A.shape[0]);
   __pyx_v_n = (__pyx_v_A.shape[1]);
 
-  /* "cybrain.pyx":399
+  /* "cybrain.pyx":578
  *         int i, j, k, m = A.shape[0], n = A.shape[1]
  *         double acc
  *         double [:,:] result = cvarray ((m, n), sizeof(double), 'd')             # <<<<<<<<<<<<<<
  * 
  *     for i in range(m):
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_m); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 399; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_m); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 578; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 399; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 578; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 399; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 578; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
@@ -10693,9 +14685,9 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementMultiply(__Pyx_memviewslice __
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_2);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 399; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 578; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 399; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 578; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
@@ -10706,17 +14698,17 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementMultiply(__Pyx_memviewslice __
   PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_n_s_d);
   __pyx_t_3 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 399; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 578; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_2);
-  if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 399; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 578; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_result = __pyx_t_4;
   __pyx_t_4.memview = NULL;
   __pyx_t_4.data = NULL;
 
-  /* "cybrain.pyx":401
+  /* "cybrain.pyx":580
  *         double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
  * 
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -10727,7 +14719,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementMultiply(__Pyx_memviewslice __
   for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
     __pyx_v_i = __pyx_t_6;
 
-    /* "cybrain.pyx":402
+    /* "cybrain.pyx":581
  * 
  *     for i in range(m):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -10738,7 +14730,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementMultiply(__Pyx_memviewslice __
     for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
       __pyx_v_j = __pyx_t_8;
 
-      /* "cybrain.pyx":403
+      /* "cybrain.pyx":582
  *     for i in range(m):
  *         for j in range(n):
  *             result[i,j] = A[i,j] * B[i,j]             # <<<<<<<<<<<<<<
@@ -10758,7 +14750,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementMultiply(__Pyx_memviewslice __
       } else if (unlikely(__pyx_t_10 >= __pyx_v_A.shape[1])) __pyx_t_11 = 1;
       if (unlikely(__pyx_t_11 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_11);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 582; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __pyx_t_11 = __pyx_v_i;
       __pyx_t_12 = __pyx_v_j;
@@ -10773,7 +14765,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementMultiply(__Pyx_memviewslice __
       } else if (unlikely(__pyx_t_12 >= __pyx_v_B.shape[1])) __pyx_t_13 = 1;
       if (unlikely(__pyx_t_13 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_13);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 582; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __pyx_t_13 = __pyx_v_i;
       __pyx_t_14 = __pyx_v_j;
@@ -10788,13 +14780,13 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementMultiply(__Pyx_memviewslice __
       } else if (unlikely(__pyx_t_14 >= __pyx_v_result.shape[1])) __pyx_t_15 = 1;
       if (unlikely(__pyx_t_15 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_15);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 582; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_result.data + __pyx_t_13 * __pyx_v_result.strides[0]) ) + __pyx_t_14 * __pyx_v_result.strides[1]) )) = ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_9 * __pyx_v_A.strides[0]) ) + __pyx_t_10 * __pyx_v_A.strides[1]) ))) * (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_B.data + __pyx_t_11 * __pyx_v_B.strides[0]) ) + __pyx_t_12 * __pyx_v_B.strides[1]) ))));
     }
   }
 
-  /* "cybrain.pyx":405
+  /* "cybrain.pyx":584
  *             result[i,j] = A[i,j] * B[i,j]
  * 
  *     return result             # <<<<<<<<<<<<<<
@@ -10805,7 +14797,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementMultiply(__Pyx_memviewslice __
   __pyx_r = __pyx_v_result;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":395
+  /* "cybrain.pyx":574
  *     return result
  * 
  * cdef double [:,:] elementMultiply (double [:,:] A, double[:,:] B):             # <<<<<<<<<<<<<<
@@ -10834,7 +14826,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementMultiply(__Pyx_memviewslice __
   return __pyx_r;
 }
 
-/* "cybrain.pyx":407
+/* "cybrain.pyx":586
  *     return result
  * 
  * cdef double [:,:] elementAdd (double [:,:] A, double[:,:] B):             # <<<<<<<<<<<<<<
@@ -10872,7 +14864,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementAdd(__Pyx_memviewslice __pyx_v
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("elementAdd", 0);
 
-  /* "cybrain.pyx":409
+  /* "cybrain.pyx":588
  * cdef double [:,:] elementAdd (double [:,:] A, double[:,:] B):
  *     cdef:
  *         int i, j, k, m = A.shape[0], n = A.shape[1]             # <<<<<<<<<<<<<<
@@ -10882,18 +14874,18 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementAdd(__Pyx_memviewslice __pyx_v
   __pyx_v_m = (__pyx_v_A.shape[0]);
   __pyx_v_n = (__pyx_v_A.shape[1]);
 
-  /* "cybrain.pyx":411
+  /* "cybrain.pyx":590
  *         int i, j, k, m = A.shape[0], n = A.shape[1]
  *         double acc
  *         double [:,:] result = cvarray ((m, n), sizeof(double), 'd')             # <<<<<<<<<<<<<<
  * 
  *     if A.shape[0] != B.shape[0] or A.shape[1] != B.shape[1]:
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_m); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 411; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_m); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 590; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 411; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 590; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 411; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 590; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
@@ -10901,9 +14893,9 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementAdd(__Pyx_memviewslice __pyx_v
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_2);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 411; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 590; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 411; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 590; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
@@ -10914,17 +14906,17 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementAdd(__Pyx_memviewslice __pyx_v
   PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_n_s_d);
   __pyx_t_3 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 411; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 590; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_2);
-  if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 411; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 590; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_result = __pyx_t_4;
   __pyx_t_4.memview = NULL;
   __pyx_t_4.data = NULL;
 
-  /* "cybrain.pyx":413
+  /* "cybrain.pyx":592
  *         double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
  * 
  *     if A.shape[0] != B.shape[0] or A.shape[1] != B.shape[1]:             # <<<<<<<<<<<<<<
@@ -10942,21 +14934,21 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementAdd(__Pyx_memviewslice __pyx_v
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_5) {
 
-    /* "cybrain.pyx":414
+    /* "cybrain.pyx":593
  * 
  *     if A.shape[0] != B.shape[0] or A.shape[1] != B.shape[1]:
  *         raise Exception ("Dimension Error")             # <<<<<<<<<<<<<<
  * 
  *     for i in range(m):
  */
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 414; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 414; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "cybrain.pyx":416
+  /* "cybrain.pyx":595
  *         raise Exception ("Dimension Error")
  * 
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -10967,7 +14959,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementAdd(__Pyx_memviewslice __pyx_v
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "cybrain.pyx":417
+    /* "cybrain.pyx":596
  * 
  *     for i in range(m):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -10978,7 +14970,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementAdd(__Pyx_memviewslice __pyx_v
     for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
       __pyx_v_j = __pyx_t_10;
 
-      /* "cybrain.pyx":418
+      /* "cybrain.pyx":597
  *     for i in range(m):
  *         for j in range(n):
  *             result[i,j] = A[i,j] + B[i,j]             # <<<<<<<<<<<<<<
@@ -10998,7 +14990,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementAdd(__Pyx_memviewslice __pyx_v
       } else if (unlikely(__pyx_t_12 >= __pyx_v_A.shape[1])) __pyx_t_13 = 1;
       if (unlikely(__pyx_t_13 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_13);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 418; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 597; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __pyx_t_13 = __pyx_v_i;
       __pyx_t_14 = __pyx_v_j;
@@ -11013,7 +15005,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementAdd(__Pyx_memviewslice __pyx_v
       } else if (unlikely(__pyx_t_14 >= __pyx_v_B.shape[1])) __pyx_t_15 = 1;
       if (unlikely(__pyx_t_15 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_15);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 418; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 597; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __pyx_t_15 = __pyx_v_i;
       __pyx_t_16 = __pyx_v_j;
@@ -11028,13 +15020,13 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementAdd(__Pyx_memviewslice __pyx_v
       } else if (unlikely(__pyx_t_16 >= __pyx_v_result.shape[1])) __pyx_t_17 = 1;
       if (unlikely(__pyx_t_17 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_17);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 418; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 597; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_result.data + __pyx_t_15 * __pyx_v_result.strides[0]) ) + __pyx_t_16 * __pyx_v_result.strides[1]) )) = ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_11 * __pyx_v_A.strides[0]) ) + __pyx_t_12 * __pyx_v_A.strides[1]) ))) + (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_B.data + __pyx_t_13 * __pyx_v_B.strides[0]) ) + __pyx_t_14 * __pyx_v_B.strides[1]) ))));
     }
   }
 
-  /* "cybrain.pyx":420
+  /* "cybrain.pyx":599
  *             result[i,j] = A[i,j] + B[i,j]
  * 
  *     return result             # <<<<<<<<<<<<<<
@@ -11045,7 +15037,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementAdd(__Pyx_memviewslice __pyx_v
   __pyx_r = __pyx_v_result;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":407
+  /* "cybrain.pyx":586
  *     return result
  * 
  * cdef double [:,:] elementAdd (double [:,:] A, double[:,:] B):             # <<<<<<<<<<<<<<
@@ -11074,7 +15066,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementAdd(__Pyx_memviewslice __pyx_v
   return __pyx_r;
 }
 
-/* "cybrain.pyx":422
+/* "cybrain.pyx":601
  *     return result
  * 
  * cdef double [:,:] elementSubtract (double [:,:] A, double[:,:] B):             # <<<<<<<<<<<<<<
@@ -11110,7 +15102,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementSubtract(__Pyx_memviewslice __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("elementSubtract", 0);
 
-  /* "cybrain.pyx":424
+  /* "cybrain.pyx":603
  * cdef double [:,:] elementSubtract (double [:,:] A, double[:,:] B):
  *     cdef:
  *         int i, j, k, m = A.shape[0], n = A.shape[1]             # <<<<<<<<<<<<<<
@@ -11120,18 +15112,18 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementSubtract(__Pyx_memviewslice __
   __pyx_v_m = (__pyx_v_A.shape[0]);
   __pyx_v_n = (__pyx_v_A.shape[1]);
 
-  /* "cybrain.pyx":426
+  /* "cybrain.pyx":605
  *         int i, j, k, m = A.shape[0], n = A.shape[1]
  *         double acc
  *         double [:,:] result = cvarray ((m, n), sizeof(double), 'd')             # <<<<<<<<<<<<<<
  * 
  *     for i in range(m):
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_m); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 426; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_m); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 605; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 426; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 605; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 426; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 605; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
@@ -11139,9 +15131,9 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementSubtract(__Pyx_memviewslice __
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_2);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 426; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 605; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 426; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 605; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
@@ -11152,17 +15144,17 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementSubtract(__Pyx_memviewslice __
   PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_n_s_d);
   __pyx_t_3 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 426; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 605; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_2);
-  if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 426; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 605; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_result = __pyx_t_4;
   __pyx_t_4.memview = NULL;
   __pyx_t_4.data = NULL;
 
-  /* "cybrain.pyx":428
+  /* "cybrain.pyx":607
  *         double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
  * 
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -11173,7 +15165,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementSubtract(__Pyx_memviewslice __
   for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
     __pyx_v_i = __pyx_t_6;
 
-    /* "cybrain.pyx":429
+    /* "cybrain.pyx":608
  * 
  *     for i in range(m):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -11184,7 +15176,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementSubtract(__Pyx_memviewslice __
     for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
       __pyx_v_j = __pyx_t_8;
 
-      /* "cybrain.pyx":430
+      /* "cybrain.pyx":609
  *     for i in range(m):
  *         for j in range(n):
  *             result[i,j] = A[i,j] - B[i,j]             # <<<<<<<<<<<<<<
@@ -11204,7 +15196,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementSubtract(__Pyx_memviewslice __
       } else if (unlikely(__pyx_t_10 >= __pyx_v_A.shape[1])) __pyx_t_11 = 1;
       if (unlikely(__pyx_t_11 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_11);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 430; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 609; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __pyx_t_11 = __pyx_v_i;
       __pyx_t_12 = __pyx_v_j;
@@ -11219,7 +15211,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementSubtract(__Pyx_memviewslice __
       } else if (unlikely(__pyx_t_12 >= __pyx_v_B.shape[1])) __pyx_t_13 = 1;
       if (unlikely(__pyx_t_13 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_13);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 430; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 609; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __pyx_t_13 = __pyx_v_i;
       __pyx_t_14 = __pyx_v_j;
@@ -11234,13 +15226,13 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementSubtract(__Pyx_memviewslice __
       } else if (unlikely(__pyx_t_14 >= __pyx_v_result.shape[1])) __pyx_t_15 = 1;
       if (unlikely(__pyx_t_15 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_15);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 430; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 609; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_result.data + __pyx_t_13 * __pyx_v_result.strides[0]) ) + __pyx_t_14 * __pyx_v_result.strides[1]) )) = ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_9 * __pyx_v_A.strides[0]) ) + __pyx_t_10 * __pyx_v_A.strides[1]) ))) - (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_B.data + __pyx_t_11 * __pyx_v_B.strides[0]) ) + __pyx_t_12 * __pyx_v_B.strides[1]) ))));
     }
   }
 
-  /* "cybrain.pyx":432
+  /* "cybrain.pyx":611
  *             result[i,j] = A[i,j] - B[i,j]
  * 
  *     return result             # <<<<<<<<<<<<<<
@@ -11251,7 +15243,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementSubtract(__Pyx_memviewslice __
   __pyx_r = __pyx_v_result;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":422
+  /* "cybrain.pyx":601
  *     return result
  * 
  * cdef double [:,:] elementSubtract (double [:,:] A, double[:,:] B):             # <<<<<<<<<<<<<<
@@ -11280,7 +15272,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementSubtract(__Pyx_memviewslice __
   return __pyx_r;
 }
 
-/* "cybrain.pyx":434
+/* "cybrain.pyx":613
  *     return result
  * 
  * cdef double[:,:] elementBinaryOperation (double [:,:] A, double [:,:] B, BinaryDoubleFun f):             # <<<<<<<<<<<<<<
@@ -11316,7 +15308,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementBinaryOperation(__Pyx_memviews
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("elementBinaryOperation", 0);
 
-  /* "cybrain.pyx":436
+  /* "cybrain.pyx":615
  * cdef double[:,:] elementBinaryOperation (double [:,:] A, double [:,:] B, BinaryDoubleFun f):
  *     cdef:
  *         int i, j, k, m = A.shape[0], n = A.shape[1]             # <<<<<<<<<<<<<<
@@ -11326,18 +15318,18 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementBinaryOperation(__Pyx_memviews
   __pyx_v_m = (__pyx_v_A.shape[0]);
   __pyx_v_n = (__pyx_v_A.shape[1]);
 
-  /* "cybrain.pyx":438
+  /* "cybrain.pyx":617
  *         int i, j, k, m = A.shape[0], n = A.shape[1]
  *         double acc
  *         double [:,:] result = cvarray ((m, n), sizeof(double), 'd')             # <<<<<<<<<<<<<<
  * 
  *     for i in range(m):
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_m); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_m); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 617; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 617; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 617; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
@@ -11345,9 +15337,9 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementBinaryOperation(__Pyx_memviews
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_2);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 617; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 617; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
@@ -11358,17 +15350,17 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementBinaryOperation(__Pyx_memviews
   PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_n_s_d);
   __pyx_t_3 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 617; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_2);
-  if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 617; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_result = __pyx_t_4;
   __pyx_t_4.memview = NULL;
   __pyx_t_4.data = NULL;
 
-  /* "cybrain.pyx":440
+  /* "cybrain.pyx":619
  *         double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
  * 
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -11379,7 +15371,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementBinaryOperation(__Pyx_memviews
   for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
     __pyx_v_i = __pyx_t_6;
 
-    /* "cybrain.pyx":441
+    /* "cybrain.pyx":620
  * 
  *     for i in range(m):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -11390,7 +15382,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementBinaryOperation(__Pyx_memviews
     for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
       __pyx_v_j = __pyx_t_8;
 
-      /* "cybrain.pyx":442
+      /* "cybrain.pyx":621
  *     for i in range(m):
  *         for j in range(n):
  *             result[i,j] = f (A[i,j], B[i,j])             # <<<<<<<<<<<<<<
@@ -11410,7 +15402,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementBinaryOperation(__Pyx_memviews
       } else if (unlikely(__pyx_t_10 >= __pyx_v_A.shape[1])) __pyx_t_11 = 1;
       if (unlikely(__pyx_t_11 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_11);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 442; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 621; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __pyx_t_11 = __pyx_v_i;
       __pyx_t_12 = __pyx_v_j;
@@ -11425,7 +15417,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementBinaryOperation(__Pyx_memviews
       } else if (unlikely(__pyx_t_12 >= __pyx_v_B.shape[1])) __pyx_t_13 = 1;
       if (unlikely(__pyx_t_13 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_13);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 442; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 621; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __pyx_t_13 = __pyx_v_i;
       __pyx_t_14 = __pyx_v_j;
@@ -11440,24 +15432,24 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementBinaryOperation(__Pyx_memviews
       } else if (unlikely(__pyx_t_14 >= __pyx_v_result.shape[1])) __pyx_t_15 = 1;
       if (unlikely(__pyx_t_15 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_15);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 442; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 621; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_result.data + __pyx_t_13 * __pyx_v_result.strides[0]) ) + __pyx_t_14 * __pyx_v_result.strides[1]) )) = __pyx_v_f((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_9 * __pyx_v_A.strides[0]) ) + __pyx_t_10 * __pyx_v_A.strides[1]) ))), (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_B.data + __pyx_t_11 * __pyx_v_B.strides[0]) ) + __pyx_t_12 * __pyx_v_B.strides[1]) ))));
     }
   }
 
-  /* "cybrain.pyx":444
+  /* "cybrain.pyx":623
  *             result[i,j] = f (A[i,j], B[i,j])
  * 
  *     return result             # <<<<<<<<<<<<<<
  * 
- * cdef double[:,:] elementUnaryOperation (double [:,:] A, UnaryDoubleFun f):
+ * 
  */
   __PYX_INC_MEMVIEW(&__pyx_v_result, 0);
   __pyx_r = __pyx_v_result;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":434
+  /* "cybrain.pyx":613
  *     return result
  * 
  * cdef double[:,:] elementBinaryOperation (double [:,:] A, double [:,:] B, BinaryDoubleFun f):             # <<<<<<<<<<<<<<
@@ -11486,8 +15478,8 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementBinaryOperation(__Pyx_memviews
   return __pyx_r;
 }
 
-/* "cybrain.pyx":446
- *     return result
+/* "cybrain.pyx":626
+ * 
  * 
  * cdef double[:,:] elementUnaryOperation (double [:,:] A, UnaryDoubleFun f):             # <<<<<<<<<<<<<<
  *     cdef:
@@ -11520,7 +15512,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementUnaryOperation(__Pyx_memviewsl
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("elementUnaryOperation", 0);
 
-  /* "cybrain.pyx":448
+  /* "cybrain.pyx":628
  * cdef double[:,:] elementUnaryOperation (double [:,:] A, UnaryDoubleFun f):
  *     cdef:
  *         int i, j, k, m = A.shape[0], n = A.shape[1]             # <<<<<<<<<<<<<<
@@ -11530,18 +15522,18 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementUnaryOperation(__Pyx_memviewsl
   __pyx_v_m = (__pyx_v_A.shape[0]);
   __pyx_v_n = (__pyx_v_A.shape[1]);
 
-  /* "cybrain.pyx":450
+  /* "cybrain.pyx":630
  *         int i, j, k, m = A.shape[0], n = A.shape[1]
  *         double acc
  *         double [:,:] result = cvarray ((m, n), sizeof(double), 'd')             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_m); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 450; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_m); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 630; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 450; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 630; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 450; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 630; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
@@ -11549,9 +15541,9 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementUnaryOperation(__Pyx_memviewsl
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_2);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 450; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_FromSize_t((sizeof(double))); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 630; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 450; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 630; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
@@ -11562,17 +15554,17 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementUnaryOperation(__Pyx_memviewsl
   PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_n_s_d);
   __pyx_t_3 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 450; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_array_type)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 630; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_2);
-  if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 450; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_4.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 630; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_result = __pyx_t_4;
   __pyx_t_4.memview = NULL;
   __pyx_t_4.data = NULL;
 
-  /* "cybrain.pyx":453
+  /* "cybrain.pyx":633
  * 
  * 
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -11583,7 +15575,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementUnaryOperation(__Pyx_memviewsl
   for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
     __pyx_v_i = __pyx_t_6;
 
-    /* "cybrain.pyx":454
+    /* "cybrain.pyx":634
  * 
  *     for i in range(m):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -11594,7 +15586,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementUnaryOperation(__Pyx_memviewsl
     for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
       __pyx_v_j = __pyx_t_8;
 
-      /* "cybrain.pyx":455
+      /* "cybrain.pyx":635
  *     for i in range(m):
  *         for j in range(n):
  *             result[i,j] = f (A[i,j])             # <<<<<<<<<<<<<<
@@ -11614,7 +15606,7 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementUnaryOperation(__Pyx_memviewsl
       } else if (unlikely(__pyx_t_10 >= __pyx_v_A.shape[1])) __pyx_t_11 = 1;
       if (unlikely(__pyx_t_11 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_11);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 455; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 635; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __pyx_t_11 = __pyx_v_i;
       __pyx_t_12 = __pyx_v_j;
@@ -11629,23 +15621,25 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementUnaryOperation(__Pyx_memviewsl
       } else if (unlikely(__pyx_t_12 >= __pyx_v_result.shape[1])) __pyx_t_13 = 1;
       if (unlikely(__pyx_t_13 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_13);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 455; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 635; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_result.data + __pyx_t_11 * __pyx_v_result.strides[0]) ) + __pyx_t_12 * __pyx_v_result.strides[1]) )) = __pyx_v_f((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_9 * __pyx_v_A.strides[0]) ) + __pyx_t_10 * __pyx_v_A.strides[1]) ))));
     }
   }
 
-  /* "cybrain.pyx":457
+  /* "cybrain.pyx":637
  *             result[i,j] = f (A[i,j])
  * 
  *     return result             # <<<<<<<<<<<<<<
+ * 
+ * cdef void copy_matrix (double [:,:] target, double [:,:] source):
  */
   __PYX_INC_MEMVIEW(&__pyx_v_result, 0);
   __pyx_r = __pyx_v_result;
   goto __pyx_L0;
 
-  /* "cybrain.pyx":446
- *     return result
+  /* "cybrain.pyx":626
+ * 
  * 
  * cdef double[:,:] elementUnaryOperation (double [:,:] A, UnaryDoubleFun f):             # <<<<<<<<<<<<<<
  *     cdef:
@@ -11669,6 +15663,293 @@ static __Pyx_memviewslice __pyx_f_7cybrain_elementUnaryOperation(__Pyx_memviewsl
   }
   __pyx_L2:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_result, 1);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cybrain.pyx":639
+ *     return result
+ * 
+ * cdef void copy_matrix (double [:,:] target, double [:,:] source):             # <<<<<<<<<<<<<<
+ *     cdef:
+ *         int i, j, k, m = target.shape[0], n = target.shape[1]
+ */
+
+static void __pyx_f_7cybrain_copy_matrix(__Pyx_memviewslice __pyx_v_target, __Pyx_memviewslice __pyx_v_source) {
+  int __pyx_v_i;
+  int __pyx_v_j;
+  int __pyx_v_m;
+  int __pyx_v_n;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  int __pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  int __pyx_t_4;
+  int __pyx_t_5;
+  int __pyx_t_6;
+  int __pyx_t_7;
+  int __pyx_t_8;
+  int __pyx_t_9;
+  int __pyx_t_10;
+  int __pyx_t_11;
+  int __pyx_t_12;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("copy_matrix", 0);
+
+  /* "cybrain.pyx":641
+ * cdef void copy_matrix (double [:,:] target, double [:,:] source):
+ *     cdef:
+ *         int i, j, k, m = target.shape[0], n = target.shape[1]             # <<<<<<<<<<<<<<
+ * 
+ *     if target.shape[0] != source.shape[0] or target.shape[1] != source.shape[1]:
+ */
+  __pyx_v_m = (__pyx_v_target.shape[0]);
+  __pyx_v_n = (__pyx_v_target.shape[1]);
+
+  /* "cybrain.pyx":643
+ *         int i, j, k, m = target.shape[0], n = target.shape[1]
+ * 
+ *     if target.shape[0] != source.shape[0] or target.shape[1] != source.shape[1]:             # <<<<<<<<<<<<<<
+ *         raise Exception("Copy error: matrices need to have the same shape")
+ * 
+ */
+  __pyx_t_2 = (((__pyx_v_target.shape[0]) != (__pyx_v_source.shape[0])) != 0);
+  if (!__pyx_t_2) {
+  } else {
+    __pyx_t_1 = __pyx_t_2;
+    goto __pyx_L4_bool_binop_done;
+  }
+  __pyx_t_2 = (((__pyx_v_target.shape[1]) != (__pyx_v_source.shape[1])) != 0);
+  __pyx_t_1 = __pyx_t_2;
+  __pyx_L4_bool_binop_done:;
+  if (__pyx_t_1) {
+
+    /* "cybrain.pyx":644
+ * 
+ *     if target.shape[0] != source.shape[0] or target.shape[1] != source.shape[1]:
+ *         raise Exception("Copy error: matrices need to have the same shape")             # <<<<<<<<<<<<<<
+ * 
+ *     for i in range(m):
+ */
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 644; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_Raise(__pyx_t_3, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 644; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+
+  /* "cybrain.pyx":646
+ *         raise Exception("Copy error: matrices need to have the same shape")
+ * 
+ *     for i in range(m):             # <<<<<<<<<<<<<<
+ *         for j in range(n):
+ *             target[i,j] = source[i,j]
+ */
+  __pyx_t_4 = __pyx_v_m;
+  for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
+    __pyx_v_i = __pyx_t_5;
+
+    /* "cybrain.pyx":647
+ * 
+ *     for i in range(m):
+ *         for j in range(n):             # <<<<<<<<<<<<<<
+ *             target[i,j] = source[i,j]
+ * 
+ */
+    __pyx_t_6 = __pyx_v_n;
+    for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_6; __pyx_t_7+=1) {
+      __pyx_v_j = __pyx_t_7;
+
+      /* "cybrain.pyx":648
+ *     for i in range(m):
+ *         for j in range(n):
+ *             target[i,j] = source[i,j]             # <<<<<<<<<<<<<<
+ * 
+ * cdef vector[double*] get_pointers (double [:,:] A):
+ */
+      __pyx_t_8 = __pyx_v_i;
+      __pyx_t_9 = __pyx_v_j;
+      __pyx_t_10 = -1;
+      if (__pyx_t_8 < 0) {
+        __pyx_t_8 += __pyx_v_source.shape[0];
+        if (unlikely(__pyx_t_8 < 0)) __pyx_t_10 = 0;
+      } else if (unlikely(__pyx_t_8 >= __pyx_v_source.shape[0])) __pyx_t_10 = 0;
+      if (__pyx_t_9 < 0) {
+        __pyx_t_9 += __pyx_v_source.shape[1];
+        if (unlikely(__pyx_t_9 < 0)) __pyx_t_10 = 1;
+      } else if (unlikely(__pyx_t_9 >= __pyx_v_source.shape[1])) __pyx_t_10 = 1;
+      if (unlikely(__pyx_t_10 != -1)) {
+        __Pyx_RaiseBufferIndexError(__pyx_t_10);
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 648; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      }
+      __pyx_t_10 = __pyx_v_i;
+      __pyx_t_11 = __pyx_v_j;
+      __pyx_t_12 = -1;
+      if (__pyx_t_10 < 0) {
+        __pyx_t_10 += __pyx_v_target.shape[0];
+        if (unlikely(__pyx_t_10 < 0)) __pyx_t_12 = 0;
+      } else if (unlikely(__pyx_t_10 >= __pyx_v_target.shape[0])) __pyx_t_12 = 0;
+      if (__pyx_t_11 < 0) {
+        __pyx_t_11 += __pyx_v_target.shape[1];
+        if (unlikely(__pyx_t_11 < 0)) __pyx_t_12 = 1;
+      } else if (unlikely(__pyx_t_11 >= __pyx_v_target.shape[1])) __pyx_t_12 = 1;
+      if (unlikely(__pyx_t_12 != -1)) {
+        __Pyx_RaiseBufferIndexError(__pyx_t_12);
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 648; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      }
+      *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_target.data + __pyx_t_10 * __pyx_v_target.strides[0]) ) + __pyx_t_11 * __pyx_v_target.strides[1]) )) = (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_source.data + __pyx_t_8 * __pyx_v_source.strides[0]) ) + __pyx_t_9 * __pyx_v_source.strides[1]) )));
+    }
+  }
+
+  /* "cybrain.pyx":639
+ *     return result
+ * 
+ * cdef void copy_matrix (double [:,:] target, double [:,:] source):             # <<<<<<<<<<<<<<
+ *     cdef:
+ *         int i, j, k, m = target.shape[0], n = target.shape[1]
+ */
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_WriteUnraisable("cybrain.copy_matrix", __pyx_clineno, __pyx_lineno, __pyx_filename, 0, 0);
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+}
+
+/* "cybrain.pyx":650
+ *             target[i,j] = source[i,j]
+ * 
+ * cdef vector[double*] get_pointers (double [:,:] A):             # <<<<<<<<<<<<<<
+ *     cdef:
+ *         vector[double*] result
+ */
+
+static std::vector<double *>  __pyx_f_7cybrain_get_pointers(__Pyx_memviewslice __pyx_v_A) {
+  std::vector<double *>  __pyx_v_result;
+  int __pyx_v_i;
+  int __pyx_v_j;
+  int __pyx_v_m;
+  int __pyx_v_n;
+  std::vector<double *>  __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  int __pyx_t_2;
+  int __pyx_t_3;
+  int __pyx_t_4;
+  __Pyx_memviewslice __pyx_t_5 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_t_6;
+  int __pyx_t_7;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_pointers", 0);
+
+  /* "cybrain.pyx":653
+ *     cdef:
+ *         vector[double*] result
+ *         int i, j, m = A.shape[0], n = A.shape[1]             # <<<<<<<<<<<<<<
+ * 
+ *     for i in range(m):
+ */
+  __pyx_v_m = (__pyx_v_A.shape[0]);
+  __pyx_v_n = (__pyx_v_A.shape[1]);
+
+  /* "cybrain.pyx":655
+ *         int i, j, m = A.shape[0], n = A.shape[1]
+ * 
+ *     for i in range(m):             # <<<<<<<<<<<<<<
+ *         for j in range(n):
+ *             result.push_back(&(A[i][j]))
+ */
+  __pyx_t_1 = __pyx_v_m;
+  for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
+    __pyx_v_i = __pyx_t_2;
+
+    /* "cybrain.pyx":656
+ * 
+ *     for i in range(m):
+ *         for j in range(n):             # <<<<<<<<<<<<<<
+ *             result.push_back(&(A[i][j]))
+ * 
+ */
+    __pyx_t_3 = __pyx_v_n;
+    for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
+      __pyx_v_j = __pyx_t_4;
+
+      /* "cybrain.pyx":657
+ *     for i in range(m):
+ *         for j in range(n):
+ *             result.push_back(&(A[i][j]))             # <<<<<<<<<<<<<<
+ * 
+ *     return result
+ */
+      __pyx_t_5.data = __pyx_v_A.data;
+      __pyx_t_5.memview = __pyx_v_A.memview;
+      __PYX_INC_MEMVIEW(&__pyx_t_5, 0);
+      {
+    Py_ssize_t __pyx_tmp_idx = __pyx_v_i;
+    Py_ssize_t __pyx_tmp_shape = __pyx_v_A.shape[0];
+    Py_ssize_t __pyx_tmp_stride = __pyx_v_A.strides[0];
+    if (1 && (__pyx_tmp_idx < 0))
+        __pyx_tmp_idx += __pyx_tmp_shape;
+    if (1 && (__pyx_tmp_idx < 0 || __pyx_tmp_idx >= __pyx_tmp_shape)) {
+        PyErr_SetString(PyExc_IndexError, "Index out of bounds (axis 0)");
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+        __pyx_t_5.data += __pyx_tmp_idx * __pyx_tmp_stride;
+}
+
+__pyx_t_5.shape[0] = __pyx_v_A.shape[1];
+__pyx_t_5.strides[0] = __pyx_v_A.strides[1];
+    __pyx_t_5.suboffsets[0] = -1;
+
+__pyx_t_6 = __pyx_v_j;
+      __pyx_t_7 = -1;
+      if (__pyx_t_6 < 0) {
+        __pyx_t_6 += __pyx_t_5.shape[0];
+        if (unlikely(__pyx_t_6 < 0)) __pyx_t_7 = 0;
+      } else if (unlikely(__pyx_t_6 >= __pyx_t_5.shape[0])) __pyx_t_7 = 0;
+      if (unlikely(__pyx_t_7 != -1)) {
+        __Pyx_RaiseBufferIndexError(__pyx_t_7);
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      }
+      try {
+        __pyx_v_result.push_back((&(*((double *) ( /* dim=0 */ (__pyx_t_5.data + __pyx_t_6 * __pyx_t_5.strides[0]) )))));
+      } catch(...) {
+        __Pyx_CppExn2PyErr();
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      }
+      __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
+    }
+  }
+
+  /* "cybrain.pyx":659
+ *             result.push_back(&(A[i][j]))
+ * 
+ *     return result             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __pyx_r = __pyx_v_result;
+  goto __pyx_L0;
+
+  /* "cybrain.pyx":650
+ *             target[i,j] = source[i,j]
+ * 
+ * cdef vector[double*] get_pointers (double [:,:] A):             # <<<<<<<<<<<<<<
+ *     cdef:
+ *         vector[double*] result
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
+  __Pyx_WriteUnraisable("cybrain.get_pointers", __pyx_clineno, __pyx_lineno, __pyx_filename, 0, 0);
+  __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -12458,7 +16739,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -12498,7 +16779,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  * 
  *             info.buf = PyArray_DATA(self)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -12775,7 +17056,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 260; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 260; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -13588,7 +17869,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  * 
  *         if ((child.byteorder == c'>' and little_endian) or
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 802; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 802; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -13640,7 +17921,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  *             # One could encode it in the format string and have Cython
  *             # complain instead, BUT: < and > in format strings also imply
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 806; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__13, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 806; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -13741,7 +18022,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  * 
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  */
-        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 826; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__14, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 826; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_Raise(__pyx_t_4, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -14496,7 +18777,7 @@ static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __
  * 
  *         if itemsize <= 0:
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__13, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__15, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -14520,7 +18801,7 @@ static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __
  * 
  *         if isinstance(format, unicode):
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__14, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 130; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__16, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 130; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -14618,7 +18899,7 @@ static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __
  * 
  * 
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple__15, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 142; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple__17, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 142; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -14870,7 +19151,7 @@ static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __
  * 
  *             if self.dtype_is_object:
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple__16, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 170; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 170; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -15088,7 +19369,7 @@ static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(stru
  *         info.buf = self.data
  *         info.len = self.len
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__17, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__19, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -17683,7 +21964,7 @@ static PyObject *__pyx_memoryview_convert_item_to_object(struct __pyx_memoryview
  *         else:
  *             if len(self.view.format) == 1:
  */
-      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 445; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
+      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__20, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 445; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_Raise(__pyx_t_6, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -18465,7 +22746,7 @@ static PyObject *__pyx_pf_15View_dot_MemoryView_10memoryview_7strides___get__(st
  * 
  *             return tuple([stride for stride in self.view.strides[:self.view.ndim]])
  */
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__19, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 521; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__21, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 521; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -18574,7 +22855,7 @@ static PyObject *__pyx_pf_15View_dot_MemoryView_10memoryview_10suboffsets___get_
     __Pyx_XDECREF(__pyx_r);
     __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_self->view.ndim); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 529; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyNumber_Multiply(__pyx_tuple__20, __pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 529; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyNumber_Multiply(__pyx_tuple__22, __pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 529; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_r = __pyx_t_3;
@@ -19884,9 +24165,9 @@ static PyObject *_unellipsify(PyObject *__pyx_v_index, int __pyx_v_ndim) {
         __Pyx_GOTREF(__pyx_t_7);
         { Py_ssize_t __pyx_temp;
           for (__pyx_temp=0; __pyx_temp < ((__pyx_v_ndim - __pyx_t_8) + 1); __pyx_temp++) {
-            __Pyx_INCREF(__pyx_slice__21);
-            __Pyx_GIVEREF(__pyx_slice__21);
-            PyList_SET_ITEM(__pyx_t_7, __pyx_temp, __pyx_slice__21);
+            __Pyx_INCREF(__pyx_slice__23);
+            __Pyx_GIVEREF(__pyx_slice__23);
+            PyList_SET_ITEM(__pyx_t_7, __pyx_temp, __pyx_slice__23);
           }
         }
         __pyx_t_9 = __Pyx_PyList_Extend(__pyx_v_result, __pyx_t_7); if (unlikely(__pyx_t_9 == -1)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 638; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -19911,7 +24192,7 @@ static PyObject *_unellipsify(PyObject *__pyx_v_index, int __pyx_v_ndim) {
  *             have_slices = True
  *         else:
  */
-        __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_result, __pyx_slice__22); if (unlikely(__pyx_t_9 == -1)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 641; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_result, __pyx_slice__24); if (unlikely(__pyx_t_9 == -1)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 641; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __pyx_L7:;
 
@@ -20040,9 +24321,9 @@ static PyObject *_unellipsify(PyObject *__pyx_v_index, int __pyx_v_ndim) {
     __Pyx_GOTREF(__pyx_t_3);
     { Py_ssize_t __pyx_temp;
       for (__pyx_temp=0; __pyx_temp < __pyx_v_nslices; __pyx_temp++) {
-        __Pyx_INCREF(__pyx_slice__23);
-        __Pyx_GIVEREF(__pyx_slice__23);
-        PyList_SET_ITEM(__pyx_t_3, __pyx_temp, __pyx_slice__23);
+        __Pyx_INCREF(__pyx_slice__25);
+        __Pyx_GIVEREF(__pyx_slice__25);
+        PyList_SET_ITEM(__pyx_t_3, __pyx_temp, __pyx_slice__25);
       }
     }
     __pyx_t_9 = __Pyx_PyList_Extend(__pyx_v_result, __pyx_t_3); if (unlikely(__pyx_t_9 == -1)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 652; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -20163,7 +24444,7 @@ static PyObject *assert_direct_dimensions(Py_ssize_t *__pyx_v_suboffsets, int __
  * 
  * 
  */
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__24, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 659; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__26, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 659; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_Raise(__pyx_t_5, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -25364,6 +29645,7 @@ static int __pyx_setprop_7cybrain_5Layer_back_active(PyObject *o, PyObject *v, C
 
 static PyMethodDef __pyx_methods_7cybrain_Layer[] = {
   {"setData", (PyCFunction)__pyx_pw_7cybrain_5Layer_3setData, METH_O, 0},
+  {"restart", (PyCFunction)__pyx_pw_7cybrain_5Layer_5restart, METH_NOARGS, 0},
   {0, 0, 0, 0}
 };
 
@@ -25527,8 +29809,9 @@ static PyMethodDef __pyx_methods_7cybrain_LinearLayer[] = {
   {"getY", (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_5getY, METH_NOARGS, 0},
   {"setData", (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_7setData, METH_O, 0},
   {"setTarget", (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_9setTarget, METH_O, 0},
-  {"fullConnectTo", (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_11fullConnectTo, METH_VARARGS|METH_KEYWORDS, 0},
-  {"linearConnectTo", (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_13linearConnectTo, METH_VARARGS|METH_KEYWORDS, 0},
+  {"neuronCount", (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_11neuronCount, METH_NOARGS, 0},
+  {"fullConnectTo", (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_13fullConnectTo, METH_VARARGS|METH_KEYWORDS, 0},
+  {"linearConnectTo", (PyCFunction)__pyx_pw_7cybrain_11LinearLayer_15linearConnectTo, METH_VARARGS|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 
@@ -25667,6 +29950,77 @@ static PyTypeObject __pyx_type_7cybrain_LogisticLayer = {
   0, /*tp_finalize*/
   #endif
 };
+static struct __pyx_vtabstruct_7cybrain_BiasUnit __pyx_vtable_7cybrain_BiasUnit;
+
+static PyObject *__pyx_tp_new_7cybrain_BiasUnit(PyTypeObject *t, PyObject *a, PyObject *k) {
+  struct __pyx_obj_7cybrain_BiasUnit *p;
+  PyObject *o = __pyx_tp_new_7cybrain_LinearLayer(t, a, k);
+  if (unlikely(!o)) return 0;
+  p = ((struct __pyx_obj_7cybrain_BiasUnit *)o);
+  p->__pyx_base.__pyx_base.__pyx_vtab = (struct __pyx_vtabstruct_7cybrain_Layer*)__pyx_vtabptr_7cybrain_BiasUnit;
+  return o;
+}
+
+static PyMethodDef __pyx_methods_7cybrain_BiasUnit[] = {
+  {0, 0, 0, 0}
+};
+
+static PyTypeObject __pyx_type_7cybrain_BiasUnit = {
+  PyVarObject_HEAD_INIT(0, 0)
+  "cybrain.BiasUnit", /*tp_name*/
+  sizeof(struct __pyx_obj_7cybrain_BiasUnit), /*tp_basicsize*/
+  0, /*tp_itemsize*/
+  __pyx_tp_dealloc_7cybrain_LinearLayer, /*tp_dealloc*/
+  0, /*tp_print*/
+  0, /*tp_getattr*/
+  0, /*tp_setattr*/
+  #if PY_MAJOR_VERSION < 3
+  0, /*tp_compare*/
+  #else
+  0, /*reserved*/
+  #endif
+  0, /*tp_repr*/
+  0, /*tp_as_number*/
+  0, /*tp_as_sequence*/
+  0, /*tp_as_mapping*/
+  0, /*tp_hash*/
+  0, /*tp_call*/
+  0, /*tp_str*/
+  0, /*tp_getattro*/
+  0, /*tp_setattro*/
+  0, /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
+  0, /*tp_doc*/
+  __pyx_tp_traverse_7cybrain_Layer, /*tp_traverse*/
+  __pyx_tp_clear_7cybrain_Layer, /*tp_clear*/
+  0, /*tp_richcompare*/
+  0, /*tp_weaklistoffset*/
+  0, /*tp_iter*/
+  0, /*tp_iternext*/
+  __pyx_methods_7cybrain_BiasUnit, /*tp_methods*/
+  0, /*tp_members*/
+  0, /*tp_getset*/
+  0, /*tp_base*/
+  0, /*tp_dict*/
+  0, /*tp_descr_get*/
+  0, /*tp_descr_set*/
+  0, /*tp_dictoffset*/
+  __pyx_pw_7cybrain_8BiasUnit_1__init__, /*tp_init*/
+  0, /*tp_alloc*/
+  __pyx_tp_new_7cybrain_BiasUnit, /*tp_new*/
+  0, /*tp_free*/
+  0, /*tp_is_gc*/
+  0, /*tp_bases*/
+  0, /*tp_mro*/
+  0, /*tp_cache*/
+  0, /*tp_subclasses*/
+  0, /*tp_weaklist*/
+  0, /*tp_del*/
+  0, /*tp_version_tag*/
+  #if PY_VERSION_HEX >= 0x030400a1
+  0, /*tp_finalize*/
+  #endif
+};
 static struct __pyx_vtabstruct_7cybrain_Network __pyx_vtable_7cybrain_Network;
 
 static PyObject *__pyx_tp_new_7cybrain_Network(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
@@ -25687,6 +30041,8 @@ static PyObject *__pyx_tp_new_7cybrain_Network(PyTypeObject *t, CYTHON_UNUSED Py
   p->layers = ((PyObject*)Py_None); Py_INCREF(Py_None);
   p->hiddenLayers = ((PyObject*)Py_None); Py_INCREF(Py_None);
   p->connections = ((PyObject*)Py_None); Py_INCREF(Py_None);
+  p->all_input_layers = ((PyObject*)Py_None); Py_INCREF(Py_None);
+  p->all_output_layers = ((PyObject*)Py_None); Py_INCREF(Py_None);
   return o;
 }
 
@@ -25705,6 +30061,8 @@ static void __pyx_tp_dealloc_7cybrain_Network(PyObject *o) {
   Py_CLEAR(p->layers);
   Py_CLEAR(p->hiddenLayers);
   Py_CLEAR(p->connections);
+  Py_CLEAR(p->all_input_layers);
+  Py_CLEAR(p->all_output_layers);
   (*Py_TYPE(o)->tp_free)(o);
 }
 
@@ -25732,6 +30090,12 @@ static int __pyx_tp_traverse_7cybrain_Network(PyObject *o, visitproc v, void *a)
   if (p->connections) {
     e = (*v)(p->connections, a); if (e) return e;
   }
+  if (p->all_input_layers) {
+    e = (*v)(p->all_input_layers, a); if (e) return e;
+  }
+  if (p->all_output_layers) {
+    e = (*v)(p->all_output_layers, a); if (e) return e;
+  }
   return 0;
 }
 
@@ -25758,6 +30122,12 @@ static int __pyx_tp_clear_7cybrain_Network(PyObject *o) {
   Py_XDECREF(tmp);
   tmp = ((PyObject*)p->connections);
   p->connections = ((PyObject*)Py_None); Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  tmp = ((PyObject*)p->all_input_layers);
+  p->all_input_layers = ((PyObject*)Py_None); Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  tmp = ((PyObject*)p->all_output_layers);
+  p->all_output_layers = ((PyObject*)Py_None); Py_INCREF(Py_None);
   Py_XDECREF(tmp);
   return 0;
 }
@@ -25853,12 +30223,41 @@ static int __pyx_setprop_7cybrain_7Network_connections(PyObject *o, PyObject *v,
   }
 }
 
+static PyObject *__pyx_getprop_7cybrain_7Network_all_input_layers(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_7cybrain_7Network_16all_input_layers_1__get__(o);
+}
+
+static int __pyx_setprop_7cybrain_7Network_all_input_layers(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_7cybrain_7Network_16all_input_layers_3__set__(o, v);
+  }
+  else {
+    return __pyx_pw_7cybrain_7Network_16all_input_layers_5__del__(o);
+  }
+}
+
+static PyObject *__pyx_getprop_7cybrain_7Network_all_output_layers(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_7cybrain_7Network_17all_output_layers_1__get__(o);
+}
+
+static int __pyx_setprop_7cybrain_7Network_all_output_layers(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_7cybrain_7Network_17all_output_layers_3__set__(o, v);
+  }
+  else {
+    return __pyx_pw_7cybrain_7Network_17all_output_layers_5__del__(o);
+  }
+}
+
 static PyMethodDef __pyx_methods_7cybrain_Network[] = {
-  {"findHiddenComponents", (PyCFunction)__pyx_pw_7cybrain_7Network_3findHiddenComponents, METH_NOARGS, 0},
+  {"setup", (PyCFunction)__pyx_pw_7cybrain_7Network_3setup, METH_NOARGS, 0},
   {"restartNetwork", (PyCFunction)__pyx_pw_7cybrain_7Network_5restartNetwork, METH_NOARGS, 0},
   {"setData", (PyCFunction)__pyx_pw_7cybrain_7Network_7setData, METH_O, 0},
   {"activate_layers", (PyCFunction)__pyx_pw_7cybrain_7Network_9activate_layers, METH_O, 0},
   {"activate", (PyCFunction)__pyx_pw_7cybrain_7Network_11activate, METH_O, 0},
+  {"setTarget", (PyCFunction)__pyx_pw_7cybrain_7Network_13setTarget, METH_O, 0},
+  {"back_activate_layers", (PyCFunction)__pyx_pw_7cybrain_7Network_15back_activate_layers, METH_O, 0},
+  {"back_activate", (PyCFunction)__pyx_pw_7cybrain_7Network_17back_activate, METH_O, 0},
   {0, 0, 0, 0}
 };
 
@@ -25870,6 +30269,8 @@ static struct PyGetSetDef __pyx_getsets_7cybrain_Network[] = {
   {(char *)"layers", __pyx_getprop_7cybrain_7Network_layers, __pyx_setprop_7cybrain_7Network_layers, 0, 0},
   {(char *)"hiddenLayers", __pyx_getprop_7cybrain_7Network_hiddenLayers, __pyx_setprop_7cybrain_7Network_hiddenLayers, 0, 0},
   {(char *)"connections", __pyx_getprop_7cybrain_7Network_connections, __pyx_setprop_7cybrain_7Network_connections, 0, 0},
+  {(char *)"all_input_layers", __pyx_getprop_7cybrain_7Network_all_input_layers, __pyx_setprop_7cybrain_7Network_all_input_layers, 0, 0},
+  {(char *)"all_output_layers", __pyx_getprop_7cybrain_7Network_all_output_layers, __pyx_setprop_7cybrain_7Network_all_output_layers, 0, 0},
   {0, 0, 0, 0, 0}
 };
 
@@ -25916,6 +30317,235 @@ static PyTypeObject __pyx_type_7cybrain_Network = {
   __pyx_pw_7cybrain_7Network_1__init__, /*tp_init*/
   0, /*tp_alloc*/
   __pyx_tp_new_7cybrain_Network, /*tp_new*/
+  0, /*tp_free*/
+  0, /*tp_is_gc*/
+  0, /*tp_bases*/
+  0, /*tp_mro*/
+  0, /*tp_cache*/
+  0, /*tp_subclasses*/
+  0, /*tp_weaklist*/
+  0, /*tp_del*/
+  0, /*tp_version_tag*/
+  #if PY_VERSION_HEX >= 0x030400a1
+  0, /*tp_finalize*/
+  #endif
+};
+static struct __pyx_vtabstruct_7cybrain_FullBatchTrainer __pyx_vtable_7cybrain_FullBatchTrainer;
+
+static PyObject *__pyx_tp_new_7cybrain_FullBatchTrainer(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+  struct __pyx_obj_7cybrain_FullBatchTrainer *p;
+  PyObject *o;
+  if (likely((t->tp_flags & Py_TPFLAGS_IS_ABSTRACT) == 0)) {
+    o = (*t->tp_alloc)(t, 0);
+  } else {
+    o = (PyObject *) PyBaseObject_Type.tp_new(t, __pyx_empty_tuple, 0);
+  }
+  if (unlikely(!o)) return 0;
+  p = ((struct __pyx_obj_7cybrain_FullBatchTrainer *)o);
+  p->__pyx_vtab = __pyx_vtabptr_7cybrain_FullBatchTrainer;
+  new((void*)&(p->_weights)) std::vector<double *> ();
+  new((void*)&(p->_gradient)) std::vector<double *> ();
+  p->net = ((struct __pyx_obj_7cybrain_Network *)Py_None); Py_INCREF(Py_None);
+  p->total_gradient.data = NULL;
+  p->total_gradient.memview = NULL;
+  p->input_data.data = NULL;
+  p->input_data.memview = NULL;
+  p->output_data.data = NULL;
+  p->output_data.memview = NULL;
+  return o;
+}
+
+static void __pyx_tp_dealloc_7cybrain_FullBatchTrainer(PyObject *o) {
+  struct __pyx_obj_7cybrain_FullBatchTrainer *p = (struct __pyx_obj_7cybrain_FullBatchTrainer *)o;
+  #if PY_VERSION_HEX >= 0x030400a1
+  if (unlikely(Py_TYPE(o)->tp_finalize) && !_PyGC_FINALIZED(o)) {
+    if (PyObject_CallFinalizerFromDealloc(o)) return;
+  }
+  #endif
+  PyObject_GC_UnTrack(o);
+  __Pyx_call_destructor(&p->_weights);
+  __Pyx_call_destructor(&p->_gradient);
+  Py_CLEAR(p->net);
+  __PYX_XDEC_MEMVIEW(&p->total_gradient, 1);
+  __PYX_XDEC_MEMVIEW(&p->input_data, 1);
+  __PYX_XDEC_MEMVIEW(&p->output_data, 1);
+  (*Py_TYPE(o)->tp_free)(o);
+}
+
+static int __pyx_tp_traverse_7cybrain_FullBatchTrainer(PyObject *o, visitproc v, void *a) {
+  int e;
+  struct __pyx_obj_7cybrain_FullBatchTrainer *p = (struct __pyx_obj_7cybrain_FullBatchTrainer *)o;
+  if (p->net) {
+    e = (*v)(((PyObject*)p->net), a); if (e) return e;
+  }
+  return 0;
+}
+
+static int __pyx_tp_clear_7cybrain_FullBatchTrainer(PyObject *o) {
+  PyObject* tmp;
+  struct __pyx_obj_7cybrain_FullBatchTrainer *p = (struct __pyx_obj_7cybrain_FullBatchTrainer *)o;
+  tmp = ((PyObject*)p->net);
+  p->net = ((struct __pyx_obj_7cybrain_Network *)Py_None); Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  return 0;
+}
+
+static PyObject *__pyx_getprop_7cybrain_16FullBatchTrainer_cost(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_7cybrain_16FullBatchTrainer_4cost_1__get__(o);
+}
+
+static int __pyx_setprop_7cybrain_16FullBatchTrainer_cost(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_7cybrain_16FullBatchTrainer_4cost_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyObject *__pyx_getprop_7cybrain_16FullBatchTrainer_net(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_7cybrain_16FullBatchTrainer_3net_1__get__(o);
+}
+
+static int __pyx_setprop_7cybrain_16FullBatchTrainer_net(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_7cybrain_16FullBatchTrainer_3net_3__set__(o, v);
+  }
+  else {
+    return __pyx_pw_7cybrain_16FullBatchTrainer_3net_5__del__(o);
+  }
+}
+
+static PyObject *__pyx_getprop_7cybrain_16FullBatchTrainer_input_data(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_7cybrain_16FullBatchTrainer_10input_data_1__get__(o);
+}
+
+static int __pyx_setprop_7cybrain_16FullBatchTrainer_input_data(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_7cybrain_16FullBatchTrainer_10input_data_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyObject *__pyx_getprop_7cybrain_16FullBatchTrainer_output_data(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_7cybrain_16FullBatchTrainer_11output_data_1__get__(o);
+}
+
+static int __pyx_setprop_7cybrain_16FullBatchTrainer_output_data(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_7cybrain_16FullBatchTrainer_11output_data_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyObject *__pyx_getprop_7cybrain_16FullBatchTrainer_learning_rate(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_7cybrain_16FullBatchTrainer_13learning_rate_1__get__(o);
+}
+
+static int __pyx_setprop_7cybrain_16FullBatchTrainer_learning_rate(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_7cybrain_16FullBatchTrainer_13learning_rate_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyObject *__pyx_getprop_7cybrain_16FullBatchTrainer_len_gradient(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_7cybrain_16FullBatchTrainer_12len_gradient_1__get__(o);
+}
+
+static int __pyx_setprop_7cybrain_16FullBatchTrainer_len_gradient(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_7cybrain_16FullBatchTrainer_12len_gradient_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyObject *__pyx_getprop_7cybrain_16FullBatchTrainer_len_data(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_7cybrain_16FullBatchTrainer_8len_data_1__get__(o);
+}
+
+static int __pyx_setprop_7cybrain_16FullBatchTrainer_len_data(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_7cybrain_16FullBatchTrainer_8len_data_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyMethodDef __pyx_methods_7cybrain_FullBatchTrainer[] = {
+  {"epochs", (PyCFunction)__pyx_pw_7cybrain_16FullBatchTrainer_3epochs, METH_O, 0},
+  {0, 0, 0, 0}
+};
+
+static struct PyGetSetDef __pyx_getsets_7cybrain_FullBatchTrainer[] = {
+  {(char *)"cost", __pyx_getprop_7cybrain_16FullBatchTrainer_cost, __pyx_setprop_7cybrain_16FullBatchTrainer_cost, 0, 0},
+  {(char *)"net", __pyx_getprop_7cybrain_16FullBatchTrainer_net, __pyx_setprop_7cybrain_16FullBatchTrainer_net, 0, 0},
+  {(char *)"input_data", __pyx_getprop_7cybrain_16FullBatchTrainer_input_data, __pyx_setprop_7cybrain_16FullBatchTrainer_input_data, 0, 0},
+  {(char *)"output_data", __pyx_getprop_7cybrain_16FullBatchTrainer_output_data, __pyx_setprop_7cybrain_16FullBatchTrainer_output_data, 0, 0},
+  {(char *)"learning_rate", __pyx_getprop_7cybrain_16FullBatchTrainer_learning_rate, __pyx_setprop_7cybrain_16FullBatchTrainer_learning_rate, 0, 0},
+  {(char *)"len_gradient", __pyx_getprop_7cybrain_16FullBatchTrainer_len_gradient, __pyx_setprop_7cybrain_16FullBatchTrainer_len_gradient, 0, 0},
+  {(char *)"len_data", __pyx_getprop_7cybrain_16FullBatchTrainer_len_data, __pyx_setprop_7cybrain_16FullBatchTrainer_len_data, 0, 0},
+  {0, 0, 0, 0, 0}
+};
+
+static PyTypeObject __pyx_type_7cybrain_FullBatchTrainer = {
+  PyVarObject_HEAD_INIT(0, 0)
+  "cybrain.FullBatchTrainer", /*tp_name*/
+  sizeof(struct __pyx_obj_7cybrain_FullBatchTrainer), /*tp_basicsize*/
+  0, /*tp_itemsize*/
+  __pyx_tp_dealloc_7cybrain_FullBatchTrainer, /*tp_dealloc*/
+  0, /*tp_print*/
+  0, /*tp_getattr*/
+  0, /*tp_setattr*/
+  #if PY_MAJOR_VERSION < 3
+  0, /*tp_compare*/
+  #else
+  0, /*reserved*/
+  #endif
+  0, /*tp_repr*/
+  0, /*tp_as_number*/
+  0, /*tp_as_sequence*/
+  0, /*tp_as_mapping*/
+  0, /*tp_hash*/
+  0, /*tp_call*/
+  0, /*tp_str*/
+  0, /*tp_getattro*/
+  0, /*tp_setattro*/
+  0, /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
+  0, /*tp_doc*/
+  __pyx_tp_traverse_7cybrain_FullBatchTrainer, /*tp_traverse*/
+  __pyx_tp_clear_7cybrain_FullBatchTrainer, /*tp_clear*/
+  0, /*tp_richcompare*/
+  0, /*tp_weaklistoffset*/
+  0, /*tp_iter*/
+  0, /*tp_iternext*/
+  __pyx_methods_7cybrain_FullBatchTrainer, /*tp_methods*/
+  0, /*tp_members*/
+  __pyx_getsets_7cybrain_FullBatchTrainer, /*tp_getset*/
+  0, /*tp_base*/
+  0, /*tp_dict*/
+  0, /*tp_descr_get*/
+  0, /*tp_descr_set*/
+  0, /*tp_dictoffset*/
+  __pyx_pw_7cybrain_16FullBatchTrainer_1__init__, /*tp_init*/
+  0, /*tp_alloc*/
+  __pyx_tp_new_7cybrain_FullBatchTrainer, /*tp_new*/
   0, /*tp_free*/
   0, /*tp_is_gc*/
   0, /*tp_bases*/
@@ -26611,6 +31241,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_Buffer_view_does_not_expose_stri, __pyx_k_Buffer_view_does_not_expose_stri, sizeof(__pyx_k_Buffer_view_does_not_expose_stri), 0, 0, 1, 0},
   {&__pyx_kp_s_Can_only_create_a_buffer_that_is, __pyx_k_Can_only_create_a_buffer_that_is, sizeof(__pyx_k_Can_only_create_a_buffer_that_is), 0, 0, 1, 0},
   {&__pyx_kp_s_Cannot_index_with_type_s, __pyx_k_Cannot_index_with_type_s, sizeof(__pyx_k_Cannot_index_with_type_s), 0, 0, 1, 0},
+  {&__pyx_kp_s_Copy_error_matrices_need_to_have, __pyx_k_Copy_error_matrices_need_to_have, sizeof(__pyx_k_Copy_error_matrices_need_to_have), 0, 0, 1, 0},
   {&__pyx_kp_s_Dimension_Error, __pyx_k_Dimension_Error, sizeof(__pyx_k_Dimension_Error), 0, 0, 1, 0},
   {&__pyx_n_s_Ellipsis, __pyx_k_Ellipsis, sizeof(__pyx_k_Ellipsis), 0, 0, 1, 1},
   {&__pyx_kp_s_Empty_shape_tuple_for_cython_arr, __pyx_k_Empty_shape_tuple_for_cython_arr, sizeof(__pyx_k_Empty_shape_tuple_for_cython_arr), 0, 0, 1, 0},
@@ -26641,6 +31272,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_allocate_buffer, __pyx_k_allocate_buffer, sizeof(__pyx_k_allocate_buffer), 0, 0, 1, 1},
   {&__pyx_n_s_asarray, __pyx_k_asarray, sizeof(__pyx_k_asarray), 0, 0, 1, 1},
   {&__pyx_n_s_axis, __pyx_k_axis, sizeof(__pyx_k_axis), 0, 0, 1, 1},
+  {&__pyx_n_s_back_activate, __pyx_k_back_activate, sizeof(__pyx_k_back_activate), 0, 0, 1, 1},
+  {&__pyx_n_s_back_activate_layers, __pyx_k_back_activate_layers, sizeof(__pyx_k_back_activate_layers), 0, 0, 1, 1},
   {&__pyx_n_s_base, __pyx_k_base, sizeof(__pyx_k_base), 0, 0, 1, 1},
   {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
   {&__pyx_n_u_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 1, 0, 1},
@@ -26653,10 +31286,12 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_dtype, __pyx_k_dtype, sizeof(__pyx_k_dtype), 0, 0, 1, 1},
   {&__pyx_n_s_dtype_is_object, __pyx_k_dtype_is_object, sizeof(__pyx_k_dtype_is_object), 0, 0, 1, 1},
   {&__pyx_n_s_empty, __pyx_k_empty, sizeof(__pyx_k_empty), 0, 0, 1, 1},
+  {&__pyx_n_s_end, __pyx_k_end, sizeof(__pyx_k_end), 0, 0, 1, 1},
   {&__pyx_n_s_enumerate, __pyx_k_enumerate, sizeof(__pyx_k_enumerate), 0, 0, 1, 1},
+  {&__pyx_n_s_epochs, __pyx_k_epochs, sizeof(__pyx_k_epochs), 0, 0, 1, 1},
   {&__pyx_n_s_error, __pyx_k_error, sizeof(__pyx_k_error), 0, 0, 1, 1},
   {&__pyx_n_s_exceptions, __pyx_k_exceptions, sizeof(__pyx_k_exceptions), 0, 0, 1, 1},
-  {&__pyx_n_s_findHiddenComponents, __pyx_k_findHiddenComponents, sizeof(__pyx_k_findHiddenComponents), 0, 0, 1, 1},
+  {&__pyx_n_s_file, __pyx_k_file, sizeof(__pyx_k_file), 0, 0, 1, 1},
   {&__pyx_n_s_flags, __pyx_k_flags, sizeof(__pyx_k_flags), 0, 0, 1, 1},
   {&__pyx_n_s_format, __pyx_k_format, sizeof(__pyx_k_format), 0, 0, 1, 1},
   {&__pyx_n_s_fortran, __pyx_k_fortran, sizeof(__pyx_k_fortran), 0, 0, 1, 1},
@@ -26670,9 +31305,11 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_id, __pyx_k_id, sizeof(__pyx_k_id), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_init, __pyx_k_init, sizeof(__pyx_k_init), 0, 0, 1, 1},
+  {&__pyx_n_s_input_data, __pyx_k_input_data, sizeof(__pyx_k_input_data), 0, 0, 1, 1},
   {&__pyx_n_s_itemsize, __pyx_k_itemsize, sizeof(__pyx_k_itemsize), 0, 0, 1, 1},
   {&__pyx_kp_s_itemsize_0_for_cython_array, __pyx_k_itemsize_0_for_cython_array, sizeof(__pyx_k_itemsize_0_for_cython_array), 0, 0, 1, 0},
   {&__pyx_n_s_layer, __pyx_k_layer, sizeof(__pyx_k_layer), 0, 0, 1, 1},
+  {&__pyx_n_s_learning_rate, __pyx_k_learning_rate, sizeof(__pyx_k_learning_rate), 0, 0, 1, 1},
   {&__pyx_n_s_linearConnectTo, __pyx_k_linearConnectTo, sizeof(__pyx_k_linearConnectTo), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_math, __pyx_k_math, sizeof(__pyx_k_math), 0, 0, 1, 1},
@@ -26683,25 +31320,32 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_ndarray_is_not_C_contiguous, __pyx_k_ndarray_is_not_C_contiguous, sizeof(__pyx_k_ndarray_is_not_C_contiguous), 0, 1, 0, 0},
   {&__pyx_kp_u_ndarray_is_not_Fortran_contiguou, __pyx_k_ndarray_is_not_Fortran_contiguou, sizeof(__pyx_k_ndarray_is_not_Fortran_contiguou), 0, 1, 0, 0},
   {&__pyx_n_s_ndim, __pyx_k_ndim, sizeof(__pyx_k_ndim), 0, 0, 1, 1},
+  {&__pyx_n_s_net, __pyx_k_net, sizeof(__pyx_k_net), 0, 0, 1, 1},
+  {&__pyx_n_s_neuronCount, __pyx_k_neuronCount, sizeof(__pyx_k_neuronCount), 0, 0, 1, 1},
   {&__pyx_n_s_neuron_number, __pyx_k_neuron_number, sizeof(__pyx_k_neuron_number), 0, 0, 1, 1},
   {&__pyx_n_s_np, __pyx_k_np, sizeof(__pyx_k_np), 0, 0, 1, 1},
   {&__pyx_n_s_numpy, __pyx_k_numpy, sizeof(__pyx_k_numpy), 0, 0, 1, 1},
   {&__pyx_n_s_obj, __pyx_k_obj, sizeof(__pyx_k_obj), 0, 0, 1, 1},
   {&__pyx_n_s_ones, __pyx_k_ones, sizeof(__pyx_k_ones), 0, 0, 1, 1},
+  {&__pyx_n_s_output_data, __pyx_k_output_data, sizeof(__pyx_k_output_data), 0, 0, 1, 1},
   {&__pyx_n_s_pack, __pyx_k_pack, sizeof(__pyx_k_pack), 0, 0, 1, 1},
+  {&__pyx_n_s_print, __pyx_k_print, sizeof(__pyx_k_print), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_getbuffer, __pyx_k_pyx_getbuffer, sizeof(__pyx_k_pyx_getbuffer), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_vtable, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
   {&__pyx_n_s_rand, __pyx_k_rand, sizeof(__pyx_k_rand), 0, 0, 1, 1},
   {&__pyx_n_s_random, __pyx_k_random, sizeof(__pyx_k_random), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
   {&__pyx_n_s_receiver, __pyx_k_receiver, sizeof(__pyx_k_receiver), 0, 0, 1, 1},
+  {&__pyx_n_s_restart, __pyx_k_restart, sizeof(__pyx_k_restart), 0, 0, 1, 1},
   {&__pyx_n_s_restartNetwork, __pyx_k_restartNetwork, sizeof(__pyx_k_restartNetwork), 0, 0, 1, 1},
   {&__pyx_n_s_rn, __pyx_k_rn, sizeof(__pyx_k_rn), 0, 0, 1, 1},
   {&__pyx_n_s_setData, __pyx_k_setData, sizeof(__pyx_k_setData), 0, 0, 1, 1},
   {&__pyx_kp_s_setData_Error_Data_shape_error_R, __pyx_k_setData_Error_Data_shape_error_R, sizeof(__pyx_k_setData_Error_Data_shape_error_R), 0, 0, 1, 0},
   {&__pyx_n_s_setTarget, __pyx_k_setTarget, sizeof(__pyx_k_setTarget), 0, 0, 1, 1},
+  {&__pyx_kp_s_setTarget_Error_Data_shape_error, __pyx_k_setTarget_Error_Data_shape_error, sizeof(__pyx_k_setTarget_Error_Data_shape_error), 0, 0, 1, 0},
   {&__pyx_n_s_setW, __pyx_k_setW, sizeof(__pyx_k_setW), 0, 0, 1, 1},
   {&__pyx_n_s_set_dW, __pyx_k_set_dW, sizeof(__pyx_k_set_dW), 0, 0, 1, 1},
+  {&__pyx_n_s_setup, __pyx_k_setup, sizeof(__pyx_k_setup), 0, 0, 1, 1},
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
   {&__pyx_n_s_size, __pyx_k_size, sizeof(__pyx_k_size), 0, 0, 1, 1},
   {&__pyx_n_s_source, __pyx_k_source, sizeof(__pyx_k_source), 0, 0, 1, 1},
@@ -26722,9 +31366,9 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_Exception = __Pyx_GetBuiltinName(__pyx_n_s_Exception); if (!__pyx_builtin_Exception) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 69; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_sum = __Pyx_GetBuiltinName(__pyx_n_s_sum); if (!__pyx_builtin_sum) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_Exception = __Pyx_GetBuiltinName(__pyx_n_s_Exception); if (!__pyx_builtin_Exception) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_sum = __Pyx_GetBuiltinName(__pyx_n_s_sum); if (!__pyx_builtin_sum) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 501; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) {__pyx_filename = __pyx_f[1]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 802; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -26742,71 +31386,93 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "cybrain.pyx":69
+  /* "cybrain.pyx":75
  * 
  *         if self.source.Y().shape[1] != self.W.shape[0]:
  *             raise Exception ("Shape Error")             # <<<<<<<<<<<<<<
  * 
  *         if self.receiver.neuronCount() != self.W.shape[1]:
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_Shape_Error); if (unlikely(!__pyx_tuple_)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 69; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_Shape_Error); if (unlikely(!__pyx_tuple_)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "cybrain.pyx":72
+  /* "cybrain.pyx":78
  * 
  *         if self.receiver.neuronCount() != self.W.shape[1]:
  *             raise Exception ("Neuron Difference Error")             # <<<<<<<<<<<<<<
  * 
- *         return dotMultiply (self.source.Y(), self.W)
+ *         ##print np.asarray (self.W)
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_s_Neuron_Difference_Error); if (unlikely(!__pyx_tuple__2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_s_Neuron_Difference_Error); if (unlikely(!__pyx_tuple__2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "cybrain.pyx":112
+  /* "cybrain.pyx":116
  * 
  *         if source.neuronCount() != receiver.neuronCount():
  *             raise Exception("Number of neurons not equal")             # <<<<<<<<<<<<<<
  * 
  *         self.W = weightMagnitud * (np.random.rand (1, receiver.neuronCount()) * 2.0 - 1.0)
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_s_Number_of_neurons_not_equal); if (unlikely(!__pyx_tuple__3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_s_Number_of_neurons_not_equal); if (unlikely(!__pyx_tuple__3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 116; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "cybrain.pyx":120
+  /* "cybrain.pyx":124
  *     cdef double[:,:] Zc (self):
  *         if self.source.Y().shape[1] != self.W.shape[1]:
  *             raise Exception  ("Shape Error")             # <<<<<<<<<<<<<<
  * 
  *         if self.receiver.neuronCount() != self.W.shape[1]:
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_s_Shape_Error); if (unlikely(!__pyx_tuple__4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 120; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_s_Shape_Error); if (unlikely(!__pyx_tuple__4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
 
-  /* "cybrain.pyx":123
+  /* "cybrain.pyx":127
  * 
  *         if self.receiver.neuronCount() != self.W.shape[1]:
  *             raise Exception ("Neuron Difference Error")             # <<<<<<<<<<<<<<
  * 
  *         return elementMultiply (self.source.Y(), self.W)
  */
-  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_Neuron_Difference_Error); if (unlikely(!__pyx_tuple__5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_Neuron_Difference_Error); if (unlikely(!__pyx_tuple__5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
-  /* "cybrain.pyx":414
+  /* "cybrain.pyx":294
+ * 
+ *     cdef double[:,:] H (self, double[:,:] Z):
+ *         cdef double[:,:] h = cvarray ((1,1), sizeof(double), 'd')             # <<<<<<<<<<<<<<
+ * 
+ *         h[0,0] = 1.0
+ */
+  __pyx_tuple__6 = PyTuple_Pack(2, __pyx_int_1, __pyx_int_1); if (unlikely(!__pyx_tuple__6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__6);
+  __Pyx_GIVEREF(__pyx_tuple__6);
+
+  /* "cybrain.pyx":593
  * 
  *     if A.shape[0] != B.shape[0] or A.shape[1] != B.shape[1]:
  *         raise Exception ("Dimension Error")             # <<<<<<<<<<<<<<
  * 
  *     for i in range(m):
  */
-  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_s_Dimension_Error); if (unlikely(!__pyx_tuple__6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 414; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__6);
-  __Pyx_GIVEREF(__pyx_tuple__6);
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_Dimension_Error); if (unlikely(!__pyx_tuple__7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__7);
+  __Pyx_GIVEREF(__pyx_tuple__7);
+
+  /* "cybrain.pyx":644
+ * 
+ *     if target.shape[0] != source.shape[0] or target.shape[1] != source.shape[1]:
+ *         raise Exception("Copy error: matrices need to have the same shape")             # <<<<<<<<<<<<<<
+ * 
+ *     for i in range(m):
+ */
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_s_Copy_error_matrices_need_to_have); if (unlikely(!__pyx_tuple__8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 644; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__8);
+  __Pyx_GIVEREF(__pyx_tuple__8);
 
   /* "../../usr/local/lib/python2.7/dist-packages/Cython/Includes/numpy/__init__.pxd":218
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)
@@ -26815,9 +31481,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_C_contiguous); if (unlikely(!__pyx_tuple__7)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__7);
-  __Pyx_GIVEREF(__pyx_tuple__7);
+  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_C_contiguous); if (unlikely(!__pyx_tuple__9)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__9);
+  __Pyx_GIVEREF(__pyx_tuple__9);
 
   /* "../../usr/local/lib/python2.7/dist-packages/Cython/Includes/numpy/__init__.pxd":222
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
@@ -26826,9 +31492,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             info.buf = PyArray_DATA(self)
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_Fortran_contiguou); if (unlikely(!__pyx_tuple__8)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__8);
-  __Pyx_GIVEREF(__pyx_tuple__8);
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_Fortran_contiguou); if (unlikely(!__pyx_tuple__10)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__10);
+  __Pyx_GIVEREF(__pyx_tuple__10);
 
   /* "../../usr/local/lib/python2.7/dist-packages/Cython/Includes/numpy/__init__.pxd":260
  *                 if ((descr.byteorder == c'>' and little_endian) or
@@ -26837,9 +31503,9 @@ static int __Pyx_InitCachedConstants(void) {
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"
  */
-  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__9)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 260; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__9);
-  __Pyx_GIVEREF(__pyx_tuple__9);
+  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__11)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 260; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__11);
+  __Pyx_GIVEREF(__pyx_tuple__11);
 
   /* "../../usr/local/lib/python2.7/dist-packages/Cython/Includes/numpy/__init__.pxd":802
  * 
@@ -26848,9 +31514,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *         if ((child.byteorder == c'>' and little_endian) or
  */
-  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor); if (unlikely(!__pyx_tuple__10)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 802; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__10);
-  __Pyx_GIVEREF(__pyx_tuple__10);
+  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor); if (unlikely(!__pyx_tuple__12)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 802; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__12);
+  __Pyx_GIVEREF(__pyx_tuple__12);
 
   /* "../../usr/local/lib/python2.7/dist-packages/Cython/Includes/numpy/__init__.pxd":806
  *         if ((child.byteorder == c'>' and little_endian) or
@@ -26859,9 +31525,9 @@ static int __Pyx_InitCachedConstants(void) {
  *             # One could encode it in the format string and have Cython
  *             # complain instead, BUT: < and > in format strings also imply
  */
-  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__11)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 806; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__11);
-  __Pyx_GIVEREF(__pyx_tuple__11);
+  __pyx_tuple__13 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__13)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 806; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__13);
+  __Pyx_GIVEREF(__pyx_tuple__13);
 
   /* "../../usr/local/lib/python2.7/dist-packages/Cython/Includes/numpy/__init__.pxd":826
  *             t = child.type_num
@@ -26870,9 +31536,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  */
-  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor_2); if (unlikely(!__pyx_tuple__12)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 826; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__12);
-  __Pyx_GIVEREF(__pyx_tuple__12);
+  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor_2); if (unlikely(!__pyx_tuple__14)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 826; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__14);
+  __Pyx_GIVEREF(__pyx_tuple__14);
 
   /* "View.MemoryView":127
  * 
@@ -26881,9 +31547,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *         if itemsize <= 0:
  */
-  __pyx_tuple__13 = PyTuple_Pack(1, __pyx_kp_s_Empty_shape_tuple_for_cython_arr); if (unlikely(!__pyx_tuple__13)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__13);
-  __Pyx_GIVEREF(__pyx_tuple__13);
+  __pyx_tuple__15 = PyTuple_Pack(1, __pyx_kp_s_Empty_shape_tuple_for_cython_arr); if (unlikely(!__pyx_tuple__15)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__15);
+  __Pyx_GIVEREF(__pyx_tuple__15);
 
   /* "View.MemoryView":130
  * 
@@ -26892,9 +31558,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *         if isinstance(format, unicode):
  */
-  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_s_itemsize_0_for_cython_array); if (unlikely(!__pyx_tuple__14)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 130; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__14);
-  __Pyx_GIVEREF(__pyx_tuple__14);
+  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_kp_s_itemsize_0_for_cython_array); if (unlikely(!__pyx_tuple__16)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 130; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__16);
+  __Pyx_GIVEREF(__pyx_tuple__16);
 
   /* "View.MemoryView":142
  * 
@@ -26903,9 +31569,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__15 = PyTuple_Pack(1, __pyx_kp_s_unable_to_allocate_shape_and_str); if (unlikely(!__pyx_tuple__15)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 142; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__15);
-  __Pyx_GIVEREF(__pyx_tuple__15);
+  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_kp_s_unable_to_allocate_shape_and_str); if (unlikely(!__pyx_tuple__17)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 142; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__17);
+  __Pyx_GIVEREF(__pyx_tuple__17);
 
   /* "View.MemoryView":170
  *             self.data = <char *>malloc(self.len)
@@ -26914,9 +31580,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             if self.dtype_is_object:
  */
-  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_kp_s_unable_to_allocate_array_data); if (unlikely(!__pyx_tuple__16)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 170; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__16);
-  __Pyx_GIVEREF(__pyx_tuple__16);
+  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_kp_s_unable_to_allocate_array_data); if (unlikely(!__pyx_tuple__18)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 170; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__18);
+  __Pyx_GIVEREF(__pyx_tuple__18);
 
   /* "View.MemoryView":186
  *             bufmode = PyBUF_F_CONTIGUOUS | PyBUF_ANY_CONTIGUOUS
@@ -26925,9 +31591,9 @@ static int __Pyx_InitCachedConstants(void) {
  *         info.buf = self.data
  *         info.len = self.len
  */
-  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_kp_s_Can_only_create_a_buffer_that_is); if (unlikely(!__pyx_tuple__17)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__17);
-  __Pyx_GIVEREF(__pyx_tuple__17);
+  __pyx_tuple__19 = PyTuple_Pack(1, __pyx_kp_s_Can_only_create_a_buffer_that_is); if (unlikely(!__pyx_tuple__19)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__19);
+  __Pyx_GIVEREF(__pyx_tuple__19);
 
   /* "View.MemoryView":445
  *             result = struct.unpack(self.view.format, bytesitem)
@@ -26936,9 +31602,9 @@ static int __Pyx_InitCachedConstants(void) {
  *         else:
  *             if len(self.view.format) == 1:
  */
-  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_kp_s_Unable_to_convert_item_to_object); if (unlikely(!__pyx_tuple__18)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 445; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__18);
-  __Pyx_GIVEREF(__pyx_tuple__18);
+  __pyx_tuple__20 = PyTuple_Pack(1, __pyx_kp_s_Unable_to_convert_item_to_object); if (unlikely(!__pyx_tuple__20)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 445; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__20);
+  __Pyx_GIVEREF(__pyx_tuple__20);
 
   /* "View.MemoryView":521
  *             if self.view.strides == NULL:
@@ -26947,9 +31613,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             return tuple([stride for stride in self.view.strides[:self.view.ndim]])
  */
-  __pyx_tuple__19 = PyTuple_Pack(1, __pyx_kp_s_Buffer_view_does_not_expose_stri); if (unlikely(!__pyx_tuple__19)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 521; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__19);
-  __Pyx_GIVEREF(__pyx_tuple__19);
+  __pyx_tuple__21 = PyTuple_Pack(1, __pyx_kp_s_Buffer_view_does_not_expose_stri); if (unlikely(!__pyx_tuple__21)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 521; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__21);
+  __Pyx_GIVEREF(__pyx_tuple__21);
 
   /* "View.MemoryView":529
  *         def __get__(self):
@@ -26958,12 +31624,12 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             return tuple([suboffset for suboffset in self.view.suboffsets[:self.view.ndim]])
  */
-  __pyx_tuple__20 = PyTuple_New(1); if (unlikely(!__pyx_tuple__20)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 529; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__20);
+  __pyx_tuple__22 = PyTuple_New(1); if (unlikely(!__pyx_tuple__22)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 529; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__22);
   __Pyx_INCREF(__pyx_int_neg_1);
   __Pyx_GIVEREF(__pyx_int_neg_1);
-  PyTuple_SET_ITEM(__pyx_tuple__20, 0, __pyx_int_neg_1);
-  __Pyx_GIVEREF(__pyx_tuple__20);
+  PyTuple_SET_ITEM(__pyx_tuple__22, 0, __pyx_int_neg_1);
+  __Pyx_GIVEREF(__pyx_tuple__22);
 
   /* "View.MemoryView":638
  *         if item is Ellipsis:
@@ -26972,9 +31638,9 @@ static int __Pyx_InitCachedConstants(void) {
  *                 seen_ellipsis = True
  *             else:
  */
-  __pyx_slice__21 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__21)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 638; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_slice__21);
-  __Pyx_GIVEREF(__pyx_slice__21);
+  __pyx_slice__23 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__23)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 638; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_slice__23);
+  __Pyx_GIVEREF(__pyx_slice__23);
 
   /* "View.MemoryView":641
  *                 seen_ellipsis = True
@@ -26983,9 +31649,9 @@ static int __Pyx_InitCachedConstants(void) {
  *             have_slices = True
  *         else:
  */
-  __pyx_slice__22 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__22)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 641; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_slice__22);
-  __Pyx_GIVEREF(__pyx_slice__22);
+  __pyx_slice__24 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__24)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 641; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_slice__24);
+  __Pyx_GIVEREF(__pyx_slice__24);
 
   /* "View.MemoryView":652
  *     nslices = ndim - len(result)
@@ -26994,9 +31660,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *     return have_slices or nslices, tuple(result)
  */
-  __pyx_slice__23 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__23)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 652; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_slice__23);
-  __Pyx_GIVEREF(__pyx_slice__23);
+  __pyx_slice__25 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__25)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 652; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_slice__25);
+  __Pyx_GIVEREF(__pyx_slice__25);
 
   /* "View.MemoryView":659
  *     for suboffset in suboffsets[:ndim]:
@@ -27005,9 +31671,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__24 = PyTuple_Pack(1, __pyx_kp_s_Indirect_dimensions_not_supporte); if (unlikely(!__pyx_tuple__24)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 659; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__24);
-  __Pyx_GIVEREF(__pyx_tuple__24);
+  __pyx_tuple__26 = PyTuple_Pack(1, __pyx_kp_s_Indirect_dimensions_not_supporte); if (unlikely(!__pyx_tuple__26)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 659; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__26);
+  __Pyx_GIVEREF(__pyx_tuple__26);
 
   /* "cybrain.pyx":21
  * ctypedef double (*UnaryDoubleFun)(double)
@@ -27016,9 +31682,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * ####################
  */
-  __pyx_tuple__25 = PyTuple_Pack(1, __pyx_n_s_d); if (unlikely(!__pyx_tuple__25)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 21; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__25);
-  __Pyx_GIVEREF(__pyx_tuple__25);
+  __pyx_tuple__27 = PyTuple_Pack(1, __pyx_n_s_d); if (unlikely(!__pyx_tuple__27)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 21; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__27);
+  __Pyx_GIVEREF(__pyx_tuple__27);
 
   /* "View.MemoryView":276
  *         return self.name
@@ -27027,9 +31693,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_tuple__26 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__26)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__26);
-  __Pyx_GIVEREF(__pyx_tuple__26);
+  __pyx_tuple__28 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__28)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__28);
+  __Pyx_GIVEREF(__pyx_tuple__28);
 
   /* "View.MemoryView":277
  * 
@@ -27038,9 +31704,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_tuple__27 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__27)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__27);
-  __Pyx_GIVEREF(__pyx_tuple__27);
+  __pyx_tuple__29 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__29)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__29);
+  __Pyx_GIVEREF(__pyx_tuple__29);
 
   /* "View.MemoryView":278
  * cdef generic = Enum("<strided and direct or indirect>")
@@ -27049,9 +31715,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__28 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__28)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__28);
-  __Pyx_GIVEREF(__pyx_tuple__28);
+  __pyx_tuple__30 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__30)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__30);
+  __Pyx_GIVEREF(__pyx_tuple__30);
 
   /* "View.MemoryView":281
  * 
@@ -27060,9 +31726,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_tuple__29 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__29)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__29);
-  __Pyx_GIVEREF(__pyx_tuple__29);
+  __pyx_tuple__31 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__31)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__31);
+  __Pyx_GIVEREF(__pyx_tuple__31);
 
   /* "View.MemoryView":282
  * 
@@ -27071,9 +31737,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__30 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__30)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 282; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__30);
-  __Pyx_GIVEREF(__pyx_tuple__30);
+  __pyx_tuple__32 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__32)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 282; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__32);
+  __Pyx_GIVEREF(__pyx_tuple__32);
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -27183,6 +31849,8 @@ PyMODINIT_FUNC PyInit_cybrain(void)
   __pyx_vtable_7cybrain_Connection.Zc = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Connection *))__pyx_f_7cybrain_10Connection_Zc;
   __pyx_vtable_7cybrain_Connection.dEdY = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Connection *))__pyx_f_7cybrain_10Connection_dEdY;
   __pyx_vtable_7cybrain_Connection.compute_dEdW = (void (*)(struct __pyx_obj_7cybrain_Connection *))__pyx_f_7cybrain_10Connection_compute_dEdW;
+  __pyx_vtable_7cybrain_Connection.get_gradient_pointers = (std::vector<double *>  (*)(struct __pyx_obj_7cybrain_Connection *))__pyx_f_7cybrain_10Connection_get_gradient_pointers;
+  __pyx_vtable_7cybrain_Connection.get_weight_pointers = (std::vector<double *>  (*)(struct __pyx_obj_7cybrain_Connection *))__pyx_f_7cybrain_10Connection_get_weight_pointers;
   if (PyType_Ready(&__pyx_type_7cybrain_Connection) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 27; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7cybrain_Connection.tp_print = 0;
   if (__Pyx_SetVtable(__pyx_type_7cybrain_Connection.tp_dict, __pyx_vtabptr_7cybrain_Connection) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 27; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -27193,15 +31861,17 @@ PyMODINIT_FUNC PyInit_cybrain(void)
   __pyx_vtable_7cybrain_FullConnection.__pyx_base.Zc = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Connection *))__pyx_f_7cybrain_14FullConnection_Zc;
   __pyx_vtable_7cybrain_FullConnection.__pyx_base.dEdY = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Connection *))__pyx_f_7cybrain_14FullConnection_dEdY;
   __pyx_vtable_7cybrain_FullConnection.__pyx_base.compute_dEdW = (void (*)(struct __pyx_obj_7cybrain_Connection *))__pyx_f_7cybrain_14FullConnection_compute_dEdW;
+  __pyx_vtable_7cybrain_FullConnection.__pyx_base.get_gradient_pointers = (std::vector<double *>  (*)(struct __pyx_obj_7cybrain_Connection *))__pyx_f_7cybrain_14FullConnection_get_gradient_pointers;
+  __pyx_vtable_7cybrain_FullConnection.__pyx_base.get_weight_pointers = (std::vector<double *>  (*)(struct __pyx_obj_7cybrain_Connection *))__pyx_f_7cybrain_14FullConnection_get_weight_pointers;
   __pyx_vtable_7cybrain_FullConnection.getW = (PyArrayObject *(*)(struct __pyx_obj_7cybrain_FullConnection *, int __pyx_skip_dispatch))__pyx_f_7cybrain_14FullConnection_getW;
   __pyx_vtable_7cybrain_FullConnection.setW = (PyObject *(*)(struct __pyx_obj_7cybrain_FullConnection *, PyArrayObject *, int __pyx_skip_dispatch))__pyx_f_7cybrain_14FullConnection_setW;
   __pyx_vtable_7cybrain_FullConnection.get_dW = (PyArrayObject *(*)(struct __pyx_obj_7cybrain_FullConnection *, int __pyx_skip_dispatch))__pyx_f_7cybrain_14FullConnection_get_dW;
   __pyx_vtable_7cybrain_FullConnection.set_dW = (PyObject *(*)(struct __pyx_obj_7cybrain_FullConnection *, __Pyx_memviewslice, int __pyx_skip_dispatch))__pyx_f_7cybrain_14FullConnection_set_dW;
   __pyx_type_7cybrain_FullConnection.tp_base = __pyx_ptype_7cybrain_Connection;
-  if (PyType_Ready(&__pyx_type_7cybrain_FullConnection) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 46; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7cybrain_FullConnection) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 52; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7cybrain_FullConnection.tp_print = 0;
-  if (__Pyx_SetVtable(__pyx_type_7cybrain_FullConnection.tp_dict, __pyx_vtabptr_7cybrain_FullConnection) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 46; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (PyObject_SetAttrString(__pyx_m, "FullConnection", (PyObject *)&__pyx_type_7cybrain_FullConnection) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 46; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_SetVtable(__pyx_type_7cybrain_FullConnection.tp_dict, __pyx_vtabptr_7cybrain_FullConnection) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 52; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "FullConnection", (PyObject *)&__pyx_type_7cybrain_FullConnection) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 52; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7cybrain_FullConnection = &__pyx_type_7cybrain_FullConnection;
   __pyx_vtabptr_7cybrain_LinearConnection = &__pyx_vtable_7cybrain_LinearConnection;
   __pyx_vtable_7cybrain_LinearConnection.__pyx_base = *__pyx_vtabptr_7cybrain_FullConnection;
@@ -27209,10 +31879,10 @@ PyMODINIT_FUNC PyInit_cybrain(void)
   __pyx_vtable_7cybrain_LinearConnection.__pyx_base.__pyx_base.dEdY = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Connection *))__pyx_f_7cybrain_16LinearConnection_dEdY;
   __pyx_vtable_7cybrain_LinearConnection.__pyx_base.__pyx_base.compute_dEdW = (void (*)(struct __pyx_obj_7cybrain_Connection *))__pyx_f_7cybrain_16LinearConnection_compute_dEdW;
   __pyx_type_7cybrain_LinearConnection.tp_base = __pyx_ptype_7cybrain_FullConnection;
-  if (PyType_Ready(&__pyx_type_7cybrain_LinearConnection) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 106; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7cybrain_LinearConnection) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7cybrain_LinearConnection.tp_print = 0;
-  if (__Pyx_SetVtable(__pyx_type_7cybrain_LinearConnection.tp_dict, __pyx_vtabptr_7cybrain_LinearConnection) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 106; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (PyObject_SetAttrString(__pyx_m, "LinearConnection", (PyObject *)&__pyx_type_7cybrain_LinearConnection) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 106; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_SetVtable(__pyx_type_7cybrain_LinearConnection.tp_dict, __pyx_vtabptr_7cybrain_LinearConnection) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "LinearConnection", (PyObject *)&__pyx_type_7cybrain_LinearConnection) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7cybrain_LinearConnection = &__pyx_type_7cybrain_LinearConnection;
   __pyx_vtabptr_7cybrain_Layer = &__pyx_vtable_7cybrain_Layer;
   __pyx_vtable_7cybrain_Layer.H = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Layer *, __Pyx_memviewslice))__pyx_f_7cybrain_5Layer_H;
@@ -27222,10 +31892,11 @@ PyMODINIT_FUNC PyInit_cybrain(void)
   __pyx_vtable_7cybrain_Layer.dEdZ = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Layer *))__pyx_f_7cybrain_5Layer_dEdZ;
   __pyx_vtable_7cybrain_Layer.neuronCount = (int (*)(struct __pyx_obj_7cybrain_Layer *))__pyx_f_7cybrain_5Layer_neuronCount;
   __pyx_vtable_7cybrain_Layer.setData = (PyObject *(*)(struct __pyx_obj_7cybrain_Layer *, __Pyx_memviewslice, int __pyx_skip_dispatch))__pyx_f_7cybrain_5Layer_setData;
-  if (PyType_Ready(&__pyx_type_7cybrain_Layer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_vtable_7cybrain_Layer.restart = (PyObject *(*)(struct __pyx_obj_7cybrain_Layer *, int __pyx_skip_dispatch))__pyx_f_7cybrain_5Layer_restart;
+  if (PyType_Ready(&__pyx_type_7cybrain_Layer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 142; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7cybrain_Layer.tp_print = 0;
-  if (__Pyx_SetVtable(__pyx_type_7cybrain_Layer.tp_dict, __pyx_vtabptr_7cybrain_Layer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (PyObject_SetAttrString(__pyx_m, "Layer", (PyObject *)&__pyx_type_7cybrain_Layer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_SetVtable(__pyx_type_7cybrain_Layer.tp_dict, __pyx_vtabptr_7cybrain_Layer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 142; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "Layer", (PyObject *)&__pyx_type_7cybrain_Layer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 142; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7cybrain_Layer = &__pyx_type_7cybrain_Layer;
   __pyx_vtabptr_7cybrain_LinearLayer = &__pyx_vtable_7cybrain_LinearLayer;
   __pyx_vtable_7cybrain_LinearLayer.__pyx_base = *__pyx_vtabptr_7cybrain_Layer;
@@ -27234,18 +31905,19 @@ PyMODINIT_FUNC PyInit_cybrain(void)
   __pyx_vtable_7cybrain_LinearLayer.__pyx_base.dEdY = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Layer *, __Pyx_memviewslice))__pyx_f_7cybrain_11LinearLayer_dEdY;
   __pyx_vtable_7cybrain_LinearLayer.__pyx_base.dYdZ = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Layer *))__pyx_f_7cybrain_11LinearLayer_dYdZ;
   __pyx_vtable_7cybrain_LinearLayer.__pyx_base.dEdZ = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Layer *))__pyx_f_7cybrain_11LinearLayer_dEdZ;
-  __pyx_vtable_7cybrain_LinearLayer.__pyx_base.neuronCount = (int (*)(struct __pyx_obj_7cybrain_Layer *))__pyx_f_7cybrain_11LinearLayer_neuronCount;
+  __pyx_vtable_7cybrain_LinearLayer.__pyx_base.neuronCount = (int (*)(struct __pyx_obj_7cybrain_Layer *))__pyx_f_7cybrain_11LinearLayer_neuronCount__pyx_wrap_1;
   __pyx_vtable_7cybrain_LinearLayer.__pyx_base.setData = (PyObject *(*)(struct __pyx_obj_7cybrain_Layer *, __Pyx_memviewslice, int __pyx_skip_dispatch))__pyx_f_7cybrain_11LinearLayer_setData;
   __pyx_vtable_7cybrain_LinearLayer.get_dEdZ = (PyArrayObject *(*)(struct __pyx_obj_7cybrain_LinearLayer *, int __pyx_skip_dispatch))__pyx_f_7cybrain_11LinearLayer_get_dEdZ;
   __pyx_vtable_7cybrain_LinearLayer.getY = (PyArrayObject *(*)(struct __pyx_obj_7cybrain_LinearLayer *, int __pyx_skip_dispatch))__pyx_f_7cybrain_11LinearLayer_getY;
   __pyx_vtable_7cybrain_LinearLayer.setTarget = (PyObject *(*)(struct __pyx_obj_7cybrain_LinearLayer *, __Pyx_memviewslice, int __pyx_skip_dispatch))__pyx_f_7cybrain_11LinearLayer_setTarget;
+  __pyx_vtable_7cybrain_LinearLayer.neuronCount = (int (*)(struct __pyx_obj_7cybrain_LinearLayer *, int __pyx_skip_dispatch))__pyx_f_7cybrain_11LinearLayer_neuronCount;
   __pyx_vtable_7cybrain_LinearLayer.fullConnectTo = (struct __pyx_obj_7cybrain_LinearLayer *(*)(struct __pyx_obj_7cybrain_LinearLayer *, struct __pyx_obj_7cybrain_LinearLayer *, int __pyx_skip_dispatch, struct __pyx_opt_args_7cybrain_11LinearLayer_fullConnectTo *__pyx_optional_args))__pyx_f_7cybrain_11LinearLayer_fullConnectTo;
   __pyx_vtable_7cybrain_LinearLayer.linearConnectTo = (struct __pyx_obj_7cybrain_LinearLayer *(*)(struct __pyx_obj_7cybrain_LinearLayer *, struct __pyx_obj_7cybrain_LinearLayer *, int __pyx_skip_dispatch, struct __pyx_opt_args_7cybrain_11LinearLayer_linearConnectTo *__pyx_optional_args))__pyx_f_7cybrain_11LinearLayer_linearConnectTo;
   __pyx_type_7cybrain_LinearLayer.tp_base = __pyx_ptype_7cybrain_Layer;
-  if (PyType_Ready(&__pyx_type_7cybrain_LinearLayer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 171; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7cybrain_LinearLayer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7cybrain_LinearLayer.tp_print = 0;
-  if (__Pyx_SetVtable(__pyx_type_7cybrain_LinearLayer.tp_dict, __pyx_vtabptr_7cybrain_LinearLayer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 171; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (PyObject_SetAttrString(__pyx_m, "LinearLayer", (PyObject *)&__pyx_type_7cybrain_LinearLayer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 171; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_SetVtable(__pyx_type_7cybrain_LinearLayer.tp_dict, __pyx_vtabptr_7cybrain_LinearLayer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "LinearLayer", (PyObject *)&__pyx_type_7cybrain_LinearLayer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7cybrain_LinearLayer = &__pyx_type_7cybrain_LinearLayer;
   __pyx_vtabptr_7cybrain_LogisticLayer = &__pyx_vtable_7cybrain_LogisticLayer;
   __pyx_vtable_7cybrain_LogisticLayer.__pyx_base = *__pyx_vtabptr_7cybrain_LinearLayer;
@@ -27253,23 +31925,50 @@ PyMODINIT_FUNC PyInit_cybrain(void)
   __pyx_vtable_7cybrain_LogisticLayer.__pyx_base.__pyx_base.dEdY = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Layer *, __Pyx_memviewslice))__pyx_f_7cybrain_13LogisticLayer_dEdY;
   __pyx_vtable_7cybrain_LogisticLayer.__pyx_base.__pyx_base.dYdZ = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Layer *))__pyx_f_7cybrain_13LogisticLayer_dYdZ;
   __pyx_type_7cybrain_LogisticLayer.tp_base = __pyx_ptype_7cybrain_LinearLayer;
-  if (PyType_Ready(&__pyx_type_7cybrain_LogisticLayer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7cybrain_LogisticLayer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7cybrain_LogisticLayer.tp_print = 0;
-  if (__Pyx_SetVtable(__pyx_type_7cybrain_LogisticLayer.tp_dict, __pyx_vtabptr_7cybrain_LogisticLayer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (PyObject_SetAttrString(__pyx_m, "LogisticLayer", (PyObject *)&__pyx_type_7cybrain_LogisticLayer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_SetVtable(__pyx_type_7cybrain_LogisticLayer.tp_dict, __pyx_vtabptr_7cybrain_LogisticLayer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "LogisticLayer", (PyObject *)&__pyx_type_7cybrain_LogisticLayer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7cybrain_LogisticLayer = &__pyx_type_7cybrain_LogisticLayer;
+  __pyx_vtabptr_7cybrain_BiasUnit = &__pyx_vtable_7cybrain_BiasUnit;
+  __pyx_vtable_7cybrain_BiasUnit.__pyx_base = *__pyx_vtabptr_7cybrain_LinearLayer;
+  __pyx_vtable_7cybrain_BiasUnit.__pyx_base.__pyx_base.H = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Layer *, __Pyx_memviewslice))__pyx_f_7cybrain_8BiasUnit_H;
+  __pyx_type_7cybrain_BiasUnit.tp_base = __pyx_ptype_7cybrain_LinearLayer;
+  if (PyType_Ready(&__pyx_type_7cybrain_BiasUnit) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_type_7cybrain_BiasUnit.tp_print = 0;
+  if (__Pyx_SetVtable(__pyx_type_7cybrain_BiasUnit.tp_dict, __pyx_vtabptr_7cybrain_BiasUnit) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "BiasUnit", (PyObject *)&__pyx_type_7cybrain_BiasUnit) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_ptype_7cybrain_BiasUnit = &__pyx_type_7cybrain_BiasUnit;
   __pyx_vtabptr_7cybrain_Network = &__pyx_vtable_7cybrain_Network;
-  __pyx_vtable_7cybrain_Network.findHiddenComponents = (PyObject *(*)(struct __pyx_obj_7cybrain_Network *, int __pyx_skip_dispatch))__pyx_f_7cybrain_7Network_findHiddenComponents;
+  __pyx_vtable_7cybrain_Network.setup = (PyObject *(*)(struct __pyx_obj_7cybrain_Network *, int __pyx_skip_dispatch))__pyx_f_7cybrain_7Network_setup;
   __pyx_vtable_7cybrain_Network.recursivelyFindLayersAndConnections = (void (*)(struct __pyx_obj_7cybrain_Network *, struct __pyx_obj_7cybrain_Layer *, PyObject *, PyObject *))__pyx_f_7cybrain_7Network_recursivelyFindLayersAndConnections;
+  __pyx_vtable_7cybrain_Network.get_gradient_pointers = (std::vector<double *>  (*)(struct __pyx_obj_7cybrain_Network *))__pyx_f_7cybrain_7Network_get_gradient_pointers;
+  __pyx_vtable_7cybrain_Network.get_weight_pointers = (std::vector<double *>  (*)(struct __pyx_obj_7cybrain_Network *))__pyx_f_7cybrain_7Network_get_weight_pointers;
   __pyx_vtable_7cybrain_Network.restartNetwork = (PyObject *(*)(struct __pyx_obj_7cybrain_Network *, int __pyx_skip_dispatch))__pyx_f_7cybrain_7Network_restartNetwork;
   __pyx_vtable_7cybrain_Network.setData = (PyObject *(*)(struct __pyx_obj_7cybrain_Network *, __Pyx_memviewslice, int __pyx_skip_dispatch))__pyx_f_7cybrain_7Network_setData;
   __pyx_vtable_7cybrain_Network.activate_layers = (PyObject *(*)(struct __pyx_obj_7cybrain_Network *, __Pyx_memviewslice, int __pyx_skip_dispatch))__pyx_f_7cybrain_7Network_activate_layers;
   __pyx_vtable_7cybrain_Network.activate = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Network *, __Pyx_memviewslice, int __pyx_skip_dispatch))__pyx_f_7cybrain_7Network_activate;
-  if (PyType_Ready(&__pyx_type_7cybrain_Network) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_vtable_7cybrain_Network.setTarget = (PyObject *(*)(struct __pyx_obj_7cybrain_Network *, __Pyx_memviewslice, int __pyx_skip_dispatch))__pyx_f_7cybrain_7Network_setTarget;
+  __pyx_vtable_7cybrain_Network.back_activate_layers = (PyObject *(*)(struct __pyx_obj_7cybrain_Network *, __Pyx_memviewslice, int __pyx_skip_dispatch))__pyx_f_7cybrain_7Network_back_activate_layers;
+  __pyx_vtable_7cybrain_Network.back_activate = (__Pyx_memviewslice (*)(struct __pyx_obj_7cybrain_Network *, __Pyx_memviewslice, int __pyx_skip_dispatch))__pyx_f_7cybrain_7Network_back_activate;
+  if (PyType_Ready(&__pyx_type_7cybrain_Network) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7cybrain_Network.tp_print = 0;
-  if (__Pyx_SetVtable(__pyx_type_7cybrain_Network.tp_dict, __pyx_vtabptr_7cybrain_Network) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (PyObject_SetAttrString(__pyx_m, "Network", (PyObject *)&__pyx_type_7cybrain_Network) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_SetVtable(__pyx_type_7cybrain_Network.tp_dict, __pyx_vtabptr_7cybrain_Network) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "Network", (PyObject *)&__pyx_type_7cybrain_Network) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7cybrain_Network = &__pyx_type_7cybrain_Network;
+  __pyx_vtabptr_7cybrain_FullBatchTrainer = &__pyx_vtable_7cybrain_FullBatchTrainer;
+  __pyx_vtable_7cybrain_FullBatchTrainer.restart_gradient = (PyObject *(*)(struct __pyx_obj_7cybrain_FullBatchTrainer *))__pyx_f_7cybrain_16FullBatchTrainer_restart_gradient;
+  __pyx_vtable_7cybrain_FullBatchTrainer.print_gradient = (PyObject *(*)(struct __pyx_obj_7cybrain_FullBatchTrainer *))__pyx_f_7cybrain_16FullBatchTrainer_print_gradient;
+  __pyx_vtable_7cybrain_FullBatchTrainer.print_actual_gradient = (PyObject *(*)(struct __pyx_obj_7cybrain_FullBatchTrainer *))__pyx_f_7cybrain_16FullBatchTrainer_print_actual_gradient;
+  __pyx_vtable_7cybrain_FullBatchTrainer.print_weights = (PyObject *(*)(struct __pyx_obj_7cybrain_FullBatchTrainer *))__pyx_f_7cybrain_16FullBatchTrainer_print_weights;
+  __pyx_vtable_7cybrain_FullBatchTrainer.add_to_total_gradient = (PyObject *(*)(struct __pyx_obj_7cybrain_FullBatchTrainer *))__pyx_f_7cybrain_16FullBatchTrainer_add_to_total_gradient;
+  __pyx_vtable_7cybrain_FullBatchTrainer.epochs = (PyObject *(*)(struct __pyx_obj_7cybrain_FullBatchTrainer *, int, int __pyx_skip_dispatch))__pyx_f_7cybrain_16FullBatchTrainer_epochs;
+  __pyx_vtable_7cybrain_FullBatchTrainer.train = (PyObject *(*)(struct __pyx_obj_7cybrain_FullBatchTrainer *))__pyx_f_7cybrain_16FullBatchTrainer_train;
+  if (PyType_Ready(&__pyx_type_7cybrain_FullBatchTrainer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 469; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_type_7cybrain_FullBatchTrainer.tp_print = 0;
+  if (__Pyx_SetVtable(__pyx_type_7cybrain_FullBatchTrainer.tp_dict, __pyx_vtabptr_7cybrain_FullBatchTrainer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 469; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "FullBatchTrainer", (PyObject *)&__pyx_type_7cybrain_FullBatchTrainer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 469; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_ptype_7cybrain_FullBatchTrainer = &__pyx_type_7cybrain_FullBatchTrainer;
   if (PyType_Ready(&__pyx_type___pyx_array) < 0) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type___pyx_array.tp_print = 0;
   __pyx_array_type = &__pyx_type___pyx_array;
@@ -27370,7 +32069,7 @@ PyMODINIT_FUNC PyInit_cybrain(void)
  * 
  * ####################
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_7cpython_5array_array)), __pyx_tuple__25, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 21; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_7cpython_5array_array)), __pyx_tuple__27, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 21; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(((PyObject *)__pyx_v_7cybrain_template));
   __Pyx_DECREF_SET(__pyx_v_7cybrain_template, ((arrayobject *)__pyx_t_1));
@@ -27407,7 +32106,7 @@ PyMODINIT_FUNC PyInit_cybrain(void)
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__26, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__28, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(generic);
   __Pyx_DECREF_SET(generic, __pyx_t_1);
@@ -27421,7 +32120,7 @@ PyMODINIT_FUNC PyInit_cybrain(void)
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__27, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__29, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(strided);
   __Pyx_DECREF_SET(strided, __pyx_t_1);
@@ -27435,7 +32134,7 @@ PyMODINIT_FUNC PyInit_cybrain(void)
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__28, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__30, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(indirect);
   __Pyx_DECREF_SET(indirect, __pyx_t_1);
@@ -27449,7 +32148,7 @@ PyMODINIT_FUNC PyInit_cybrain(void)
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__29, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__31, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(contiguous);
   __Pyx_DECREF_SET(contiguous, __pyx_t_1);
@@ -27463,7 +32162,7 @@ PyMODINIT_FUNC PyInit_cybrain(void)
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__30, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 282; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__32, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[3]; __pyx_lineno = 282; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(indirect_contiguous);
   __Pyx_DECREF_SET(indirect_contiguous, __pyx_t_1);
@@ -29847,6 +34546,173 @@ static int __pyx_memview_set_double(const char *itemp, PyObject *obj) {
     return 1;
 }
 
+#if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION < 3
+static PyObject *__Pyx_GetStdout(void) {
+    PyObject *f = PySys_GetObject((char *)"stdout");
+    if (!f) {
+        PyErr_SetString(PyExc_RuntimeError, "lost sys.stdout");
+    }
+    return f;
+}
+static int __Pyx_Print(PyObject* f, PyObject *arg_tuple, int newline) {
+    int i;
+    if (!f) {
+        if (!(f = __Pyx_GetStdout()))
+            return -1;
+    }
+    Py_INCREF(f);
+    for (i=0; i < PyTuple_GET_SIZE(arg_tuple); i++) {
+        PyObject* v;
+        if (PyFile_SoftSpace(f, 1)) {
+            if (PyFile_WriteString(" ", f) < 0)
+                goto error;
+        }
+        v = PyTuple_GET_ITEM(arg_tuple, i);
+        if (PyFile_WriteObject(v, f, Py_PRINT_RAW) < 0)
+            goto error;
+        if (PyString_Check(v)) {
+            char *s = PyString_AsString(v);
+            Py_ssize_t len = PyString_Size(v);
+            if (len > 0) {
+                switch (s[len-1]) {
+                    case ' ': break;
+                    case '\f': case '\r': case '\n': case '\t': case '\v':
+                        PyFile_SoftSpace(f, 0);
+                        break;
+                    default:  break;
+                }
+            }
+        }
+    }
+    if (newline) {
+        if (PyFile_WriteString("\n", f) < 0)
+            goto error;
+        PyFile_SoftSpace(f, 0);
+    }
+    Py_DECREF(f);
+    return 0;
+error:
+    Py_DECREF(f);
+    return -1;
+}
+#else
+static int __Pyx_Print(PyObject* stream, PyObject *arg_tuple, int newline) {
+    PyObject* kwargs = 0;
+    PyObject* result = 0;
+    PyObject* end_string;
+    if (unlikely(!__pyx_print)) {
+        __pyx_print = PyObject_GetAttr(__pyx_b, __pyx_n_s_print);
+        if (!__pyx_print)
+            return -1;
+    }
+    if (stream) {
+        kwargs = PyDict_New();
+        if (unlikely(!kwargs))
+            return -1;
+        if (unlikely(PyDict_SetItem(kwargs, __pyx_n_s_file, stream) < 0))
+            goto bad;
+        if (!newline) {
+            end_string = PyUnicode_FromStringAndSize(" ", 1);
+            if (unlikely(!end_string))
+                goto bad;
+            if (PyDict_SetItem(kwargs, __pyx_n_s_end, end_string) < 0) {
+                Py_DECREF(end_string);
+                goto bad;
+            }
+            Py_DECREF(end_string);
+        }
+    } else if (!newline) {
+        if (unlikely(!__pyx_print_kwargs)) {
+            __pyx_print_kwargs = PyDict_New();
+            if (unlikely(!__pyx_print_kwargs))
+                return -1;
+            end_string = PyUnicode_FromStringAndSize(" ", 1);
+            if (unlikely(!end_string))
+                return -1;
+            if (PyDict_SetItem(__pyx_print_kwargs, __pyx_n_s_end, end_string) < 0) {
+                Py_DECREF(end_string);
+                return -1;
+            }
+            Py_DECREF(end_string);
+        }
+        kwargs = __pyx_print_kwargs;
+    }
+    result = PyObject_Call(__pyx_print, arg_tuple, kwargs);
+    if (unlikely(kwargs) && (kwargs != __pyx_print_kwargs))
+        Py_DECREF(kwargs);
+    if (!result)
+        return -1;
+    Py_DECREF(result);
+    return 0;
+bad:
+    if (kwargs != __pyx_print_kwargs)
+        Py_XDECREF(kwargs);
+    return -1;
+}
+#endif
+
+#if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION < 3
+static int __Pyx_PrintOne(PyObject* f, PyObject *o) {
+    if (!f) {
+        if (!(f = __Pyx_GetStdout()))
+            return -1;
+    }
+    Py_INCREF(f);
+    if (PyFile_SoftSpace(f, 0)) {
+        if (PyFile_WriteString(" ", f) < 0)
+            goto error;
+    }
+    if (PyFile_WriteObject(o, f, Py_PRINT_RAW) < 0)
+        goto error;
+    if (PyFile_WriteString("\n", f) < 0)
+        goto error;
+    Py_DECREF(f);
+    return 0;
+error:
+    Py_DECREF(f);
+    return -1;
+    /* the line below is just to avoid C compiler
+     * warnings about unused functions */
+    return __Pyx_Print(f, NULL, 0);
+}
+#else
+static int __Pyx_PrintOne(PyObject* stream, PyObject *o) {
+    int res;
+    PyObject* arg_tuple = PyTuple_Pack(1, o);
+    if (unlikely(!arg_tuple))
+        return -1;
+    res = __Pyx_Print(stream, arg_tuple, 1);
+    Py_DECREF(arg_tuple);
+    return res;
+}
+#endif
+
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
+    const long neg_one = (long) -1, const_zero = 0;
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(long) < sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(long) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+        } else if (sizeof(long) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
+        }
+    } else {
+        if (sizeof(long) <= sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(long) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
+        }
+    }
+    {
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        unsigned char *bytes = (unsigned char *)&value;
+        return _PyLong_FromByteArray(bytes, sizeof(long),
+                                     little, !is_unsigned);
+    }
+}
+
 #if CYTHON_CCOMPLEX
   #ifdef __cplusplus
     static CYTHON_INLINE __pyx_t_float_complex __pyx_t_float_complex_from_parts(float x, float y) {
@@ -30222,32 +35088,6 @@ __pyx_capsule_create(void *p, CYTHON_UNUSED const char *sig)
     return cobj;
 }
 
-static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
-    const long neg_one = (long) -1, const_zero = 0;
-    const int is_unsigned = neg_one > const_zero;
-    if (is_unsigned) {
-        if (sizeof(long) < sizeof(long)) {
-            return PyInt_FromLong((long) value);
-        } else if (sizeof(long) <= sizeof(unsigned long)) {
-            return PyLong_FromUnsignedLong((unsigned long) value);
-        } else if (sizeof(long) <= sizeof(unsigned PY_LONG_LONG)) {
-            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
-        }
-    } else {
-        if (sizeof(long) <= sizeof(long)) {
-            return PyInt_FromLong((long) value);
-        } else if (sizeof(long) <= sizeof(PY_LONG_LONG)) {
-            return PyLong_FromLongLong((PY_LONG_LONG) value);
-        }
-    }
-    {
-        int one = 1; int little = (int)*(unsigned char *)&one;
-        unsigned char *bytes = (unsigned char *)&value;
-        return _PyLong_FromByteArray(bytes, sizeof(long),
-                                     little, !is_unsigned);
-    }
-}
-
 static CYTHON_INLINE char __Pyx_PyInt_As_char(PyObject *x) {
     const char neg_one = (char) -1, const_zero = 0;
     const int is_unsigned = neg_one > const_zero;
@@ -30456,6 +35296,28 @@ raise_neg_overflow:
     PyErr_SetString(PyExc_OverflowError,
         "can't convert negative value to long");
     return (long) -1;
+}
+
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_double(PyObject *obj) {
+    __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
+    __Pyx_BufFmt_StackElem stack[1];
+    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED) };
+    int retcode;
+    if (obj == Py_None) {
+        result.memview = (struct __pyx_memoryview_obj *) Py_None;
+        return result;
+    }
+    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
+                                                 PyBUF_RECORDS, 1,
+                                                 &__Pyx_TypeInfo_double, stack,
+                                                 &result, obj);
+    if (unlikely(retcode == -1))
+        goto __pyx_fail;
+    return result;
+__pyx_fail:
+    result.memview = NULL;
+    result.data = NULL;
+    return result;
 }
 
 static int __Pyx_check_binary_version(void) {

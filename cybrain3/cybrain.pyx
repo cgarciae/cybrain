@@ -42,6 +42,12 @@ cdef class Connection (object):
     cdef void compute_dEdW (self):
         pass
 
+    cdef vector[double*] get_gradient_pointers (self):
+        pass
+
+    cdef vector[double*] get_weight_pointers (self):
+        pass
+
 
 cdef class FullConnection (Connection):
 
@@ -71,35 +77,33 @@ cdef class FullConnection (Connection):
         if self.receiver.neuronCount() != self.W.shape[1]:
             raise Exception ("Neuron Difference Error")
 
+        ##print np.asarray (self.W)
         return dotMultiply (self.source.Y(), self.W)
 
     cpdef np.ndarray getW (self):
         return np.asarray (self.W)
 
     cpdef setW (self, np.ndarray value):
-        self.W = value
+        copy_matrix(self.W, value)
 
     cpdef np.ndarray get_dW (self):
         return np.asarray (self.dW)
 
     cpdef set_dW (self, double [:,:] value):
-        self.dW = value
+        copy_matrix(self.dW, value)
 
     cdef void compute_dEdW (self):
-        ##dW : [n, m]
-        ##(dZdW = Y) : [1, n]
-        ##dEdZ.shape : [1, m]
-        ##(Y.T * dEdZ) : [n, 1] * [1, m]  =  [n, m]
-        self.dW = dotMultiply (self.source.Y().T, self.receiver.dEdZ())
+        copy_matrix(self.dW, dotMultiply (self.source.Y().T, self.receiver.dEdZ()))
 
     cdef double[:,:] dEdY (self):
         self.compute_dEdW()
-        ##(dZdY = W) : [n, m]
-        ##dEdZ : [1, m]
-        ##dEdY : [1, n]
-        ##(W * dEdZ.T).T :  ([n, m] * [m, 1] = [n, 1]).T = [1, n]
-        ##(W * dEdZ.T).T = dEdZ * W.T : [1, m] * [m, n] = [1, n]
         return dotMultiply (self.receiver.dEdZ(), self.W.T)
+
+    cdef vector[double*] get_gradient_pointers (self):
+        return get_pointers(self.dW)
+
+    cdef vector[double*] get_weight_pointers (self):
+        return get_pointers(self.W)
 
 
 
@@ -125,7 +129,7 @@ cdef class LinearConnection (FullConnection):
         return elementMultiply (self.source.Y(), self.W)
 
     cdef void compute_dEdW (self):
-        self.dW = elementMultiply (self.source.Y(), self.receiver.dEdZ())
+        copy_matrix(self.dW, elementMultiply (self.source.Y(), self.receiver.dEdZ()))
 
     cdef double[:,:] dEdY (self):
         self.compute_dEdW()
@@ -146,6 +150,8 @@ cdef class Layer (object):
     def __init__(self):
         self.sourceConnections = []
         self.receiverConnections = []
+        self.active = False
+        self.back_active = False
 
     cdef double[:,:] H (self, double[:,:] Z):
         pass
@@ -167,6 +173,10 @@ cdef class Layer (object):
 
     cpdef setData (self, double [:,:] value):
         pass
+
+    cpdef restart (self):
+        self.active = False
+        self.back_active = False
 
 cdef class LinearLayer (Layer):
 
@@ -192,7 +202,6 @@ cdef class LinearLayer (Layer):
         cdef:
             Connection connection
             int i
-
 
         if not self.active:
             self.active = True
@@ -238,6 +247,11 @@ cdef class LinearLayer (Layer):
 
     cpdef setTarget (self, double [:,:] T):
         cdef double [:,:] dEdY = self.dEdY (T)
+
+        if T.shape[1] != self.neuronCount():
+            raise Exception ("setTarget Error: Data shape error. Received {0}, expected {1}".format(T.shape[1], self.neuronCount()))
+
+        dEdY = self.dEdY (T)
         self._dEdZ = elementMultiply (self.dYdZ(), dEdY)
         self.back_active = True
 
@@ -247,7 +261,7 @@ cdef class LinearLayer (Layer):
     cdef double[:,:] dYdZ (self):
         return np.ones ((1, self._Y.shape[1]), dtype="double")
 
-    cdef int neuronCount (self):
+    cpdef int neuronCount (self):
         return self._Y.shape[1]
 
     cpdef LinearLayer fullConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):
@@ -269,6 +283,20 @@ cdef class LogisticLayer (LinearLayer):
     cdef double[:,:] dYdZ (self):
         return elementUnaryOperation(self.Y(), logistic_dYdZ)
 
+cdef class BiasUnit (LinearLayer):
+
+    def __init__(self):
+        LinearLayer.__init__(self, 1)
+        self._Y[0,0] = 1.0
+        self._dEdZ[0,0] = 1.0
+
+    cdef double[:,:] H (self, double[:,:] Z):
+        cdef double[:,:] h = cvarray ((1,1), sizeof(double), 'd')
+
+        h[0,0] = 1.0
+
+        return h
+
 
 ####################
 ##NETWORK
@@ -276,26 +304,31 @@ cdef class LogisticLayer (LinearLayer):
 
 cdef class Network (object):
     cdef:
-        public list inputLayers, outputLayers, autoInputLayers, autoOutputLayers, layers, hiddenLayers, connections
+        public list inputLayers, outputLayers, autoInputLayers, autoOutputLayers, layers, hiddenLayers, connections, all_input_layers, all_output_layers
 
     def __init__(self):
         self.inputLayers = []
         self.outputLayers = []
         self.autoInputLayers = []
         self.autoOutputLayers = []
+        self.all_output_layers = []
+        self.all_input_layers = []
 
         self.hiddenLayers = []
         self.layers = []
         self.connections = []
 
-    cpdef findHiddenComponents (self):
+    cpdef setup (self):
         cdef:
             Layer layer
+
+        self.all_input_layers = self.inputLayers + self.autoInputLayers
+        self.all_output_layers = self.outputLayers + self.autoOutputLayers
 
         layers = set()
         connections = set()
 
-        for layer in self.inputLayers + self.autoInputLayers:
+        for layer in self.all_input_layers:
             self.recursivelyFindLayersAndConnections (layer, layers, connections)
 
         self.layers = list (layers)
@@ -312,11 +345,34 @@ cdef class Network (object):
             connections.add (connection)
             self.recursivelyFindLayersAndConnections (connection.receiver, layers, connections)
 
+    cdef vector[double*] get_gradient_pointers (self):
+        cdef:
+            vector[double*] total, partial
+            Connection connection
+
+        for connection in self.connections:
+            partial = connection.get_gradient_pointers()
+            total.insert(total.end(), partial.begin(), partial.end())
+
+        return total
+
+    cdef vector[double*] get_weight_pointers (self):
+        cdef:
+            vector[double*] total, partial
+            Connection connection
+
+        for connection in self.connections:
+            partial = connection.get_weight_pointers()
+            total.insert(total.end(), partial.begin(), partial.end())
+
+        return total
+
     cpdef restartNetwork (self):
         cdef Layer layer
 
         for layer in self.layers:
             layer.active = False
+            layer.back_active = False
 
     cpdef setData (self, double[:,:] X):
         cdef:
@@ -338,9 +394,10 @@ cdef class Network (object):
         cdef:
             Layer layer
 
+
         self.setData(X)
 
-        for layer in self.layers:
+        for layer in self.all_output_layers:
             layer.Y()
 
 
@@ -349,15 +406,137 @@ cdef class Network (object):
             Layer layer
             double[:,:] result = None
 
+        self.restartNetwork()
         self.activate_layers(X)
 
-        for layer in self.layers:
+        for layer in self.all_output_layers:
             if result is None:
-                result = layer.getY()
+                result = np.asarray(layer.Y())
             else:
                 result = np.concatenate((result, layer.Y()), axis=1)
 
         return result
+
+    ## Backactivation
+
+    cpdef setTarget (self, double[:,:] T):
+        cdef:
+            int start = 0, end
+            LinearLayer layer
+
+        neuron_count = sum([layer.neuronCount() for layer in self.outputLayers])
+        if  neuron_count != T.shape[1]:
+            raise Exception("The input data has {0} entries but there are {1} neurons.".format(T.shape[1], neuron_count))
+
+        for layer in self.outputLayers:
+            end = start + layer.neuronCount()
+            layer.setTarget(T [0:1, start : end])
+            start = end
+
+
+
+    cpdef back_activate_layers(self, double[:,:] T):
+        cdef:
+            Layer layer
+
+
+        self.setTarget(T)
+
+        for layer in self.all_input_layers:
+            layer.dEdZ()
+
+
+    cpdef double[:,:] back_activate(self, double[:,:] X):
+        cdef:
+            Layer layer
+            double[:,:] result = None
+
+        self.restartNetwork()
+        self.back_activate_layers(X)
+
+        for layer in self.all_input_layers:
+            if result is None:
+                result = np.asarray(layer.dEdZ())
+            else:
+                result = np.concatenate((result, layer.dEdZ()), axis=1)
+
+        return result
+
+
+####################
+## TRAINERS
+####################
+cdef class FullBatchTrainer(object):
+
+    cdef:
+        vector[double*] _weights
+        vector[double*] _gradient
+        double[:] total_gradient
+        public double cost
+        public Network net
+        public double[:,:] input_data
+        public double[:,:] output_data
+        public double learning_rate
+        public int len_gradient
+        public int len_data
+
+    def __init__(self, Network net, double[:,:] input_data, double[:,:] output_data, double learning_rate):
+        self.net = net
+        self.input_data = input_data
+        self.output_data = output_data
+        self.learning_rate = learning_rate
+        self._weights = net.get_weight_pointers()
+        self._gradient = net.get_gradient_pointers()
+        self.len_gradient = self._gradient.size()
+        self.len_data = len(input_data)
+        self.len_data = len(input_data)
+        self.total_gradient = cvarray ((self.len_gradient,), sizeof(double), 'd')
+
+    cdef restart_gradient(self):
+        self.total_gradient[...] = 0.0
+
+    cdef print_gradient(self):
+        cdef:
+            int i
+        for i in range(self.len_gradient):
+            print(self.total_gradient[i])
+
+    cdef print_actual_gradient(self):
+        cdef:
+            int i
+        for i in range(self.len_gradient):
+            print(self._gradient[i][0],)
+
+    cdef print_weights(self):
+        cdef:
+            int i
+        for i in range(self.len_gradient):
+            print (self._weights[i][0],)
+
+    cdef add_to_total_gradient(self):
+        cdef:
+            int i
+        for i in range(self.len_gradient):
+            self.total_gradient[i] += self._gradient[i][0]
+
+    cpdef epochs(self, int epochs):
+        cdef:
+            int i
+        for i in range(epochs):
+            self.train()
+
+    cdef train(self):
+        cdef:
+            int i
+        self.restart_gradient()
+        for i in range(self.len_data):
+            self.net.restartNetwork()
+            self.net.activate_layers(self.input_data[i:i+1,:])
+            self.net.back_activate_layers(self.output_data[i:i+1,:])
+            self.add_to_total_gradient()
+
+        for i in range(self.len_gradient):
+            self._weights[i][0] -= self.learning_rate * self.total_gradient[i]
 
 
 ####################
@@ -443,6 +622,7 @@ cdef double[:,:] elementBinaryOperation (double [:,:] A, double [:,:] B, BinaryD
 
     return result
 
+
 cdef double[:,:] elementUnaryOperation (double [:,:] A, UnaryDoubleFun f):
     cdef:
         int i, j, k, m = A.shape[0], n = A.shape[1]
@@ -455,3 +635,27 @@ cdef double[:,:] elementUnaryOperation (double [:,:] A, UnaryDoubleFun f):
             result[i,j] = f (A[i,j])
 
     return result
+
+cdef void copy_matrix (double [:,:] target, double [:,:] source):
+    cdef:
+        int i, j, k, m = target.shape[0], n = target.shape[1]
+
+    if target.shape[0] != source.shape[0] or target.shape[1] != source.shape[1]:
+        raise Exception("Copy error: matrices need to have the same shape")
+
+    for i in range(m):
+        for j in range(n):
+            target[i,j] = source[i,j]
+
+cdef vector[double*] get_pointers (double [:,:] A):
+    cdef:
+        vector[double*] result
+        int i, j, m = A.shape[0], n = A.shape[1]
+
+    for i in range(m):
+        for j in range(n):
+            result.push_back(&(A[i][j]))
+
+    return result
+
+

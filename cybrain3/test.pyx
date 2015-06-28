@@ -18,3 +18,13 @@ cdef double logisticFunctionP (double z):
 
 print logisticFunctionC(d)
 print logisticFunctionP(d)
+
+cdef:
+    double* v
+    double[:,:] A
+
+A = np.array([[1.,2.,3.]])
+v = &(A[0][1])
+v[0] = 4.
+
+print A[0][1]
