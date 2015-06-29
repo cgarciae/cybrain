@@ -136,3 +136,12 @@ Roadmap
 * Auto-encoders and CNNs [Requires research]
 * Try to organize the folders [Cython research]
 * Solutions to Andrew Ng's ML class with CyBrain [Soon]
+
+
+About the Author
+================
+
+My name is Cristian Garcia, I am a Mathematical Engineer and Software developer, so I claim to be a Mathematical Developer.
+I live in Colombia but plan to travel abroad as soon as I get my collage degree to do a Master in Artificial Intelligence
+or get a job as a Mathematical Developer.
+If you happen to need a Mathematical Developer at your company and find my code reasonable, contact me. 
