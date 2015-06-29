@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="e8240239-8e8b-4bf0-b44c-30ddba5c49f0" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="cybrain.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -35,24 +34,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="logistic_XOR_example.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="logistic_XOR_example.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/examples/logistic_XOR_example.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.6486486">
-              <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="50" selection-end-column="71" />
+            <state vertical-scroll-proportion="0.37209302">
+              <caret line="43" column="6" selection-start-line="43" selection-start-column="6" selection-end-line="43" selection-end-column="6" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
             <state />
           </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.12028302">
-              <caret line="3" column="69" selection-start-line="3" selection-start-column="69" selection-end-line="3" selection-end-column="69" />
+            <state vertical-scroll-proportion="-1.8378378">
+              <caret line="10" column="4" selection-start-line="10" selection-start-column="4" selection-end-line="57" selection-end-column="65" />
               <folding />
             </state>
           </provider>
@@ -574,14 +573,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cybrain.pyx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-11.222222">
-          <caret line="417" column="21" selection-start-line="417" selection-start-column="21" selection-end-line="417" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-9.527778">
@@ -592,10 +583,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/examples/logistic_XOR_example.py">
+    <entry file="file://$PROJECT_DIR$/cybrain.pyx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.6486486">
-          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="50" selection-end-column="71" />
+        <state vertical-scroll-proportion="-11.222222">
+          <caret line="417" column="21" selection-start-line="417" selection-start-column="21" selection-end-line="417" selection-end-column="21" />
           <folding />
         </state>
       </provider>
@@ -605,8 +596,16 @@
         <state />
       </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.12028302">
-          <caret line="3" column="69" selection-start-line="3" selection-start-column="69" selection-end-line="3" selection-end-column="69" />
+        <state vertical-scroll-proportion="-1.8378378">
+          <caret line="10" column="4" selection-start-line="10" selection-start-column="4" selection-end-line="57" selection-end-column="65" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/logistic_XOR_example.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.37209302">
+          <caret line="43" column="6" selection-start-line="43" selection-start-column="6" selection-end-line="43" selection-end-column="6" />
           <folding />
         </state>
       </provider>

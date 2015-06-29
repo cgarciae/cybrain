@@ -26,14 +26,15 @@ XOR Example
 
     #CREATE LAYERS
     Lin = cb.LinearLayer(2)
-    Lhidden = cb.LinearLayer(2)
-    Lout = cb.LinearLayer(1)
-    bias = cb.LinearLayer(1)
+    Lhidden = cb.LogisticLayer(2)
+    Lout = cb.LogisticLayer(1)
+    bias = cb.BiasUnit()
 
     #ADD LAYERS TO NETWORK
-    nnet.inputLayers.append(Lin)
-    nnet.outputLayers.append(Lout)
-    nnet.autoInputLayers.append(bias)
+    nnet.inputLayers = [Lin]
+    nnet.hiddenLayers = [Lhidden]
+    nnet.outputLayers = [Lout]
+    nnet.autoInputLayers = [bias]
 
     #CONNECT LAYERS
     Lin.fullConnectTo(Lhidden)
@@ -41,12 +42,11 @@ XOR Example
     bias.fullConnectTo(Lhidden)
     bias.fullConnectTo(Lout)
 
-    #SETUP NETWORK
-    nnet.setup()
-
     #CREATE BATCH TRAINER
     rate = 0.1
+    nnet.setup()
     batch = cb.FullBatchTrainer(nnet, X, Y, rate)
+
 
     #TRAIN
     t1 = time()
