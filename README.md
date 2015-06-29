@@ -3,7 +3,7 @@ CyBrain
 
 Neural Networks in Cython, inspired by PyBrain, but focused on speed.
 
-Check Comparison.py for a first approach. In this example we train a CyBrain network to solve the XOR problem.
+Check examples/logistic_XOR_example.py for a first approach.
 
 XOR Example
 ===========

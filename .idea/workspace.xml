@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e8240239-8e8b-4bf0-b44c-30ddba5c49f0" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/temp.linux-x86_64-2.7/cybrain.o" afterPath="$PROJECT_DIR$/build/temp.linux-x86_64-2.7/cybrain.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.so" afterPath="$PROJECT_DIR$/cybrain.so" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.cpp" afterPath="$PROJECT_DIR$/cybrain.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.pyx" afterPath="$PROJECT_DIR$/cybrain.pyx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/logistic_XOR_example.py" afterPath="$PROJECT_DIR$/examples/logistic_XOR_example.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="cybrain.iws" />
@@ -56,8 +51,8 @@
             <state />
           </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.35849056">
-              <caret line="62" column="24" selection-start-line="62" selection-start-column="24" selection-end-line="62" selection-end-column="24" />
+            <state vertical-scroll-proportion="0.12028302">
+              <caret line="3" column="69" selection-start-line="3" selection-start-column="69" selection-end-line="3" selection-end-column="69" />
               <folding />
             </state>
           </provider>
@@ -610,8 +605,8 @@
         <state />
       </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.35849056">
-          <caret line="62" column="24" selection-start-line="62" selection-start-column="24" selection-end-line="62" selection-end-column="24" />
+        <state vertical-scroll-proportion="0.12028302">
+          <caret line="3" column="69" selection-start-line="3" selection-start-column="69" selection-end-line="3" selection-end-column="69" />
           <folding />
         </state>
       </provider>
