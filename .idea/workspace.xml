@@ -2,43 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e8240239-8e8b-4bf0-b44c-30ddba5c49f0" name="Default" comment="">
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\.gitignore" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\README.md" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\TBrain.pyx" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\Untitled0.ipynb" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain.h" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain2.c" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain2.cpp" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain2.h" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain2.html" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain2.pyx" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\cybrain.so" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\layerTests.py" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\tbrain.cpp" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\tbrain.so" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\tests\layerTests.py" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\tests\neuronTests.py" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\tests\testComparison.py" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\tests\testSoftmaxAsLayer.py" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\tests\testSoftmaxAsOutput.py" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\tests\testTBrain.py" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\tests\testing.py" afterPath="" />
-      <change type="MOVED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\Dockerfile" afterPath="$PROJECT_DIR$/Dockerfile" />
-      <change type="MOVED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\commands.txt" afterPath="$PROJECT_DIR$/commands.txt" />
-      <change type="MOVED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\cybrain.c" afterPath="$PROJECT_DIR$/cybrain.c" />
-      <change type="MOVED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\cybrain.cpp" afterPath="$PROJECT_DIR$/cybrain.cpp" />
-      <change type="MOVED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\cybrain.html" afterPath="$PROJECT_DIR$/cybrain.html" />
-      <change type="MOVED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\cybrain.pyx" afterPath="$PROJECT_DIR$/cybrain.pyx" />
-      <change type="MOVED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\main.py" afterPath="$PROJECT_DIR$/main.py" />
-      <change type="MOVED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\setup.py" afterPath="$PROJECT_DIR$/setup.py" />
-      <change type="MOVED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\test.c" afterPath="$PROJECT_DIR$/test.c" />
-      <change type="MOVED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\test.cpp" afterPath="$PROJECT_DIR$/test.cpp" />
-      <change type="MOVED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\test.html" afterPath="$PROJECT_DIR$/test.html" />
-      <change type="MOVED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\test.pyx" afterPath="$PROJECT_DIR$/test.pyx" />
-      <change type="MOVED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\test.so" afterPath="$PROJECT_DIR$/test.so" />
-      <change type="MOVED" beforePath="C:\Users\Cristian\Documents\GitHub\cybrain\cybrain3\testLayerActivation.py" afterPath="$PROJECT_DIR$/tests.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/__init__.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.so" afterPath="$PROJECT_DIR$/cybrain.so" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.cpp" afterPath="$PROJECT_DIR$/cybrain.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.pyx" afterPath="$PROJECT_DIR$/cybrain.pyx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/logistic_XOR_example.py" afterPath="$PROJECT_DIR$/examples/logistic_XOR_example.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="cybrain.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -60,26 +29,22 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="logistic_XOR_example.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="logistic_XOR_example.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/examples/logistic_XOR_example.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="1.8888888">
-              <caret line="18" column="54" selection-start-line="18" selection-start-column="54" selection-end-line="28" selection-end-column="15" />
-              <folding>
-                <element signature="e#0#20#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="0.0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="50" selection-end-column="61" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="tests.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/tests.py">
+      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.93073595">
-              <caret line="247" column="21" selection-start-line="237" selection-start-column="21" selection-end-line="247" selection-end-column="21" />
-              <folding>
-                <element signature="e#32#52#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="-0.0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -87,9 +52,21 @@
       <file leaf-file-name="cybrain.pyx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cybrain.pyx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.9054054">
-              <caret line="232" column="21" selection-start-line="232" selection-start-column="21" selection-end-line="232" selection-end-column="21" />
+            <state vertical-scroll-proportion="-10.277778">
+              <caret line="415" column="68" selection-start-line="415" selection-start-column="68" selection-end-line="415" selection-end-column="68" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="tests.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tests.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-23.75">
+              <caret line="247" column="21" selection-start-line="237" selection-start-column="21" selection-end-line="247" selection-end-column="21" />
+              <folding>
+                <element signature="e#32#52#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -120,6 +97,10 @@
         <option value="$PROJECT_DIR$/cybrain3/test.pyx" />
         <option value="$PROJECT_DIR$/cybrain3/cybrain.pyx" />
         <option value="$PROJECT_DIR$/cybrain3/testLayerActivation.py" />
+        <option value="$PROJECT_DIR$/__init__.py" />
+        <option value="$PROJECT_DIR$/examples/__init__.py" />
+        <option value="$PROJECT_DIR$/examples/logistic_XOR_example.py" />
+        <option value="$PROJECT_DIR$/cybrain.pyx" />
       </list>
     </option>
   </component>
@@ -189,6 +170,7 @@
     <property name="settings.editor.selected.configurable" value="preferences.editor" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="FullScreen" value="false" />
+    <property name="recentsLimit" value="5" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -196,7 +178,25 @@
       <recent name="C:\Users\Cristian\Documents\GitHub\cybrain\tests" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.logistic_XOR_example">
+    <configuration default="false" name="logistic_XOR_example" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/examples" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="cybrain" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/examples/logistic_XOR_example.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
     <configuration default="true" type="DjangoTestsConfigurationType" factoryName="Django tests">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -385,6 +385,14 @@
       <option name="USE_KEYWORD" value="false" />
       <method />
     </configuration>
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="Python.logistic_XOR_example" />
+    </list>
+    <recent_temporary>
+      <list size="1">
+        <item index="0" class="java.lang.String" itemvalue="Python.logistic_XOR_example" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
   <component name="SvnConfiguration">
@@ -521,22 +529,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cybrain.pyx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.9054054">
-          <caret line="232" column="21" selection-start-line="232" selection-start-column="21" selection-end-line="232" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/commands.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.034136545">
@@ -545,23 +537,45 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/examples/logistic_XOR_example.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.8888888">
-          <caret line="18" column="54" selection-start-line="18" selection-start-column="54" selection-end-line="28" selection-end-column="15" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.93073595">
+        <state vertical-scroll-proportion="-23.75">
           <caret line="247" column="21" selection-start-line="237" selection-start-column="21" selection-end-line="247" selection-end-column="21" />
           <folding>
             <element signature="e#32#52#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cybrain.pyx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-10.277778">
+          <caret line="415" column="68" selection-start-line="415" selection-start-column="68" selection-end-line="415" selection-end-column="68" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/logistic_XOR_example.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="50" selection-end-column="61" />
+          <folding />
         </state>
       </provider>
     </entry>

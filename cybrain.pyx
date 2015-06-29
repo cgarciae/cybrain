@@ -415,7 +415,7 @@ cdef class Network (object):
             else:
                 result = np.concatenate((result, layer.Y()), axis=1)
 
-        return result
+        return np.asarray(result)
 
     ## Backactivation
 
