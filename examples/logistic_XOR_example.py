@@ -19,14 +19,15 @@ nnet = cb.Network()
 
 #CREATE LAYERS
 Lin = cb.LinearLayer(2)
-Lhidden = cb.LinearLayer(2)
-Lout = cb.LinearLayer(1)
-bias = cb.LinearLayer(1)
+Lhidden = cb.LogisticLayer(2)
+Lout = cb.LogisticLayer(1)
+bias = cb.BiasUnit()
 
 #ADD LAYERS TO NETWORK
-nnet.inputLayers.append(Lin)
-nnet.outputLayers.append(Lout)
-nnet.autoInputLayers.append(bias)
+nnet.inputLayers = [Lin]
+nnet.hiddenLayers = [Lhidden]
+nnet.outputLayers = [Lout]
+nnet.autoInputLayers = [bias]
 
 #CONNECT LAYERS
 Lin.fullConnectTo(Lhidden)
@@ -34,12 +35,11 @@ Lhidden.fullConnectTo(Lout)
 bias.fullConnectTo(Lhidden)
 bias.fullConnectTo(Lout)
 
-#SETUP NETWORK
-nnet.setup()
-
 #CREATE BATCH TRAINER
 rate = 0.1
+nnet.setup()
 batch = cb.FullBatchTrainer(nnet, X, Y, rate)
+
 
 #TRAIN
 t1 = time()
@@ -48,4 +48,4 @@ print "Time CyBrain {}".format(time()-t1)
 
 #PRINT RESULTS
 for i in range(len(X)):
-    print "{} ==> {}".format(X[i], nnet.activate(X[i:i+1,:]))
+    print "{} ==> {}".format(X[i], np.array(nnet.activate(X[i:i+1,:])))
