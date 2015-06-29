@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e8240239-8e8b-4bf0-b44c-30ddba5c49f0" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.so" afterPath="$PROJECT_DIR$/cybrain.so" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.cpp" afterPath="$PROJECT_DIR$/cybrain.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cybrain.pyx" afterPath="$PROJECT_DIR$/cybrain.pyx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/logistic_XOR_example.py" afterPath="$PROJECT_DIR$/examples/logistic_XOR_example.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/README.md" />
     </list>
     <ignored path="cybrain.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -29,11 +24,24 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="logistic_XOR_example.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="logistic_XOR_example.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/examples/logistic_XOR_example.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="50" selection-end-column="61" />
+            <state vertical-scroll-proportion="-11.5">
+              <caret line="50" column="61" selection-start-line="3" selection-start-column="0" selection-end-line="50" selection-end-column="61" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+            <state />
+          </provider>
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.759434">
+              <caret line="114" column="47" selection-start-line="114" selection-start-column="47" selection-end-line="114" selection-end-column="47" />
               <folding />
             </state>
           </provider>
@@ -99,8 +107,9 @@
         <option value="$PROJECT_DIR$/cybrain3/testLayerActivation.py" />
         <option value="$PROJECT_DIR$/__init__.py" />
         <option value="$PROJECT_DIR$/examples/__init__.py" />
-        <option value="$PROJECT_DIR$/examples/logistic_XOR_example.py" />
         <option value="$PROJECT_DIR$/cybrain.pyx" />
+        <option value="$PROJECT_DIR$/examples/logistic_XOR_example.py" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -409,9 +418,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-11" y="-11" width="1942" height="1102" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18743287" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18743287" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -573,8 +582,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/examples/logistic_XOR_example.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="50" selection-end-column="61" />
+        <state vertical-scroll-proportion="-11.5">
+          <caret line="50" column="61" selection-start-line="3" selection-start-column="0" selection-end-line="50" selection-end-column="61" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.759434">
+          <caret line="114" column="47" selection-start-line="114" selection-start-column="47" selection-end-line="114" selection-end-column="47" />
           <folding />
         </state>
       </provider>
