@@ -25,6 +25,7 @@ class TestLinearLayerFunctions(unittest.TestCase):
         np.testing.assert_almost_equal (result, [[9, 12, 15]])
 
     def test_dEdZ (self):
+        
         self.layerIn.setData(np.array ([[1.,2.]]))
         self.con.setW (np.array ([[1.,2.,3.],
                                   [4.,5.,6.]]))
@@ -33,16 +34,14 @@ class TestLinearLayerFunctions(unittest.TestCase):
         self.layerOut.setTarget (np.array([[10., 14., 18.]]))
         self.layerIn.get_dEdZ()
 
+
+
         dEdZ = self.layerOut.get_dEdZ()
         dW = self.con.get_dW()
 
         np.testing.assert_almost_equal (dEdZ, [[-1, -2, -3]])
         np.testing.assert_almost_equal (dW, [[-1, -2, -3],
                                              [-2, -4, -6]])
-
-
-
-
 
 
 class TestLogisticLayerFunctions(unittest.TestCase):
@@ -78,6 +77,7 @@ class TestLogisticLayerFunctions2(unittest.TestCase):
         self.layerIn.get_dEdZ()
 
         dW = self.connection.get_dW()
+
 
         np.testing.assert_almost_equal (Y, [[0.3318122278318339, 0.6899744811276125, 0.28905049737499605]])
         np.testing.assert_almost_equal (dW, [[-0.6681877721681662, 0.6899744811276126, -0.7109495026250039],
@@ -148,6 +148,8 @@ class TestNetworkDimensions(unittest.TestCase):
         self.l3.linearConnectTo(self.l6)
         self.l5.fullConnectTo(self.l7)
 
+        self.net.setup()
+
     def test_lenght (self):
         pass
 
@@ -184,11 +186,10 @@ class TestNetworkValues (unittest.TestCase):
 
     def test_dEdZ (self):
 
-        self.connection.setW (np.array ([[0.1,-0.2, 0.3],
-                                         [-0.4, 0.5,-0.6]]))
+        self.connection.setW (np.array ([[0.1,-0.2, 0.3],[-0.4, 0.5,-0.6]]))
 
         Y = self.net.activate(np.array ([[1.,2.]]))
-        self.net.back_activate (np.array([[1., 0., 1.]]))
+        self.net.back_activate_layers (np.array([[1., 0., 1.]]))
         dW = self.connection.get_dW()
 
         np.testing.assert_almost_equal (Y, [[0.3318122278318339, 0.6899744811276125, 0.28905049737499605]])
@@ -235,54 +236,42 @@ class TestFullBatchTrainer (unittest.TestCase):
         self.batch = cb.FullBatchTrainer(self.nnet, self.X, self.Y, rate)
 
     def test_epochs (self):
-
-        #TRAIN
-        t1 = time()
-        for c in self.nnet.connections:
-            print c.getW()
-        print "\n\n"
-
         self.batch.epochs(2000)
 
-        for c in self.nnet.connections:
-            print c.getW()
-        print "\n\n"
-
-        print "Time CyBrain {}".format(time()-t1)
-
-        for i in range(4):
-            print "{0} => {1}".format (self.X[i], np.array(self.nnet.activate(self.X[i:i+1,:])))
+        for i in range(len(self.Y)):
+            self.assertEqual(self.Y[i] > 0.5, self.nnet.activate(self.X[i:i+1,:])[0,0] > 0.5)
 
 
 if __name__ == '__main__':
 
-    print "\n\n\n"
+    
     suite = unittest.TestLoader().loadTestsFromTestCase(TestLinearLayerFunctions)
     unittest.TextTestRunner(verbosity=2).run(suite)
-    print "\n\n\n"
-
+    
+    #'''
     suite = unittest.TestLoader().loadTestsFromTestCase(TestLogisticLayerFunctions)
     unittest.TextTestRunner(verbosity=2).run(suite)
-    print "\n\n\n"
+    
 
     suite = unittest.TestLoader().loadTestsFromTestCase(TestLogisticLayerFunctions2)
     unittest.TextTestRunner(verbosity=2).run(suite)
-    print "\n\n\n"
+    
 
 
     suite = unittest.TestLoader().loadTestsFromTestCase(TestNetworkDimensions)
     unittest.TextTestRunner(verbosity=2).run(suite)
-    print "\n\n\n"
+    
 
 
     suite = unittest.TestLoader().loadTestsFromTestCase(TestLinearConnectionTests)
     unittest.TextTestRunner(verbosity=2).run(suite)
-    print "\n\n\n"
+    
 
     suite = unittest.TestLoader().loadTestsFromTestCase(TestNetworkValues)
     unittest.TextTestRunner(verbosity=2).run(suite)
-    print "\n\n\n"
+    
 
     suite = unittest.TestLoader().loadTestsFromTestCase(TestFullBatchTrainer)
     unittest.TextTestRunner(verbosity=2).run(suite)
-    print "\n\n\n"
+
+    #'''

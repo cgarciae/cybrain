@@ -1,6 +1,7 @@
 from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
+from Cython.Build import cythonize
 import numpy as np
 
 # connections = Extension( "connections",
@@ -18,25 +19,21 @@ import numpy as np
 #                  language='c++'
 #                  )
 
-cybrain = Extension( "cybrain",
-                 sources= ["cybrain.pyx"],
-                 include_dirs= [np.get_include()],
-                 language='c++'
-                 )
-cybrain2 = Extension( "cybrain2",
-                 sources= ["cybrain2.pyx"],
-                 include_dirs= [np.get_include()],
-                 language='c++'
-                 )
-tbrain = Extension( "tbrain",
-                 sources= ["tbrain.pyx"],
-                 include_dirs= [np.get_include()],
-                 language='c++'
-                 )
 
 
 setup\
 (
     cmdclass = {'build_ext': build_ext},
-    ext_modules = [cybrain, cybrain2, tbrain]
+
+    ext_modules = [
+        Extension( "cybrain",
+        sources= ["cybrain.pyx"],
+        include_dirs= [np.get_include()],
+        language='c++'
+        ),
+        Extension( "test",
+        sources= ["test.pyx"],
+        include_dirs= [np.get_include()],
+        language='c++'
+        )]
 )

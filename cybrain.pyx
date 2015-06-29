@@ -1,825 +1,472 @@
 from libc.stdlib cimport malloc, free
 cimport libc.math as cmath
 from libcpp.vector cimport vector
-from cython.view cimport array
+from cython.view cimport array as cvarray
+from cpython.array cimport array, clone
+import numpy as np
+cimport numpy as np
 import random as rn
 import math
+import exceptions
 
-cdef public int neuronCount = 0
+#BUILD: python setup.py build_ext --inplace
 
-cdef class Neuron2 (object):
+####################
+##TYPES AND TEMPS
+####################
+
+ctypedef double (*BinaryDoubleFun)(double, double)
+ctypedef double (*UnaryDoubleFun)(double)
+
+cdef array template = array ('d')
+
+####################
+##CONNECTIONS
+####################
+
+cdef class Connection (object):
 
     cdef:
-        public double _z
-        public double y
-        public double dEdy
-        public double dEdz
-        public bint active
-
-        public list forwardConnections
-        public list backwardConnections
-
-    property z:
-        def __get__(self):
-            cdef Connection2 connection
-            if not self.active:
-                self.active = True
-
-                self._z = sum([connection.value for connection in self.backwardConnections])
-
-            return self._z
-
+        public Layer source
+        public Layer receiver
 
     def __init__(self):
-        self._z = 0
-        self.y = 0
-        self.dEdy = 0
-        self.dEdz = 0
-        self.active = False
+        pass
 
-        self.forwardConnections = []
-        self.backwardConnections = []
+    cdef double[:,:] Zc (self):
+        pass
 
-cdef class InputNeuron2 (Neuron2):
+    cdef double[:,:] dEdY (self):
+        pass
 
-    cdef:
-        public double x
+    cdef void compute_dEdW (self):
+        pass
 
-    def __init__(self):
-        Neuron2.__init__(self)
+    cdef vector[double*] get_gradient_pointers (self):
+        pass
 
-        self.x = 0
+    cdef vector[double*] get_weight_pointers (self):
+        pass
 
 
-
-
-cdef class Connection2 (object):
+cdef class FullConnection (Connection):
 
     cdef:
-        public int id;
-        public Neuron2 source
-        public Neuron2 receiver
-        double * _w
-        double * _dw
+        double[:,:] W
+        double[:,:] dW
 
-    def __init__(self, Neuron2 source, Neuron2 receiver, double weight = 0):
+    def __init__(self, LinearLayer source, LinearLayer receiver, double weightMagnitud = 1.0):
+        Connection.__init__(self)
 
-        self._w  = <double *> malloc (sizeof (double *))
-        self._dw = <double *> malloc (sizeof (double *))
+        self.W = weightMagnitud * (np.random.rand (source.neuronCount(), receiver.neuronCount()) * 2.0 - 1.0)
+        self.dW = np.empty ((source.neuronCount(), receiver.neuronCount()), dtype='double')
+
+        source.receiverConnections.append (self)
+        receiver.sourceConnections.append (self)
 
         self.source = source
         self.receiver = receiver
-        self._w[0] = weight
-        self._dw[0] = 0
 
-        source .forwardConnections .append (self)
-        receiver .backwardConnections .append (self)
 
-    property value:
-        def __get__(self):
-            return self.source.y * self.w
+    cdef double[:,:] Zc (self):
 
-    property w:
-        def __get__(self):
-            return self._w[0]
 
-        def __set__(self, double value):
-            self._w[0] = value
+        if self.source.Y().shape[1] != self.W.shape[0]:
+            raise Exception ("Shape Error")
 
-    cpdef disconnect (self):
-        self.source.forwardConnections.remove (self)
-        self.receiver.backwardConnections.remove (self)
-        self.source = None
-        self.receiver = None
+        if self.receiver.neuronCount() != self.W.shape[1]:
+            raise Exception ("Neuron Difference Error")
 
-cdef class Layer2 (object):
+        ##print np.asarray (self.W)
+        return dotMultiply (self.source.Y(), self.W)
+
+    cpdef np.ndarray getW (self):
+        return np.asarray (self.W)
+
+    cpdef setW (self, np.ndarray value):
+        copy_matrix(self.W, value)
+
+    cpdef np.ndarray get_dW (self):
+        return np.asarray (self.dW)
+
+    cpdef set_dW (self, double [:,:] value):
+        copy_matrix(self.dW, value)
+
+    cdef void compute_dEdW (self):
+        copy_matrix(self.dW, dotMultiply (self.source.Y().T, self.receiver.dEdZ()))
+
+    cdef double[:,:] dEdY (self):
+        self.compute_dEdW()
+        return dotMultiply (self.receiver.dEdZ(), self.W.T)
+
+    cdef vector[double*] get_gradient_pointers (self):
+        return get_pointers(self.dW)
+
+    cdef vector[double*] get_weight_pointers (self):
+        return get_pointers(self.W)
+
+
+
+cdef class LinearConnection (FullConnection):
+
+    def __init__(self, LinearLayer source, LinearLayer receiver, double weightMagnitud = 1.0):
+        FullConnection.__init__(self, source, receiver, weightMagnitud)
+
+        if source.neuronCount() != receiver.neuronCount():
+            raise Exception("Number of neurons not equal")
+
+        self.W = weightMagnitud * (np.random.rand (1, receiver.neuronCount()) * 2.0 - 1.0)
+        self.dW = np.empty ((1, receiver.neuronCount()), dtype='double')
+
+
+    cdef double[:,:] Zc (self):
+        if self.source.Y().shape[1] != self.W.shape[1]:
+            raise Exception  ("Shape Error")
+
+        if self.receiver.neuronCount() != self.W.shape[1]:
+            raise Exception ("Neuron Difference Error")
+
+        return elementMultiply (self.source.Y(), self.W)
+
+    cdef void compute_dEdW (self):
+        copy_matrix(self.dW, elementMultiply (self.source.Y(), self.receiver.dEdZ()))
+
+    cdef double[:,:] dEdY (self):
+        self.compute_dEdW()
+        return elementMultiply (self.receiver.dEdZ(), self.W)
+
+####################
+##LAYERS
+####################
+
+cdef class Layer (object):
 
     cdef:
-        public list neurons
-        public list forwardLayers
-        public list backwardLayers
+        public list sourceConnections
+        public list receiverConnections
         public bint active
+        public bint back_active
 
-    def __init__(self, int neuron_number, neuronType = Neuron2):
-
-        self.forwardLayers = []
-        self.backwardLayers = []
-        self.neurons = []
+    def __init__(self):
+        self.sourceConnections = []
+        self.receiverConnections = []
         self.active = False
+        self.back_active = False
 
-        for _ in range (neuron_number):
-            self.neurons.append (neuronType ())
+    cdef double[:,:] H (self, double[:,:] Z):
+        pass
 
-    cpdef signalForwardActivation (self):
-        cdef:
-            Layer2 layer
+    cdef double[:,:] Y (self):
+        pass
 
-        for layer in self.backwardLayers:
-            layer.activate()
+    cdef double[:,:] dEdY (self, double[:,:] T):
+        pass
 
-    cdef activationFunction (self):
-        cdef:
-            Neuron2 neuron
+    cdef double[:,:] dYdZ (self):
+        pass
 
-        for neuron in self.neurons:
-            neuron.y = neuron.z
+    cdef double[:,:] dEdZ (self):
+        pass
 
-    cpdef activate (self):
-        if not self.active:
-            self.active = True
+    cdef int neuronCount (self):
+        pass
 
-            self.signalForwardActivation()
-            self.activationFunction()
+    cpdef setData (self, double [:,:] value):
+        pass
 
-    cpdef fullConnectionTo (self, Layer2 receiver):
-        cdef:
-            Neuron2 neuronSource
-            Neuron2 neuronReceiver
+    cpdef restart (self):
+        self.active = False
+        self.back_active = False
 
-        self.forwardLayers.append (receiver)
-        receiver.backwardLayers.append (self)
+cdef class LinearLayer (Layer):
 
-        for neuronSource in self.neurons:
-            for neuronReceiver in receiver.neurons:
-                Connection2 (neuronSource, neuronReceiver)
+    cdef:
+        public double[:,:] _Y, Z, _dEdZ, _dEdY
 
-    cpdef linearConnectionTo (self, Layer2 receiver):
-        cdef:
-            Neuron2 neuronSource
-            Neuron2 neuronReceiver
-
-        self.forwardLayers.append (receiver)
-        receiver.backwardLayers.append (self)
-
-        for (neuronSource, neuronReceiver) in zip (self.neurons, receiver.neurons):
-            Connection2 (neuronSource, neuronReceiver)
-
-    cpdef disconnectFrom (self, Layer2 receiver):
-        cdef:
-            Neuron2 neuronSource
-            Connection2 connection
-
-        self.forwardLayers.remove (receiver)
-        receiver.backwardLayers.remove (self)
-
-        for neuronSource in self.neurons:
-            for connection in neuronSource.forwardConnections:
-                if connection.receiver in receiver.neurons:
-                    connection.disconnect()
-
-
-cdef class InputLayer2 (Layer2):
 
     def __init__(self, int neuron_number):
-        Layer2.__init__(self, neuron_number, InputNeuron2)
+        Layer.__init__(self)
+
+        self._Y = np.empty ((1, neuron_number), dtype='double')
+        self.Z = np.empty ((1, neuron_number), dtype='double')
+        self._dEdZ = np.empty ((1, neuron_number), dtype='double')
+        self._dEdY = np.empty ((1, neuron_number), dtype='double')
+        self.active = False
+        self.back_active = False
 
 
-    cdef activationFunction (self):
-        cdef InputNeuron2 neuron
-        for neuron in self.neurons:
-            neuron.y = neuron.x
+    cdef double[:,:] H (self, double[:,:] Z):
+        return Z
 
-    cpdef setData(self, double[:] data):
+    cdef double[:,:] Y (self):
         cdef:
-            InputNeuron2 neuron
-            int i = 0
-            int lengthNeurons
+            Connection connection
+            int i
 
-        lengthNeurons = len(self.neurons)
+        if not self.active:
+            self.active = True
+            self.Z[...] = 0.0
 
-        if lengthNeurons != len(data):
-            raise IndexError("data and layer dimensions are not equal")
+            for connection in self.sourceConnections:
+                self.Z = elementAdd (self.Z, connection.Zc())
 
-        for i in range (lengthNeurons):
-            neuron = self.neurons[i]
-            neuron.x = data[i]
+            self._Y = self.H (self.Z)
 
-cdef class Net2 (object):
+        return self._Y
 
+    cdef double[:,:] dEdZ (self):
+        cdef:
+            Connection connection
+            int i
+
+        if not self.back_active:
+            self.back_active = True
+            self._dEdY[...] = 0.0
+
+            for connection in self.receiverConnections:
+                self._dEdY = elementAdd (self._dEdY, connection.dEdY())
+
+            self._dEdZ = elementMultiply (self.dYdZ(), self._dEdY)
+
+        return self._dEdZ
+
+    cpdef np.ndarray get_dEdZ (self):
+        return np.asarray (self.dEdZ())
+
+
+    cpdef np.ndarray getY (self):
+        return np.asarray (self.Y())
+
+    cpdef setData (self, double [:,:] value):
+        #TODO: check dimensions
+        if value.shape[1] != self.neuronCount():
+            raise Exception ("setData Error: Data shape error. Received {0}, expected {1}".format(value.shape[1], self.neuronCount()))
+
+        self._Y = value
+        self.active = True
+
+    cpdef setTarget (self, double [:,:] T):
+        cdef double [:,:] dEdY
+
+        if T.shape[1] != self.neuronCount():
+            raise Exception ("setTarget Error: Data shape error. Received {0}, expected {1}".format(T.shape[1], self.neuronCount()))
+
+        dEdY = self.dEdY (T)
+        self._dEdZ = elementMultiply (self.dYdZ(), dEdY)
+        self.back_active = True
+
+    cdef double[:,:] dEdY (self, double[:,:] T):
+        return elementSubtract (self.Y(), T)
+
+    cdef double[:,:] dYdZ (self):
+        return np.ones ((1, self.neuronCount()), dtype="double")
+
+    cpdef int neuronCount (self):
+        return self._Y.shape[1]
+
+    cpdef LinearLayer fullConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):
+        FullConnection (self, layer, weightMagnitud)
+        return  layer
+
+    cpdef LinearLayer linearConnectTo (self, LinearLayer layer, double weightMagnitud = 1.0):
+        LinearConnection (self, layer, weightMagnitud)
+        return  layer
+
+cdef class LogisticLayer (LinearLayer):
+
+    cdef double[:,:] H (self, double[:,:] Z):
+        return elementUnaryOperation (Z, logisticFunction)
+
+    cdef double[:,:] dEdY (self, double[:,:] T):
+        return elementBinaryOperation (T, self.Y(), logistic_dEdY)
+
+    cdef double[:,:] dYdZ (self):
+        return elementUnaryOperation(self.Y(), logistic_dYdZ)
+
+cdef class BiasUnit (LinearLayer):
+
+    def __init__(self):
+        LinearLayer.__init__(self, 1)
+        self._Y[0,0] = 1.0
+        self._dEdZ[0,0] = 1.0
+
+    cdef double[:,:] H (self, double[:,:] Z):
+        cdef double[:,:] h = cvarray ((1,1), sizeof(double), 'd')
+
+        h[0,0] = 1.0
+
+        return h
+
+
+####################
+##NETWORK
+####################
+
+cdef class Network (object):
     cdef:
-        public list inputLayers
-        public list hiddenLayers
-        public list outputLayers
-        public list constantInput
+        public list inputLayers, outputLayers, autoInputLayers, autoOutputLayers, layers, hiddenLayers, connections, all_input_layers, all_output_layers
 
     def __init__(self):
         self.inputLayers = []
-        self.hiddenLayers = []
         self.outputLayers = []
+        self.autoInputLayers = []
+        self.autoOutputLayers = []
+        self.all_output_layers = []
+        self.all_input_layers = []
+
+        self.hiddenLayers = []
+        self.layers = []
+        self.connections = []
+
+    cpdef setup (self):
+        cdef:
+            Layer layer
+
+        self.all_input_layers = self.inputLayers + self.autoInputLayers
+        self.all_output_layers = self.outputLayers + self.autoOutputLayers
+
+        layers = set()
+        connections = set()
+
+        for layer in self.all_input_layers:
+            self.recursivelyFindLayersAndConnections (layer, layers, connections)
+
+        self.layers = list (layers)
+        self.connections = list (connections)
 
 
-
-
-cdef class Neuron(object):
-    cdef:
-        public str name
-        public list backward_connections
-        public list forward_connections
-        public int number_backward_connections
-        public int number_forward_connections
-        public double z
-        public double y
-        public double dEdy
-        public double dEdz
-        public Layer layer
-        public double x
-        public double t
-        public bint is_active_sum
-        public bint is_active_state
-        public bint is_error_derivative_active
-        public bint is_local_gradient_active
-    
-    def __init__(self, str name = ''):
-
-        if name == '':
-            name = str(id(self))
-
-        self.name = name
-        self.forward_connections = []
-        self.backward_connections = []
-        
-        self.number_backward_connections = 0
-        self.number_forward_connections = 0
-        
-        self.z = 0.0
-        self.y = 0.0
-        self.dEdy = 0.0
-        self.dEdz = 0.0
-        self.x = 0.0
-        self.t = 0.0
-
-        self.is_active_sum = False
-        self.is_active_state = False
-        self.is_error_derivative_active = False
-        self.is_local_gradient_active = False
-
-    cpdef Connection connectTo(self, Neuron neuron, str name = '', weight = 0.0, connection_type = Connection ):
-        cdef Connection new = connection_type( self, neuron, name= name, weight= weight )
-        return new
-
-    cdef addForwardConnection( self, Connection connection ):
-        self.forward_connections.append( connection )
-        self.number_forward_connections += 1
-
-    cdef addBackwardConnection( self, Connection connection ):
-        self.backward_connections.append( connection )
-        self.number_backward_connections += 1
-
-    cdef setLayer(self, Layer layer ):
-        self.layer = layer
-
-    cpdef setData(self, double x ):
-        self.x = x
-
-    cpdef setTarget(self, double t ):
-        self.t = t
-
-    cdef calculateZ(self):
+    cdef void recursivelyFindLayersAndConnections (self, Layer layer, layers, connections):
         cdef:
             Connection connection
-            list signals = []
-        if not self.is_active_sum:
-            self.is_active_sum = True
-            self.z = 0.0
-            if self.number_backward_connections > 0:
-                self.z = 0.0
-                for connection in self.backward_connections:
-                    self.z += connection.activate()
-                    signals.append( connection.activate() )
-                #print "\nF => Neuron {}, Signal = {}\n".format( self.name, signals )
-            else:
-                self.z = self.x
+            Layer nextLayer
 
-    cpdef double activate(self):
+        layers.add (layer)
+        for connection in layer.receiverConnections:
+            connections.add (connection)
+            self.recursivelyFindLayersAndConnections (connection.receiver, layers, connections)
 
-        if not self.is_active_sum:
-            self.calculateZ()
-        if not self.is_active_state:
-            self.is_active_state = True
-            self.activateLayer()
-            self.activationFunction()
-        #print "\nF => Neuron {}, Y = {}, Z = {}\n".format( self.name, self.y, self.z )
-
-        return self.y
-
-    cdef activateLayer(self):
-        pass
-
-    cdef layerCalculations(self):
-        pass
-
-    cpdef calculated_dEdy(self):
+    cdef vector[double*] get_gradient_pointers (self):
         cdef:
+            vector[double*] total, partial
             Connection connection
-            list signals = []
-        if not self.is_error_derivative_active:
-            self.is_error_derivative_active = True
-            signals = []
-            self.dEdy = 0.0
-            if self.number_forward_connections > 0:
-                for connection in self.forward_connections:
-                    self.dEdy += connection.errorActivate()
-                signals = [ connection.errorActivate() for connection in self.forward_connections ]
-                #print "\nB => Neuron {}, Signal = {}\n".format( self.name, signals )
-    
-    cdef dEdzFromNeurons(self):
-        self.dEdz = self.dEdy * self.dydz()
-    
-    cdef calculate_dEdz(self):
-        if self.number_forward_connections > 0:
-            self.dEdzFromNeurons()
-        else:
-            self.dEdzFromTarget()
 
-    cpdef double errorActivate(self):
-        
-        if not self.is_error_derivative_active:
-            self.calculated_dEdy()
-            
-        if not self.is_local_gradient_active:
-            self.is_local_gradient_active = True
-            self.errorActivateLayer()
-            self.calculate_dEdz()
-            #print "\nB => Neuron {}, Local Gradient = {}, Function Derivative = {}, Error Derivative = {}\n".format( self.name, self.dEdz, self.dydz(), self.dEdy )
+        for connection in self.connections:
+            partial = connection.get_gradient_pointers()
+            total.insert(total.end(), partial.begin(), partial.end())
 
-        return self.dEdz
+        return total
 
-    cdef errorActivateLayer(self):
-        pass
-
-    def errorLayerCalculations(self):
-        pass
-
-    cdef activationFunction(self):
-        self.y = self.z
-
-    cdef double dydz(self):
-        return 1.0
-
-    cdef double E(self):
-        return 0.5*( self.t - self.y )**2
-
-    cdef double dEdzFromTarget(self):
-        self.dEdz = self.y - self.t
-
-    cdef clear(self):
-        self.is_active_sum = self.is_error_derivative_active = self.is_active_state = self.is_local_gradient_active = False
-        self.y = self.z = self.dEdy = self.dEdz = 0.0
-
-    cdef list getConnections(self):
-        return self.forward_connections
-
-    def __repr__(self):
-        return str(self.y)
-
-cdef class LogisticNeuron(Neuron):
-
-    def __init__(self):
-        Neuron.__init__(self)
-
-    cpdef activationFunction(self):
-        self.y = 1.0 / ( 1.0 + math.exp(-self.z ) )
-
-    cpdef double dydz(self):
-        return self.y - self.y**2
-
-    cpdef double E(self):
-        return -math.log(self.y) if self.t == 1 else -math.log( 1.0 - self.y )
-
-
-cdef class TanhNeuron(Neuron):
-
-    def __init__(self):
-        Neuron.__init__(self)
-
-    cpdef activationFunction(self):
-        self.y = 2.0 / ( 1.0 + math.exp( -2.0*self.z ) ) - 1.0
-
-    cpdef double dydz(self):
-        return 1.0 - self.y**2
-
-    cpdef double E(self):
-        return -math.log( (self.y + 1.0) / 2.0 ) if self.t == 1 else -math.log( 1.0 - (self.y + 1.0) / 2.0 )
-
-cdef class BiasUnit(Neuron):
-
-    def __init__(self):
-        Neuron.__init__(self)
-        self.x = 1.0
-        self.y = 1.0
-        self.is_active_sum = True
-
-    cdef activationFunction(self):
-        self.y = 1.0
-
-cdef class LayerActivatedNeuron(Neuron):
-
-    def __init__(self, str name = ''):
-        Neuron.__init__(self, name)
-
-    cdef activateLayer(self):
+    cdef vector[double*] get_weight_pointers (self):
         cdef:
-            Neuron neuron
+            vector[double*] total, partial
+            Connection connection
 
-        if not self.layer.is_active:
-            self.layer.is_active = True
-            for neuron in self.layer.neurons:
-                neuron.calculateZ()
+        for connection in self.connections:
+            partial = connection.get_weight_pointers()
+            total.insert(total.end(), partial.begin(), partial.end())
 
-            self.layerCalculations()
+        return total
 
-    cdef errorActivateLayer(self):
-        cdef:
-            Neuron neuron
-
-        if not self.layer.is_error_active:
-            self.layer.is_error_active = True
-            for neuron in self.layer.neurons:
-                neuron.calculated_dEdy()
-
-            self.errorLayerCalculations()
-
-
-
-cdef class SoftMaxNeuron(LayerActivatedNeuron):
-
-    def __init__(self, str name = ''):
-        Neuron.__init__(self, name)
-
-
-    cdef layerCalculations(self):
-        cdef:
-            SoftMaxNeuron neuron
-
-        self.layer.max = max( [ neuron.z for neuron in self.layer.neurons] )
-        self.layer.sum = sum( [ math.exp( neuron.z - self.layer.max ) for neuron in self.layer.neurons] )
-
-
-    cdef activationFunction(self):
-        self.y = math.exp( self.z - self.layer.max ) / self.layer.sum
-        
-    cdef dEdzFromNeurons(self):
-        cdef:
-            SoftMaxNeuron neuron
-            float dydz
-
-        self.dEdz = 0.0
-        for neuron in self.layer.neurons:
-            dydz = self.y*(1.0 -self.y) if neuron is self else -self.y * neuron.y
-            self.dEdz += neuron.dEdy * dydz
-
-
-
-cdef class Connection(object):
-    """
-    Connection base class
-    """
-    cdef:
-        public str name
-        public Neuron source
-        public Neuron destination
-        double * _weight
-        double * _weight_diff
-
-
-    def __init__(self, Neuron source, Neuron destination, double weight = 0.0):
-
-        self.name = source.name + "_" + destination.name
-
-        self._weight = <double *> malloc( sizeof(double *) )
-        self._weight_diff = <double *> malloc( sizeof(double *) )
-
-        self.source = source
-        source.addForwardConnection( self )
-
-        self.destination = destination
-        destination.addBackwardConnection( self )
-
-        self._weight[0] = weight if weight != 0 else rn.uniform(-1,1)
-        self._weight_diff[0] = 0.0
-
-    property weight:
-        def __get__(self):
-            return self._weight[0]
-
-        def __set__(self, value):
-            self._weight[0] = value
-
-    property weight_diff:
-        def __get__(self):
-            return self._weight_diff[0]
-
-        def __set__(self, double value):
-            self._weight_diff[0] = value
-
-    cdef double activate(self):
-        cdef:
-            double signal = self.source.activate()
-            double product = signal * self.weight
-
-        #print "    Connection {}, Weight {}, Signal {}, Product {}".format( self.name, self.weight, signal, product )
-        return product
-
-    cdef double errorActivate(self):
-        cdef:
-            double signal = self.destination.errorActivate()
-            double product = signal * self.weight
-
-        self.weight_diff = signal * self.source.y
-
-        #print "    Connection {}, Product {}, Weight {}, Signal {}, Source State = {}, Weight Diff = {}".format( self.name, product, self.weight, signal, self.source.y, self.weight_diff )
-        return signal * self.weight
-
-    def __repr__(self):
-        return str(self.weight)
-
-cdef class Layer(object):
-    cdef:
-        public list neurons
-
-    def __init__(self, *args, neuron_type = Neuron, list names = [] ):
-        cdef:
-            list type_list
-            int i
-            Neuron neuron
-        self.neurons = list()
-        if len(args) == 2:
-            type_list = args[0]*[ args[1] ]
-        elif type(args[0]) is int:
-            type_list = args[0] * [neuron_type]
-        else:
-            type_list = args[0]
-        for neuron_type in type_list:
-            neuron = neuron_type()
-            neuron.layer = self
-            self.neurons.append( neuron )
-
-        if names:
-            for i in range(len(names)):
-                self.neurons[i].name = names[i]
-
-    def addNeuron(self, Neuron neuron ):
-        self.neurons.append( neuron )
-        neuron.setLayer(self)
-
-    cpdef removeNeuron(self, Neuron neuron):
-        self.neurons.remove(neuron)
-        neuron.setLayer( None )
-
-    cpdef list getConnections(self):
-        cdef:
-            list connections = list()
-            Neuron neuron
-        for neuron in self.neurons:
-            connections += neuron.getConnections()
-        return connections
-
-    cpdef clear(self):
-        cdef:
-            Neuron neuron
-        for neuron in self.neurons:
-            neuron.clear()
-
-    cdef double error(self):
-        cdef:
-            double error = 0.0
-            Neuron neuron
-        for neuron in self.neurons:
-            error += neuron.E()
-
-        return error
-
-    #TODO: activate, errorActivate
-
-    cpdef activate(self):
-        cdef:
-            Neuron neuron
-        for neuron in self.neurons:
-            neuron.activate()
-
-    cpdef errorActivate(self):
-        cdef:
-            Neuron neuron
-        for neuron in self.neurons:
-            neuron.errorActivate()
-
-    cpdef setData(self, double[:] data ):
-        cdef:
-            Neuron neuron
-            int i = 0
-        if len(self.neurons) != len(data):
-            raise IndexError("data and layer dimensions are not equal")
-        for neuron in self.neurons:
-            neuron.setData( data[i] )
-            i += 1
-
-    cpdef setTarget(self, double[:] target ):
-        cdef:
-            Neuron neuron
-            int i = 0
-
-        if len(self.neurons) != len(target):
-            raise IndexError("target and layer dimensions are not equal")
-        for neuron in self.neurons:
-            neuron.setTarget( target[i] )
-            i += 1
-
-    cpdef list connectTo( self, Layer b, connection = Connection ):
-
-        cdef:
-            list connection_list = list()
-            list neuron_connexions
-            Neuron na, nb
-
-        for na in self.neurons:
-            neuron_connexions = list()
-            for nb in b.neurons:
-                neuron_connexions.append( connection(na,nb) )
-
-            connection_list.append(neuron_connexions)
-
-        return connection_list
-
-    def __repr__(self):
-        return str([ n.__repr__() for n in self.neurons ])
-
-    def __getitem__(self, item):
-        return self.neurons[item]
-
-cdef class NeuronActivatedLayer(Layer):
-    cdef:
-        public bint is_active
-        public bint is_error_active
-
-    def __init__(self, *args, neuron_type = Neuron, list names = [] ):
-        Layer.__init__(self,*args, neuron_type = neuron_type, names = names )
-        self.is_active = self.is_error_active = False
-
-    cpdef clear(self):
-        Layer.clear(self)
-        self.is_active = self.is_error_active = False
-
-
-cdef class SoftMaxLayer(NeuronActivatedLayer):
-    cdef:
-        public float max
-        public float sum
-
-    def __init__(self, *args, neuron_type = SoftMaxNeuron, list names = [] ):
-        NeuronActivatedLayer.__init__(self,*args, neuron_type = SoftMaxNeuron, names = names )
-        self.max = -1000000000000.0
-        self.sum = 0.0
-
-    cpdef clear(self):
-        NeuronActivatedLayer.clear(self)
-        self.max = -1000000000000.0
-        self.sum = 0.0
-
-
-cdef class Network(object):
-
-    cdef:
-        public list input_layers
-        public list output_layers
-        public list auto_inputs
-        public list fake_outputs
-        public list layers
-
-    def __init__(self):
-        self.input_layers = list()
-        self.output_layers = list()
-        self.auto_inputs = list()
-        self.fake_outputs = list()
-        self.layers = list()
-
-    cpdef addLayer(self, Layer layer):
-        self.layers.append(layer)
-
-    cpdef addInputLayer(self, Layer layer):
-        self.input_layers.append(layer)
-
-    cpdef addOutputLayer(self, Layer layer):
-        self.output_layers.append(layer)
-
-    cpdef addAutoInputLayer(self, Layer layer):
-        self.auto_inputs.append(layer)
-
-    cpdef addFakeOutputLayer(self, Layer layer):
-        self.fake_outputs.append(layer)
-
-    cpdef list getConnections(self):
-        cdef:
-            Layer layer
-            list connections = list()
-        for layer in self.input_layers + self.layers + self.auto_inputs:
-            connections += layer.getConnections()
-        return connections
-
-    cpdef activateWith(self, double[:] input_data, bint return_value = False ):
-        cdef:
-            Layer layer
-            Neuron neuron
-            int neuron_count = 0
-            int layer_length, i
-            list values
-            float[:] output
-
-        self.clearLayers()
-        for layer in self.input_layers:
-            layer_length = len(layer.neurons)
-            layer.setData(input_data[neuron_count:neuron_count+layer_length])
-            neuron_count += layer_length
-
-        if len(input_data) != neuron_count:
-            raise IndexError("Input dimension dont match the number of input neurons")
-
-        for layer in self.output_layers + self.fake_outputs:
-            layer.activate()
-
-        if return_value:
-            return self.output_layers
-
-    cpdef backpropagateWith(self, double[:] target_data ):
-        cdef:
-            Layer layer
-            int neuron_count = 0
-            int layer_length
-
-        for layer in self.output_layers:
-            layer_length = len(layer.neurons)
-            layer.setTarget( target_data[neuron_count:neuron_count+layer_length] )
-            neuron_count += layer_length
-
-        if len(target_data) != neuron_count:
-            raise IndexError("Target dimension dont match the number of output neurons")
-
-        for layer in self.input_layers + self.auto_inputs:
-            layer.errorActivate()
-
-    cpdef clearLayers(self):
+    cpdef restartNetwork (self):
         cdef Layer layer
-        for layer in self.output_layers + self.input_layers + self.layers + self.auto_inputs + self.fake_outputs:
-            layer.clear()
 
-    cdef double error(self, double[:] input_data, double[:] target_data ):
+        for layer in self.layers:
+            layer.active = False
+            layer.back_active = False
+
+    cpdef setData (self, double[:,:] X):
         cdef:
-            double error = 0.0
-            Neuron neuron
+            int start = 0, end
+            LinearLayer layer
+
+        neuron_count = sum([layer.neuronCount() for layer in self.inputLayers])
+        if  neuron_count != X.shape[1]:
+            raise Exception("The input data has {0} entries but there are {1} neurons.".format(X.shape[1], neuron_count))
+
+        for layer in self.inputLayers:
+            end = start + layer.neuronCount()
+            layer.setData(X [0:1, start : end])
+            start = end
+
+
+
+    cpdef activate_layers(self, double[:,:] X):
+        cdef:
             Layer layer
 
-        self.clearLayers()
-        self.activateWith(input_data)
-        self.backpropagateWith(target_data)
-        for layer in self.output_layers + self.fake_outputs:
-            error += layer.error()
 
-        return error
+        self.setData(X)
+
+        for layer in self.all_output_layers:
+            layer.Y()
 
 
-    cpdef double[:] getGradient(self, double[:] input_data, double[:] target_data ):
+    cpdef double[:,:] activate(self, double[:,:] X):
         cdef:
-            list connections = self.getConnections()
-            Connection connection
-            double[:] gradient
-            int i
+            Layer layer
+            double[:,:] result = None
 
-        gradient = array(shape=(len(connections),), itemsize=sizeof(double), format="d")
-        self.clearLayers()
-        self.activateWith(input_data)
-        self.backpropagateWith(target_data)
+        self.restartNetwork()
+        self.activate_layers(X)
 
-        for i in range(len(connections)):
-            gradient[i] = connections[i].dw
+        for layer in self.all_output_layers:
+            if result is None:
+                result = np.asarray(layer.Y())
+            else:
+                result = np.concatenate((result, layer.Y()), axis=1)
 
-        return gradient
+        return result
 
+    ## Backactivation
 
-    cpdef double[:] numGradient(self, double[:] input_data, double[:] target_data, double delta = 0.01 ):
+    cpdef setTarget (self, double[:,:] T):
         cdef:
-            list connections = self.getConnections()
-            list gradient
-            Connection connection
-            double[:] num_gradient
-            double e1, e2
-            int i
+            int start = 0, end
+            LinearLayer layer
 
-        gradient = self.getConnections()
-        num_gradient = array(shape=(len(gradient),), itemsize=sizeof(double), format="d")
+        neuron_count = sum([layer.neuronCount() for layer in self.outputLayers])
+        if  neuron_count != T.shape[1]:
+            raise Exception("The input data has {0} entries but there are {1} neurons.".format(T.shape[1], neuron_count))
 
-        for i in range(len(gradient)):
-            connections[i].w += delta
-            e2 = self.error(input_data,target_data)
-
-            connections[i].w -= 2.0*delta
-            e1 = self.error(input_data,target_data)
-
-            num_gradient[i] = ( e2 - e1 ) / ( 2.0*delta )
-
-        return num_gradient
+        for layer in self.outputLayers:
+            end = start + layer.neuronCount()
+            layer.setTarget(T [0:1, start : end])
+            start = end
 
 
 
-cdef class Trainer(object):
+    cpdef back_activate_layers(self, double[:,:] T):
+        cdef:
+            Layer layer
+
+
+        self.setTarget(T)
+
+        for layer in self.all_input_layers:
+            layer.dEdZ()
+
+
+    cpdef double[:,:] back_activate(self, double[:,:] X):
+        cdef:
+            Layer layer
+            double[:,:] result = None
+
+        self.restartNetwork()
+        self.back_activate_layers(X)
+
+        for layer in self.all_input_layers:
+            if result is None:
+                result = np.asarray(layer.dEdZ())
+            else:
+                result = np.concatenate((result, layer.dEdZ()), axis=1)
+
+        return result
+
+
+####################
+## TRAINERS
+####################
+cdef class FullBatchTrainer(object):
 
     cdef:
         vector[double*] _weights
@@ -834,53 +481,39 @@ cdef class Trainer(object):
         public int len_data
 
     def __init__(self, Network net, double[:,:] input_data, double[:,:] output_data, double learning_rate):
-        cdef:
-            Connection connection
-            list connections
-            int i = 0
-            double *p;
         self.net = net
         self.input_data = input_data
         self.output_data = output_data
         self.learning_rate = learning_rate
-        connections = net.getConnections()
-        self.len_gradient = len(connections)
+        self._weights = net.get_weight_pointers()
+        self._gradient = net.get_gradient_pointers()
+        self.len_gradient = self._gradient.size()
         self.len_data = len(input_data)
+        self.len_data = len(input_data)
+        self.total_gradient = cvarray ((self.len_gradient,), sizeof(double), 'd')
 
-        self.total_gradient = array(shape=(self.len_gradient,), itemsize=sizeof(double), format="d")
-        for connection in connections:
-            self._weights.push_back(connection._weight)
-            self._gradient.push_back(connection._weight_diff)
+    cdef restart_gradient(self):
+        self.total_gradient[...] = 0.0
 
-    cdef restartGradient(self):
+    cdef print_gradient(self):
         cdef:
             int i
         for i in range(self.len_gradient):
-            self.total_gradient[i] = 0.0
+            print(self.total_gradient[i])
 
-    cdef printGradient(self):
+    cdef print_actual_gradient(self):
         cdef:
             int i
         for i in range(self.len_gradient):
-            #print(self.total_gradient[i],)
-            pass
+            print(self._gradient[i][0],)
 
-    cdef printActualGradient(self):
+    cdef print_weights(self):
         cdef:
             int i
         for i in range(self.len_gradient):
-            #print(self._gradient[i][0],)
-            pass
+            print (self._weights[i][0],)
 
-    cdef printWeights(self):
-        cdef:
-            int i
-        for i in range(self.len_gradient):
-            #print self._weights[i][0],
-            pass
-        ##print
-
-    cdef addToGradient( self ):
+    cdef add_to_total_gradient(self):
         cdef:
             int i
         for i in range(self.len_gradient):
@@ -890,18 +523,139 @@ cdef class Trainer(object):
         cdef:
             int i
         for i in range(epochs):
-            self.fullBatch()
+            self.train()
 
-    cdef fullBatch(self):
+    cdef train(self):
         cdef:
             int i
-        self.restartGradient()
+        self.restart_gradient()
         for i in range(self.len_data):
-            self.net.activateWith(self.input_data[i] )
-            self.net.backpropagateWith( self.output_data[i] )
-            self.addToGradient()
+            self.net.restartNetwork()
+            self.net.activate_layers(self.input_data[i:i+1,:])
+            self.net.back_activate_layers(self.output_data[i:i+1,:])
+            self.add_to_total_gradient()
 
         for i in range(self.len_gradient):
             self._weights[i][0] -= self.learning_rate * self.total_gradient[i]
+
+
+####################
+##HELPER FUNCTIONS
+####################
+cdef double logistic_dEdY (double t, double y):
+    return (t - y) / ((-1.0 + y) * y)
+
+cdef double logistic_dYdZ (double y):
+    return y * (1.0 - y)
+
+cdef double quadraticDistance (double a, double b):
+    return 0.5 * (a - b)**2
+
+cdef double logisticFunction (double z):
+    return 1. / (1. + cmath.exp (-z))
+
+cdef double [:,:] dotMultiply (double [:,:] A, double[:,:] B):
+    cdef:
+        int i, j, k, m = A.shape[0], n = B.shape[1], o = A.shape[1]
+        double acc
+        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
+
+
+    for i in range(m):
+        for j in range(n):
+            acc = 0.0
+            for k in range(o):
+                acc += A[i,k] * B[k,j]
+
+            result[i,j] = acc
+
+    return result
+
+cdef double [:,:] elementMultiply (double [:,:] A, double[:,:] B):
+    cdef:
+        int i, j, k, m = A.shape[0], n = A.shape[1]
+        double acc
+        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
+
+    for i in range(m):
+        for j in range(n):
+            result[i,j] = A[i,j] * B[i,j]
+
+    return result
+
+cdef double [:,:] elementAdd (double [:,:] A, double[:,:] B):
+    cdef:
+        int i, j, k, m = A.shape[0], n = A.shape[1]
+        double acc
+        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
+
+    if A.shape[0] != B.shape[0] or A.shape[1] != B.shape[1]:
+        raise Exception ("Dimension Error")
+
+    for i in range(m):
+        for j in range(n):
+            result[i,j] = A[i,j] + B[i,j]
+
+    return result
+
+cdef double [:,:] elementSubtract (double [:,:] A, double[:,:] B):
+    cdef:
+        int i, j, k, m = A.shape[0], n = A.shape[1]
+        double acc
+        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
+
+    for i in range(m):
+        for j in range(n):
+            result[i,j] = A[i,j] - B[i,j]
+
+    return result
+
+cdef double[:,:] elementBinaryOperation (double [:,:] A, double [:,:] B, BinaryDoubleFun f):
+    cdef:
+        int i, j, k, m = A.shape[0], n = A.shape[1]
+        double acc
+        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
+
+    for i in range(m):
+        for j in range(n):
+            result[i,j] = f (A[i,j], B[i,j])
+
+    return result
+
+
+cdef double[:,:] elementUnaryOperation (double [:,:] A, UnaryDoubleFun f):
+    cdef:
+        int i, j, k, m = A.shape[0], n = A.shape[1]
+        double acc
+        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
+
+
+    for i in range(m):
+        for j in range(n):
+            result[i,j] = f (A[i,j])
+
+    return result
+
+cdef void copy_matrix (double [:,:] target, double [:,:] source):
+    cdef:
+        int i, j, k, m = target.shape[0], n = target.shape[1]
+
+    if target.shape[0] != source.shape[0] or target.shape[1] != source.shape[1]:
+        raise Exception("Copy error: matrices need to have the same shape")
+
+    for i in range(m):
+        for j in range(n):
+            target[i,j] = source[i,j]
+
+cdef vector[double*] get_pointers (double [:,:] A):
+    cdef:
+        vector[double*] result
+        int i, j, m = A.shape[0], n = A.shape[1]
+
+    for i in range(m):
+        for j in range(n):
+            result.push_back(&(A[i][j]))
+
+    return result
 
 
