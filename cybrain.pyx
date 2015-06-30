@@ -283,6 +283,32 @@ cdef class LogisticLayer (LinearLayer):
     cdef double[:,:] dYdZ (self):
         return elementUnaryOperation(self.Y(), logistic_dYdZ)
 
+
+cdef class SoftmaxLayer (LinearLayer):
+
+    cdef double[:,:] H (self, double[:,:] Z):
+        cdef:
+            double total, maximum = reduce(Z[0], max)
+            double[:,:] result = cvarray ((Z.shape[0], Z.shape[1]), sizeof(double), 'd')
+
+        for i in range(Z.shape[1]):
+            result[0,i] = Z[0,i] - maximum
+
+        elementUnaryOperationT(result, result, cmath.exp)
+        total = reduce(result[0], add)
+
+        for i in range(Z.shape[1]):
+            result[0,i] /= total
+
+        return result
+
+
+    cdef double[:,:] dEdY (self, double[:,:] T):
+        return elementBinaryOperation (T, self.Y(), logistic_dEdY)
+
+    cdef double[:,:] dYdZ (self):
+        return elementUnaryOperation(self.Y(), logistic_dYdZ)
+
 cdef class BiasUnit (LinearLayer):
 
     def __init__(self):
@@ -542,6 +568,24 @@ cdef class FullBatchTrainer(object):
 ####################
 ##HELPER FUNCTIONS
 ####################
+cdef double max (double a, double b):
+    return a if a > b else b
+
+cdef double min (double a, double b):
+    return a if a < b else b
+
+cdef double add (double a, double b):
+    return a + b
+
+cdef double subtract (double a, double b):
+    return a - b
+
+cdef double multiply (double a, double b):
+    return a * b
+
+cdef double power (double a, double b):
+    return cmath.pow (a, b)
+
 cdef double logistic_dEdY (double t, double y):
     return (t - y) / ((-1.0 + y) * y)
 
@@ -572,43 +616,22 @@ cdef double [:,:] dotMultiply (double [:,:] A, double[:,:] B):
     return result
 
 cdef double [:,:] elementMultiply (double [:,:] A, double[:,:] B):
-    cdef:
-        int i, j, k, m = A.shape[0], n = A.shape[1]
-        double acc
-        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
+    return elementBinaryOperation(A, B, multiply)
 
-    for i in range(m):
-        for j in range(n):
-            result[i,j] = A[i,j] * B[i,j]
-
-    return result
+cdef void elementMultiplyT (double[:,:] result, double [:,:] A, double[:,:] B):
+    elementBinaryOperationT(result, A, B, multiply)
 
 cdef double [:,:] elementAdd (double [:,:] A, double[:,:] B):
-    cdef:
-        int i, j, k, m = A.shape[0], n = A.shape[1]
-        double acc
-        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
+    return elementBinaryOperation(A, B, add)
 
-    if A.shape[0] != B.shape[0] or A.shape[1] != B.shape[1]:
-        raise Exception ("Dimension Error")
-
-    for i in range(m):
-        for j in range(n):
-            result[i,j] = A[i,j] + B[i,j]
-
-    return result
+cdef void elementAddT (double[:,:] result, double [:,:] A, double[:,:] B):
+    elementBinaryOperationT(result, A, B, add)
 
 cdef double [:,:] elementSubtract (double [:,:] A, double[:,:] B):
-    cdef:
-        int i, j, k, m = A.shape[0], n = A.shape[1]
-        double acc
-        double [:,:] result = cvarray ((m, n), sizeof(double), 'd')
+    return elementBinaryOperation(A, B, subtract)
 
-    for i in range(m):
-        for j in range(n):
-            result[i,j] = A[i,j] - B[i,j]
-
-    return result
+cdef void elementSubtractT (double[:,:] result, double [:,:] A, double[:,:] B):
+    elementBinaryOperationT(result, A, B, subtract)
 
 cdef double[:,:] elementBinaryOperation (double [:,:] A, double [:,:] B, BinaryDoubleFun f):
     cdef:
@@ -621,6 +644,16 @@ cdef double[:,:] elementBinaryOperation (double [:,:] A, double [:,:] B, BinaryD
             result[i,j] = f (A[i,j], B[i,j])
 
     return result
+
+cdef void elementBinaryOperationT (double [:,:] result, double [:,:] A, double [:,:] B, BinaryDoubleFun f):
+    cdef:
+        int i, j, k, m = A.shape[0], n = A.shape[1]
+        double acc
+
+    for i in range(m):
+        for j in range(n):
+            result[i,j] = f (A[i,j], B[i,j])
+
 
 
 cdef double[:,:] elementUnaryOperation (double [:,:] A, UnaryDoubleFun f):
@@ -635,6 +668,17 @@ cdef double[:,:] elementUnaryOperation (double [:,:] A, UnaryDoubleFun f):
             result[i,j] = f (A[i,j])
 
     return result
+
+cdef void elementUnaryOperationT (double [:,:] result, double [:,:] A, UnaryDoubleFun f):
+    cdef:
+        int i, j, k, m = A.shape[0], n = A.shape[1]
+        double acc
+
+
+    for i in range(m):
+        for j in range(n):
+            result[i,j] = f (A[i,j])
+
 
 cdef void copy_matrix (double [:,:] target, double [:,:] source):
     cdef:
@@ -657,5 +701,20 @@ cdef vector[double*] get_pointers (double [:,:] A):
             result.push_back(&(A[i][j]))
 
     return result
+
+cdef double pow (double a, double b):
+    return cmath.pow(a, b)
+
+cdef double reduce (double [:] l, BinaryDoubleFun f):
+    cdef:
+        int i
+        double elem = l[0]
+
+    for i in range (1, l.shape[0]):
+        elem = f (elem, l[i])
+
+    return elem
+
+
 
 
