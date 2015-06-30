@@ -307,7 +307,23 @@ cdef class SoftmaxLayer (LinearLayer):
         return elementBinaryOperation (T, self.Y(), logistic_dEdY)
 
     cdef double[:,:] dYdZ (self):
-        return elementUnaryOperation(self.Y(), logistic_dYdZ)
+        cdef:
+            int i, j, n = self.Y().shape[1]
+            double[:,:] result = cvarray ((1,n), sizeof(double), 'd')
+            double acum
+
+        for i in range(n):
+            acum = 0.
+            for j in range(n):
+                if i != j:
+                    acum += -self.Y()[0,i] * self.Y()[0,j]
+                else:
+                    acum += self.Y()[0,i] * (1. - self.Y()[0,j])
+
+            result[0,i] = acum
+
+        return result
+
 
 cdef class BiasUnit (LinearLayer):
 
