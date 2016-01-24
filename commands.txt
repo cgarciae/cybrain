@@ -3,3 +3,8 @@ python setup.py build_ext --inplace
 
 ## C code in HTML
 cython -a cybrain.pyx
+
+git checkout arrayBased
+git merge --strategy=ours master    # keep the content of this branch, but record a merge
+git checkout master
+git merge arrayBased             # fast-forward master up to the merge
