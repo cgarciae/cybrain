@@ -93,11 +93,11 @@ cdef class FullConnection (Connection):
         copy_matrix(self.dW, value)
 
     cdef void compute_dEdW (self):
-        copy_matrix(self.dW, dotMultiply (self.source.Y().T, self.receiver.dEdZ()))
+        copy_matrix(self.dW, dotMultiply (self.source.Y().T, self.receiver.compute_dEdZ()))
 
     cdef double[:,:] dEdY (self):
         self.compute_dEdW()
-        return dotMultiply (self.receiver.dEdZ(), self.W.T)
+        return dotMultiply (self.receiver.compute_dEdZ(), self.W.T)
 
     cdef vector[double*] get_gradient_pointers (self):
         return get_pointers(self.dW)
@@ -129,11 +129,11 @@ cdef class LinearConnection (FullConnection):
         return elementMultiply (self.source.Y(), self.W)
 
     cdef void compute_dEdW (self):
-        copy_matrix(self.dW, elementMultiply (self.source.Y(), self.receiver.dEdZ()))
+        copy_matrix(self.dW, elementMultiply (self.source.Y(), self.receiver.compute_dEdZ()))
 
     cdef double[:,:] dEdY (self):
         self.compute_dEdW()
-        return elementMultiply (self.receiver.dEdZ(), self.W)
+        return elementMultiply (self.receiver.compute_dEdZ(), self.W)
 
 ####################
 ##LAYERS
@@ -159,13 +159,13 @@ cdef class Layer (object):
     cdef double[:,:] Y (self):
         pass
 
-    cdef double[:,:] dEdY (self, double[:,:] T):
+    cdef double[:,:] dEdZ (self, double[:,:] T):
         pass
 
     cdef double[:,:] dYdZ (self):
         pass
 
-    cdef double[:,:] dEdZ (self):
+    cdef double[:,:] compute_dEdZ (self):
         pass
 
     cdef int neuronCount (self):
@@ -214,7 +214,7 @@ cdef class LinearLayer (Layer):
 
         return self._Y
 
-    cdef double[:,:] dEdZ (self):
+    cdef double[:,:] compute_dEdZ (self):
         cdef:
             Connection connection
             int i
@@ -231,7 +231,7 @@ cdef class LinearLayer (Layer):
         return self._dEdZ
 
     cpdef np.ndarray get_dEdZ (self):
-        return np.asarray (self.dEdZ())
+        return np.asarray (self.compute_dEdZ())
 
 
     cpdef np.ndarray getY (self):
@@ -251,11 +251,10 @@ cdef class LinearLayer (Layer):
         if T.shape[1] != self.neuronCount():
             raise Exception ("setTarget Error: Data shape error. Received {0}, expected {1}".format(T.shape[1], self.neuronCount()))
 
-        dEdY = self.dEdY (T)
-        self._dEdZ = elementMultiply (self.dYdZ(), dEdY)
+        self._dEdZ = self.dEdZ(T)
         self.back_active = True
 
-    cdef double[:,:] dEdY (self, double[:,:] T):
+    cdef double[:,:] dEdZ (self, double[:,:] T):
         return elementSubtract (self.Y(), T)
 
     cdef double[:,:] dYdZ (self):
@@ -277,9 +276,6 @@ cdef class LogisticLayer (LinearLayer):
     cdef double[:,:] H (self, double[:,:] Z):
         return elementUnaryOperation (Z, logisticFunction)
 
-    cdef double[:,:] dEdY (self, double[:,:] T):
-        return elementBinaryOperation (T, self.Y(), logistic_dEdY)
-
     cdef double[:,:] dYdZ (self):
         return elementUnaryOperation(self.Y(), logistic_dYdZ)
 
@@ -289,20 +285,16 @@ cdef class TanhLayer (LinearLayer):
     cdef double[:,:] H (self, double[:,:] Z):
         return elementUnaryOperation (Z, tanh_function)
 
-    cdef double[:,:] dEdY (self, double[:,:] T):
-        return elementBinaryOperation (T, self.Y(), )
-
     cdef double[:,:] dYdZ (self):
         return elementUnaryOperation(self.Y(), tanh_dYdZ)
 
     ##FUNCIONES VIEJAS
 
+    #cpdef double dydz(self):
+    #    return 1.0 - self.y**2
 
-    cpdef double dydz(self):
-        return 1.0 - self.y**2
-
-    cpdef double E(self):
-        return -math.log( (self.y + 1.0) / 2.0 ) if self.t == 1 else -math.log( 1.0 - (self.y + 1.0) / 2.0 )
+    #cpdef double E(self):
+    #    return -math.log( (self.y + 1.0) / 2.0 ) if self.t == 1 else -math.log( 1.0 - (self.y + 1.0) / 2.0 )
 
 
 cdef class SoftmaxLayer (LinearLayer):
@@ -322,10 +314,6 @@ cdef class SoftmaxLayer (LinearLayer):
             result[0,i] /= total
 
         return result
-
-
-    cdef double[:,:] dEdY (self, double[:,:] T):
-        return elementBinaryOperation (T, self.Y(), logistic_dEdY)
 
     cdef double[:,:] dYdZ (self):
         cdef:
@@ -506,7 +494,7 @@ cdef class Network (object):
         self.setTarget(T)
 
         for layer in self.all_input_layers:
-            layer.dEdZ()
+            layer.compute_dEdZ()
 
 
     cpdef double[:,:] back_activate(self, double[:,:] X):
@@ -519,9 +507,9 @@ cdef class Network (object):
 
         for layer in self.all_input_layers:
             if result is None:
-                result = np.asarray(layer.dEdZ())
+                result = np.asarray(layer.compute_dEdZ())
             else:
-                result = np.concatenate((result, layer.dEdZ()), axis=1)
+                result = np.concatenate((result, layer.compute_dEdZ()), axis=1)
 
         return result
 
@@ -623,23 +611,28 @@ cdef double multiply (double a, double b):
 cdef double power (double a, double b):
     return cmath.pow (a, b)
 
-cdef double logistic_dEdY (double t, double y):
-    return (t - y) / ((-1.0 + y) * y)
+cdef double general_dEdZ (double t, double y):
+    return (t - y)
+
+cdef double tanh_function(double z):
+    return math.tanh(z)
+
+cdef double tanh_dEdY (double t, double y):
+    return (t - y) / (1.0 - (y * y))
+
+cdef double tanh_dYdZ (double y):
+    return 1.0 - (y * y)
 
 cdef double logistic_dYdZ (double y):
     return y * (1.0 - y)
 
-cdef double tanh_dYdZ (double y):
-    return 1.0 - y ** 2
+
 
 cdef double quadraticDistance (double a, double b):
     return 0.5 * (a - b)**2
 
 cdef double logisticFunction (double z):
     return 1. / (1. + cmath.exp (-z))
-
-cdef double tanh_function(double z):
-    return 2.0 / ( 1.0 + math.exp( -2.0 * z ) ) - 1.0
 
 cdef double [:,:] dotMultiply (double [:,:] A, double[:,:] B):
     cdef:

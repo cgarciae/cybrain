@@ -19,8 +19,8 @@ nnet = cb.Network()
 
 #CREATE LAYERS
 Lin = cb.LinearLayer(2)
-Lhidden = cb.LogisticLayer(2)
-Lout = cb.LogisticLayer(1)
+Lhidden = cb.TanhLayer(2)
+Lout = cb.TanhLayer(1)
 bias = cb.BiasUnit()
 
 #ADD LAYERS TO NETWORK
