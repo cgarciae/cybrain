@@ -284,6 +284,18 @@ cdef class LogisticLayer (LinearLayer):
         return elementUnaryOperation(self.Y(), logistic_dYdZ)
 
 
+cdef class TanhLayer (LinearLayer):
+
+    cdef double[:,:] H (self, double[:,:] Z):
+        return elementUnaryOperation (Z, logisticFunction)
+
+    cdef double[:,:] dEdY (self, double[:,:] T):
+        return elementBinaryOperation (T, self.Y(), logistic_dEdY)
+
+    cdef double[:,:] dYdZ (self):
+        return elementUnaryOperation(self.Y(), logistic_dYdZ)
+
+
 cdef class SoftmaxLayer (LinearLayer):
 
     cdef double[:,:] H (self, double[:,:] Z):
