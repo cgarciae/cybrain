@@ -1,12 +1,12 @@
 data:
   image: busybox
   volumes:
-   - /cybrain:/cybrain
+   - /c/Users/Cristian/Documents/GitHub/cybrain:/cybrain
 
 cython:
   image: cgarciae/cython:0.23.4
   volumes_from:
-    - data
+   - data
     
 tensorflow:
   image: b.gcr.io/tensorflow/tensorflow
