@@ -287,13 +287,22 @@ cdef class LogisticLayer (LinearLayer):
 cdef class TanhLayer (LinearLayer):
 
     cdef double[:,:] H (self, double[:,:] Z):
-        return elementUnaryOperation (Z, logisticFunction)
+        return elementUnaryOperation (Z, tanh_function)
 
     cdef double[:,:] dEdY (self, double[:,:] T):
-        return elementBinaryOperation (T, self.Y(), logistic_dEdY)
+        return elementBinaryOperation (T, self.Y(), )
 
     cdef double[:,:] dYdZ (self):
-        return elementUnaryOperation(self.Y(), logistic_dYdZ)
+        return elementUnaryOperation(self.Y(), tanh_dYdZ)
+
+    ##FUNCIONES VIEJAS
+
+
+    cpdef double dydz(self):
+        return 1.0 - self.y**2
+
+    cpdef double E(self):
+        return -math.log( (self.y + 1.0) / 2.0 ) if self.t == 1 else -math.log( 1.0 - (self.y + 1.0) / 2.0 )
 
 
 cdef class SoftmaxLayer (LinearLayer):
@@ -620,11 +629,17 @@ cdef double logistic_dEdY (double t, double y):
 cdef double logistic_dYdZ (double y):
     return y * (1.0 - y)
 
+cdef double tanh_dYdZ (double y):
+    return 1.0 - y ** 2
+
 cdef double quadraticDistance (double a, double b):
     return 0.5 * (a - b)**2
 
 cdef double logisticFunction (double z):
     return 1. / (1. + cmath.exp (-z))
+
+cdef double tanh_function(double z):
+    return 2.0 / ( 1.0 + math.exp( -2.0 * z ) ) - 1.0
 
 cdef double [:,:] dotMultiply (double [:,:] A, double[:,:] B):
     cdef:
